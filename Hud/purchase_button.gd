@@ -162,3 +162,11 @@ func affordable_changed() -> void:
 		connect_calls()
 		set_eta_text()
 		update_progress_bar()
+
+
+func _on_button_button_down():
+	texture_rect.position.y = 1
+
+
+func _on_button_button_up():
+	texture_rect.position.y = 0

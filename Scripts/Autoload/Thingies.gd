@@ -23,14 +23,27 @@ var output := Value.new(1.0)
 var output_increase := Big.new(1.15, true)
 var output_range := FloatPair.new(1.0, 1.0)
 
+var crit_chance := LoudFloat.new(0.0)
+var crit_range := FloatPair.new(1.5, 1.5)
+var crit_crit_chance := LoudFloat.new(0.0)
+
 var duration := LoudFloat.new(5.0)
 var duration_increase := LoudFloat.new(1.1)
 var duration_range := FloatPair.new(1.0, 1.0)
 
 
 func _ready():
-	cost = Cost.new({Currency.Type.GOLD: Value.new(1)})
+	cost = Cost.new({Currency.Type.WILL: Value.new(1)})
 	cost.increase_multiplier = 3.0
+	if true:
+		xp_unlocked.set_to(true)
+		crit_chance.set_to(5)
+		crit_range.total.set_to(2.5)
+		output_range.total.set_to(2)
+		duration_range.current.set_to(0.9)
+		duration_range.total.set_to(1.1)
+	if true:
+		xp.set_to(1)
 
 
 

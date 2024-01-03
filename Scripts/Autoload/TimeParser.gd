@@ -72,20 +72,44 @@ func quick_parse(duration, brief: bool) -> String:
 		if duration < 1:
 			return str(duration).pad_decimals(2) + ("s" if brief else " seconds")
 		if duration < 10:
-			return str(duration).pad_decimals(1) + ("s" if brief else " seconds")
+			return str(duration).pad_decimals(1) + (
+				"s" if brief else (
+					" second" if is_equal_approx(1.0, duration) else " seconds"
+				)
+			)
 	if duration < 60:
-		return str(roundi(duration)) + ("s" if brief else " seconds")
+		return str(roundi(duration)) + (
+			"s" if brief else (
+				" second" if is_equal_approx(1.0, duration) else " seconds"
+			)
+		)
 	duration /= 60
 	if duration < 60:
-		return str(roundi(duration)) + ("m" if brief else " minutes")
+		return str(roundi(duration)) + (
+			"m" if brief else (
+				" minute" if is_equal_approx(1.0, duration) else " minutes"
+			)
+		)
 	duration /= 60
 	if duration < 24:
-		return str(roundi(duration)) + ("h" if brief else " hours")
+		return str(roundi(duration)) + (
+			"h" if brief else (
+				" hour" if is_equal_approx(1.0, duration) else " hours"
+			)
+		)
 	duration /= 24
 	if duration < 365:
-		return str(roundi(duration)) + ("d" if brief else " days")
+		return str(roundi(duration)) + (
+			"d" if brief else (
+				" day" if is_equal_approx(1.0, duration) else " days"
+			)
+		)
 	duration /= 365
-	return str(roundi(duration)) + ("y" if brief else " years")
+	return str(roundi(duration)) + (
+			"y" if brief else (
+				" year" if is_equal_approx(1.0, duration) else " years"
+			)
+		)
 
 
 

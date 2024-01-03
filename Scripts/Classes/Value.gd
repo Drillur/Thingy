@@ -75,10 +75,10 @@ func sync() -> void:
 	if requires_sync:
 		requires_sync = false
 		var new_cur = Big.new(current.base)
-		new_cur.a(added)
-		new_cur.s(subtracted)
 		new_cur.m(multiplied)
 		new_cur.d(divided)
+		new_cur.a(added)
+		new_cur.s(subtracted)
 		current.set_to(new_cur)
 
 

@@ -2,14 +2,12 @@ extends CanvasLayer
 
 
 
-@onready var gold_label = %"Gold Label"
-@onready var gold_flair = %"Gold Flair"
-@onready var gold_rate = %"Gold Rate"
 @onready var tab_container = %TabContainer
-@onready var top_panel = %TopPanel
 
 #region Dev
 @onready var fps = %FPS
+func fps_timer_timeout() -> void:
+	fps.text = "FPS: " + str(Engine.get_frames_per_second())
 #endregion
 
 enum Tab {
@@ -28,13 +26,7 @@ func _ready() -> void:
 		fps.queue_free()
 	current_tab.changed.connect(current_tab_changed)
 	setup_sidebar()
-	gold_flair.text = "[i]" + wa.get_details(Currency.Type.GOLD).icon_and_name_text
-	gold_rate.modulate = wa.get_color(Currency.Type.GOLD)
-	wa.get_currency(Currency.Type.GOLD).amount.changed.connect(gold_changed)
-	wa.get_currency(Currency.Type.GOLD).net_rate.changed.connect(gold_rate_changed)
-	gold_changed()
-	gold_rate_changed()
-	top_panel.hide()
+	setup_top_panel()
 	th.thingy_created.connect(thingy_created)
 	
 	th.container = %ThingyContainer
@@ -44,6 +36,32 @@ func _ready() -> void:
 	
 	# when loading game, display top_panel
 
+#region Top Panel
+
+
+@onready var top_panel = %TopPanel
+@onready var gold_label = %"Gold Label"
+@onready var gold_flair = %"Gold Flair"
+@onready var gold_rate = %"Gold Rate"
+@onready var will_label = %"Will Label"
+@onready var will_flair = %"Will Flair"
+@onready var will_rate = %"Will Rate"
+
+
+func setup_top_panel() -> void:
+	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name_text
+	will_rate.modulate = wa.get_color(Currency.Type.WILL)
+	#gold_flair.text = "[i]" + wa.get_details(Currency.Type.GOLD).icon_and_name_text
+	#gold_rate.modulate = wa.get_color(Currency.Type.GOLD)
+	wa.get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
+	wa.get_currency(Currency.Type.WILL).net_rate.changed.connect(will_rate_changed)
+	#wa.get_currency(Currency.Type.GOLD).amount.changed.connect(gold_changed)
+	#wa.get_currency(Currency.Type.GOLD).net_rate.changed.connect(gold_rate_changed)
+	#gold_changed()
+	#gold_rate_changed()
+	will_changed()
+	will_rate_changed()
+	top_panel.hide()
 
 
 func gold_changed() -> void:
@@ -56,8 +74,20 @@ func gold_rate_changed() -> void:
 	gold_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.GOLD).get_text()
 
 
-func fps_timer_timeout() -> void:
-	fps.text = "FPS: " + str(Engine.get_frames_per_second())
+func will_changed() -> void:
+	will_label.text = "[i]" + (
+		wa.get_details(Currency.Type.WILL).color_text % (
+			wa.get_amount_text(Currency.Type.WILL)
+		)
+	)
+
+
+func will_rate_changed() -> void:
+	will_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.WILL).get_text()
+
+
+#endregion
+
 
 
 func thingy_created() -> void:

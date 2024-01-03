@@ -14,6 +14,7 @@ extends MarginContainer
 @onready var selected = %Selected
 @onready var xp_labels = %"XP Labels"
 @onready var border = %Border
+@onready var crit_success = %CritSuccess
 
 var thingy: Thingy
 
@@ -31,8 +32,10 @@ func _ready() -> void:
 	set_process(false)
 	xp_labels.hide()
 	xp_bar.hide()
-	output_label.modulate = wa.get_color(Currency.Type.GOLD)
+	crit_success.hide()
+	output_label.modulate = wa.get_color(Currency.Type.WILL)
 	await th.container_loaded
+	th.thingy_created.connect(thingy_created)
 	th.container.selected_index.changed.connect(selected_index_changed)
 	th.xp_unlocked.changed.connect(xp_unlocked_changed)
 	xp_unlocked_changed()
@@ -61,27 +64,24 @@ func _process(_delta):
 
 func connect_calls() -> void:
 	thingy.level.increased.connect(level_increased)
-	thingy.level.changed.connect(output_changed)
-	th.output.changed.connect(output_changed)
-	th.output_range.changed.connect(output_changed)
-	th.output_increase.changed.connect(output_changed)
-	thingy.timer_started.connect(duration_changed)
-	xp_bar.attach_attribute(thingy.xp)
+	thingy.inhand.changed.connect(output_changed)
+	thingy.timer_started.connect(timer_wait_time_changed)
+	thingy.crit_success.changed.connect(crit_success_changed)
 	thingy.xp.current.changed.connect(xp_current_changed)
 	thingy.xp.total.changed.connect(xp_total_changed)
+	xp_bar.attach_attribute(thingy.xp)
 	output_changed()
-	duration_changed()
+	timer_wait_time_changed()
 	xp_current_changed()
 	xp_total_changed()
+	crit_success_changed()
 
 
 func disconnect_calls() -> void:
 	thingy.level.increased.disconnect(level_increased)
-	thingy.level.changed.disconnect(output_changed)
-	th.output.changed.disconnect(output_changed)
-	th.output_range.changed.disconnect(output_changed)
-	th.output_increase.changed.disconnect(output_changed)
-	thingy.timer_started.disconnect(duration_changed)
+	thingy.inhand.changed.disconnect(output_changed)
+	thingy.timer_started.disconnect(timer_wait_time_changed)
+	thingy.crit_success.changed.disconnect(crit_success_changed)
 	thingy.xp.current.changed.disconnect(xp_current_changed)
 	thingy.xp.total.changed.disconnect(xp_total_changed)
 	xp_bar.remove_value()
@@ -129,18 +129,23 @@ func selected_index_changed() -> void:
 
 
 func output_changed() -> void:
-	var text = "[b][i]+"
-	if th.output_range.is_full():
-		text = text + thingy.get_minimum_output().get_text()
-	else:
-		text = text + "%s-%s" % [
-			thingy.get_minimum_output().get_text(),
-			thingy.get_maximum_output().get_text()
-		]
+	var text = "[b][i]+" + thingy.inhand.get_text()
 	output_label.text = text
 
 
-func duration_changed() -> void:
+func crit_success_changed() -> void:
+	if thingy.crit_success.is_true():
+		crit_success.show()
+		crit_success.text = "[img=<15> color=#%s]%s[/img] [b][i]x%s" % [
+			wa.get_color(thingy.inhand_currency).to_html(),
+			bag.get_resource("Dice").get_path(),
+			thingy.crit_multiplier.get_text()
+		]
+	else:
+		crit_success.hide()
+
+
+func timer_wait_time_changed() -> void:
 	max_progress_label.text = "[i]" + tp.quick_parse(
 		thingy.timer.wait_time,
 		true
@@ -166,6 +171,13 @@ func xp_unlocked_changed() -> void:
 
 func level_increased() -> void:
 	gv.flash(self, thingy.details.color)
+
+
+func thingy_created() -> void:
+	if not thingy:
+		if th.get_selected_index() - get_offset_index() == th.get_top_index():
+			assign_thingy(th.get_latest_thingy())
+			th.container.update_navigator_colors()
 
 
 
@@ -195,6 +207,12 @@ func clear_thingy() -> void:
 	hide()
 
 
+
+# - Get
+
+
+func get_offset_index() -> int:
+	return get_index() - 3
 
 
 

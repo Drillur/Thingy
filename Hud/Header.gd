@@ -34,6 +34,5 @@ extends MarginContainer
 
 func _ready() -> void:
 	if icon == null:
-		print("removed")
 		texture_rect.queue_free()
 	label.text = text

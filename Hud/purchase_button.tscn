@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://Hud/purchase_button.gd" id="1_c15yb"]
 [ext_resource type="Theme" uid="uid://cw23v8nlfy06y" path="res://Themes/Title.tres" id="2_db3gh"]
-[ext_resource type="Texture2D" uid="uid://dlt8c53eja853" path="res://Art/Icons/Hud/New Game.png" id="2_olho3"]
 [ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Themes/Subtle Background.tres" id="2_r644i"]
 [ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/bar.tscn" id="3_406o2"]
 [ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Themes/Standard.tres" id="3_cpise"]
+[ext_resource type="Texture2D" uid="uid://djwo8cenuwp14" path="res://Art/Icons/Hud/Menu.png" id="3_uatfa"]
 [ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Themes/Invis.tres" id="8_h0e0u"]
 
 [node name="Purchase Button" type="MarginContainer"]
@@ -36,6 +36,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Details"]
 layout_mode = 2
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="TitleComponents" type="HBoxContainer" parent="VBoxContainer/Details/VBoxContainer"]
@@ -44,12 +45,23 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Texture Rect" type="TextureRect" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
+[node name="IconContainer" type="Control" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
-texture = ExtResource("2_olho3")
-expand_mode = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Texture Rect" type="TextureRect" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/IconContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+offset_right = 24.0
+offset_bottom = 24.0
+size_flags_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("3_uatfa")
+expand_mode = 2
 stretch_mode = 5
 
 [node name="Title" type="RichTextLabel" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
@@ -144,5 +156,7 @@ mouse_default_cursor_shape = 2
 theme = ExtResource("8_h0e0u")
 metadata/_edit_lock_ = true
 
+[connection signal="button_down" from="Button" to="." method="_on_button_button_down"]
+[connection signal="button_up" from="Button" to="." method="_on_button_button_up"]
 [connection signal="gui_input" from="Button" to="." method="_on_button_gui_input"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

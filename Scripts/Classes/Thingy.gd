@@ -8,6 +8,7 @@ enum Attribute {
 	DURATION,
 	OUTPUT,
 	COST,
+	CRIT,
 }
 
 signal timer_started
@@ -17,12 +18,16 @@ var just_born := true
 var level := LoudInt.new(1)
 var timer := Timer.new()
 var xp := ValuePair.new(1.0).do_not_cap_current()
-var pending_amount := Big.new(0)
+var inhand := Big.new(0, true)
+var crit_success := LoudBool.new(false)
+var crit_multiplier := LoudFloat.new(1.0)
+var inhand_currency: Currency.Type
+#var critcrit_success := LoudBool.new(false)
 
 var details = Details.new()
 
 #region References
-var gold: Currency = wa.get_currency(Currency.Type.GOLD)
+var will: Currency = wa.get_currency(Currency.Type.WILL)
 #endregion
 
 
@@ -30,12 +35,12 @@ var gold: Currency = wa.get_currency(Currency.Type.GOLD)
 func _init(_index: int) -> void:
 	index = _index
 	details.color = th.next_thingy_color
-	th.duration.changed.connect(duration_changed)
-	th.duration_increase.changed.connect(duration_changed)
-	th.duration_range.changed.connect(duration_changed)
-	th.output.changed.connect(output_changed)
-	th.output_increase.changed.connect(output_changed)
-	th.output_range.changed.connect(output_changed)
+	#th.duration.changed.connect(duration_changed)
+	#th.duration_increase.changed.connect(duration_changed)
+	#th.duration_range.changed.connect(duration_changed)
+	#th.output.changed.connect(output_changed)
+	#th.output_increase.changed.connect(output_changed)
+	#th.output_range.changed.connect(output_changed)
 	xp.set_to(0)
 	xp.filled.connect(xp_filled)
 	level.changed.connect(level_changed)
@@ -56,20 +61,23 @@ func _init(_index: int) -> void:
 
 
 func timer_timeout() -> void:
-	gold.add(get_random_output())
+	will.amount.subtract_pending(inhand)
+	will.add(inhand)
 	if th.xp_unlocked.is_true():
 		xp.add(th.xp_gain.get_value())
+	crit_success.reset()
+	crit_multiplier.reset()
+	#critcrit_success.reset()
 	start_timer()
 
 
 func duration_changed() -> void:
-	log_output_rate()
+	pass#log_output_rate()
 	#print("time left at point of duration change: ", timer.time_left, " - new duration: ", get_duration())
 
 
 func output_changed() -> void:
-	log_output_rate()
-	update_pending_amount()
+	pass#log_output_rate()
 
 
 func xp_filled() -> void:
@@ -79,8 +87,6 @@ func xp_filled() -> void:
 
 func level_changed() -> void:
 	sync_xp()
-	log_output_rate()
-	update_pending_amount()
 
 
 
@@ -95,20 +101,27 @@ func sync_xp() -> void:
 
 func log_output_rate() -> void:
 	var rate: Big = get_output_rate()
-	gold.gain_rate.edit_change("added", self, rate)
+	will.gain_rate.edit_change("added", self, rate)
 
 
 func start_timer() -> void:
+	set_inhand()
 	timer.start(get_random_duration())
 	timer_started.emit()
-	update_pending_amount()
+	log_output_rate()
+	inhand_currency = Currency.Type.WILL
 
 
-func update_pending_amount() -> void:
-	if pending_amount.greater(0):
-		gold.amount.subtract_pending(pending_amount)
-	pending_amount.set_to(get_average_output())
-	gold.amount.add_pending(pending_amount)
+func set_inhand() -> void:
+	var new_inhand := get_random_output()
+	if randf_range(0, 100) < th.crit_chance.get_value():
+		crit_multiplier.multiply(th.crit_range.get_random_point_in_center())
+		while randf_range(0, 100) < th.crit_crit_chance.get_value():
+			crit_multiplier.multiply(th.crit_range.get_random_point_in_center())
+		new_inhand.m(crit_multiplier.get_value())
+		crit_success.set_to(true)
+	inhand.set_to(new_inhand)
+	will.amount.add_pending(inhand)
 
 
 
@@ -150,5 +163,5 @@ func get_average_duration() -> float:
 
 
 func get_output_rate() -> Big:
-	var rate := get_average_output().d(get_average_duration())
+	var rate := Big.new(inhand).d(timer.time_left)
 	return rate

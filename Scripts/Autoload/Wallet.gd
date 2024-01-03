@@ -47,5 +47,13 @@ func get_amount_text(cur: Currency.Type) -> String:
 	return get_currency(cur).amount.text
 
 
+func get_currency_name(cur: Currency.Type) -> String:
+	return get_details(cur).name
+
+
+func get_color_text(cur: Currency.Type) -> Color:
+	return get_details(cur).color_text
+
+
 func get_color(cur: Currency.Type) -> Color:
 	return get_details(cur).color

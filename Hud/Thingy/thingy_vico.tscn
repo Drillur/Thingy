@@ -128,7 +128,24 @@ text = "123e123"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Output Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Output Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme = ExtResource("3_e4ujg")
+bbcode_enabled = true
+text = "[b][i]+ 4-6"
+fit_content = true
+autowrap_mode = 0
+
+[node name="CritSuccess" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 10

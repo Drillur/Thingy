@@ -11,6 +11,8 @@ enum Type {
 	OUTPUT01,
 	COST01,
 	UNLOCK_RANDOM_TREE,
+	UNLOCK_XP,
+	UNLOCK_CRIT,
 }
 
 var type: Type
@@ -38,35 +40,32 @@ func _init(_type: Type) -> void:
 	details.name = key.capitalize()
 	match type:
 		Type.UNLOCK_UPGRADES:
-			cost = Cost.new({Currency.Type.GOLD: Value.new(10)})
+			cost = Cost.new({Currency.Type.WILL: Value.new(5)})
 			details.color = up.upgrade_color
-			details.icon = bag.get_resource("Fire")
+			details.icon = bag.get_resource("upgrades")
 			unlocked_tree = up.UpgradeTree.Type.FIRESTARTER
 		Type.HASTE01:
-			details.name = "Haste"
-			details.description = "Thingy Duration [b]-%s[/b]."
+			details.name = "Urgency"
+			details.description = "Thingy duration [b]-%s[/b]."
 			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({Currency.Type.GOLD: Value.new(8)})
-			cost.increase_multiplier = 5.0
+			cost = Cost.new({Currency.Type.WILL: Value.new(10)})
 			thingy_attribute = Thingy.Attribute.DURATION
-			purchase_limit = 4
 			category = "subtracted"
-			modifier_add = 1
+			modifier_add = 1.0
 		Type.OUTPUT01:
-			details.name = "Stranth"
-			details.description = "Thingy Output [b]x%s[/b]."
+			details.name = "Boxer"
+			details.description = "Thingy output [b]+%s[/b]."
+			details.color = wa.get_color(Currency.Type.WILL)
 			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({Currency.Type.GOLD: Value.new(12)})
-			cost.increase_multiplier = 5.0
+			cost = Cost.new({Currency.Type.WILL: Value.new(20)})
 			thingy_attribute = Thingy.Attribute.OUTPUT
-			purchase_limit = 5
-			category = "multiplied"
-			modifier_multiply = 2
+			category = "added"
+			modifier_add = 1.0
 		Type.COST01:
 			details.name = "Greed"
-			details.description = "Thingy Cost [b]x%s[/b]."
+			details.description = "Thingy cost [b]x%s[/b]."
 			details.icon = bag.get_resource("Coin")
-			cost = Cost.new({Currency.Type.GOLD: Value.new(90)})
+			cost = Cost.new({Currency.Type.WILL: Value.new(90)})
 			cost.increase_multiplier = 8.0
 			thingy_attribute = Thingy.Attribute.COST
 			purchase_limit = 3
@@ -77,7 +76,21 @@ func _init(_type: Type) -> void:
 			details.name = "Gamblin' Man"
 			details.description = "Unlocks the [b]%s[/b] tree." % details.name
 			details.icon = bag.get_resource("Coin Hand")
-			cost = Cost.new({Currency.Type.GOLD: Value.new(1000)})
+			cost = Cost.new({Currency.Type.WILL: Value.new(1000)})
+		Type.UNLOCK_XP:
+			details.name = "Adventurer"
+			details.description = "Unlocks %s." % wa.get_currency_name(Currency.Type.XP)
+			details.color = wa.get_color(Currency.Type.XP)
+			details.icon = bag.get_resource("Star")
+			cost = Cost.new({Currency.Type.WILL: Value.new(50)})
+		Type.UNLOCK_CRIT:
+			details.name = "Low Roller"
+			details.description = "Thingy crit chance [b]+%s%%[/b]."
+			details.icon = bag.get_resource("Dice")
+			cost = Cost.new({Currency.Type.WILL: Value.new(45)})
+			thingy_attribute = Thingy.Attribute.CRIT
+			category = "added"
+			modifier_add = 5.0
 	match category:
 		"added", "subtracted":
 			modifier = LoudFloat.new(0)
@@ -119,32 +132,44 @@ func modifier_changed() -> void:
 
 
 func remove() -> void:
-	if thingy_attribute != Thingy.Attribute.NONE:
-		match thingy_attribute:
-			Thingy.Attribute.DURATION:
-				th.duration.remove_change(category, self)
-			Thingy.Attribute.OUTPUT:
-				th.output.remove_change(category, self)
-			Thingy.Attribute.COST:
-				for cur in th.cost.amount:
-					th.cost.amount[cur].remove_change(category, self)
-	elif unlocked_tree != up.UpgradeTree.Type.NONE:
-		up.upgrade_trees[unlocked_tree].unlocked.set_to(false)
+	match type:
+		Type.UNLOCK_XP:
+			th.xp_unlocked.set_to(false)
+		_:
+			if thingy_attribute != Thingy.Attribute.NONE:
+				match thingy_attribute:
+					Thingy.Attribute.DURATION:
+						th.duration.remove_change(category, self)
+					Thingy.Attribute.OUTPUT:
+						th.output.remove_change(category, self)
+					Thingy.Attribute.CRIT:
+						th.crit_chance.remove_change(category, self)
+					Thingy.Attribute.COST:
+						for cur in th.cost.amount:
+							th.cost.amount[cur].remove_change(category, self)
+			elif unlocked_tree != up.UpgradeTree.Type.NONE:
+				up.upgrade_trees[unlocked_tree].unlocked.set_to(false)
 
 
 
 func apply() -> void:
-	if thingy_attribute != Thingy.Attribute.NONE:
-		match thingy_attribute:
-			Thingy.Attribute.DURATION:
-				th.duration.edit_change(category, self, modifier.get_value())
-			Thingy.Attribute.OUTPUT:
-				th.output.edit_change(category, self, modifier.get_value())
-			Thingy.Attribute.COST:
-				for cur in th.cost.amount:
-					th.cost.amount[cur].edit_change(category, self, modifier.get_value())
-	elif unlocked_tree != up.UpgradeTree.Type.NONE:
-		up.upgrade_trees[unlocked_tree].unlocked.set_to(true)
+	match type:
+		Type.UNLOCK_XP:
+			th.xp_unlocked.set_to(true)
+		_:
+			if thingy_attribute != Thingy.Attribute.NONE:
+				match thingy_attribute:
+					Thingy.Attribute.DURATION:
+						th.duration.edit_change(category, self, modifier.get_value())
+					Thingy.Attribute.OUTPUT:
+						th.output.edit_change(category, self, modifier.get_value())
+					Thingy.Attribute.CRIT:
+						th.crit_chance.edit_change(category, self, modifier.get_value())
+					Thingy.Attribute.COST:
+						for cur in th.cost.amount:
+							th.cost.amount[cur].edit_change(category, self, modifier.get_value())
+			elif unlocked_tree != up.UpgradeTree.Type.NONE:
+				up.upgrade_trees[unlocked_tree].unlocked.set_to(true)
 
 
 

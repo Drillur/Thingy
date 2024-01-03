@@ -4,8 +4,9 @@ extends Resource
 
 
 enum Type {
+	WILL,
 	GOLD,
-	#XP,
+	XP,
 }
 
 var type: Type
@@ -28,15 +29,17 @@ func _init(_type: Type) -> void:
 	details.name = key.capitalize()
 	set_starting_amount()
 	match type:
+		Type.WILL:
+			details.color = Color(1, 0.114, 0.278)
+			details.icon = bag.get_resource("Heart")
 		Type.GOLD:
 			details.name = "Coin"
 			details.color = Color(1, 0.867, 0)
 			details.icon = bag.get_resource("Coin")
-			print(details.icon_text)
-		#Type.XP:
-			#details.name = "Experience"
-			#details.color = Color(0.894, 0.51, 1)
-			#details.icon = bag.get_resource("Icon")
+		Type.XP:
+			details.name = "Experience"
+			details.color = Color(0.894, 0.51, 1)
+			details.icon = bag.get_resource("Star")
 
 
 

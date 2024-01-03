@@ -25,8 +25,8 @@ func watch_cost(_cur: Currency.Type, _cost: Cost) -> void:
 
 
 func update_text_cost() -> void:
-	text = "[center]%s/%s %s" % [
-		currency.details.color_text % currency.amount.get_text(),
+	text = "[center]%s%s %s" % [
+		currency.details.color_text % (currency.amount.get_text() + "/"),
 		currency.details.color_text % cost_value.get_text(),
 		currency.details.icon_and_name_text
 	]

@@ -1,7 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://bn52kwycifxlc"]
+[gd_scene load_steps=9 format=3 uid="uid://bn52kwycifxlc"]
 
 [ext_resource type="Script" path="res://Hud/Thingy/thingy_container.gd" id="1_2egv3"]
-[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Themes/Standard.tres" id="2_2o3xv"]
 [ext_resource type="PackedScene" uid="uid://btmej8oakg4f1" path="res://Hud/Thingy/thingy_vico.tscn" id="2_y25jd"]
 [ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/purchase_button.tscn" id="4_7f4hf"]
 [ext_resource type="Texture2D" uid="uid://bkebt7vnjp4bt" path="res://Art/Icons/Hud/activeBuffs.png" id="5_bvvq8"]
@@ -24,17 +23,6 @@ alignment = 1
 [node name="VBoxContainer4" type="VBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4
-
-[node name="Selected Index Label" type="RichTextLabel" parent="HBoxContainer/VBoxContainer4"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("2_2o3xv")
-bbcode_enabled = true
-text = "[i]#1"
-fit_content = true
-autowrap_mode = 0
 
 [node name="VBoxContainer3" type="VBoxContainer" parent="HBoxContainer/VBoxContainer4"]
 layout_mode = 2

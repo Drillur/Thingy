@@ -1,9 +1,9 @@
+VBoxContainer
 HBoxContainer
 MarginContainer
 TabContainer
 ScrollContainer
 TextureRect
-VBoxContainer
 Control
 Panel
 Button

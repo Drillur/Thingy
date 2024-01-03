@@ -15,8 +15,10 @@ layout_mode = 2
 mouse_filter = 2
 theme = ExtResource("2_0dyva")
 tab_alignment = 1
+current_tab = 1
 
 [node name="Gamblin\' Man" type="ScrollContainer" parent="TabContainer"]
+visible = false
 layout_mode = 2
 mouse_filter = 2
 theme = ExtResource("2_0dyva")
@@ -49,7 +51,6 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="Firestarter" type="ScrollContainer" parent="TabContainer"]
-visible = false
 layout_mode = 2
 mouse_filter = 2
 theme = ExtResource("2_0dyva")
@@ -91,13 +92,13 @@ alignment = 1
 
 [node name="UpgradeButton2" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
-upgrade_type = 3
+upgrade_type = 5
+
+[node name="UpgradeButton3" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 6
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
-
-[node name="UpgradeButton2" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer3" instance=ExtResource("2_yq021")]
-layout_mode = 2
-upgrade_type = 4
