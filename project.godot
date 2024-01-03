@@ -1,0 +1,37 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Thingy"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.2", "GL Compatibility")
+config/icon="res://Art/Icons/Icon.svg"
+
+[autoload]
+
+bag="*res://Scripts/Autoload/Resources.gd"
+tp="*res://Scripts/Autoload/TimeParser.gd"
+wa="*res://Scripts/Autoload/Wallet.gd"
+gv="*res://Scripts/Autoload/Overseer.gd"
+up="*res://Scripts/Autoload/Upgrades.gd"
+th="*res://Scripts/Autoload/Thingies.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.0507813, 0.0507813, 0.0507813, 1)
