@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cmo5x3dcvsaet"]
+[gd_scene load_steps=12 format=3 uid="uid://cmo5x3dcvsaet"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_q04pk"]
 [ext_resource type="PackedScene" uid="uid://bn52kwycifxlc" path="res://Hud/Thingy/thingy_container.tscn" id="3_i7kju"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Header.tscn" id="7_gtgho"]
 [ext_resource type="PackedScene" uid="uid://dq3cwy5fqfot5" path="res://Hud/Upgrades/upgrade_container.tscn" id="9_o0od1"]
 [ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Upgrades/upgrade_button.tscn" id="10_4ysqw"]
+[ext_resource type="PackedScene" uid="uid://f0bw1mm367n6" path="res://Hud/Thingy/thingy_widget.tscn" id="11_lmscp"]
 
 [node name="Main" type="CanvasLayer"]
 script = ExtResource("1_q04pk")
@@ -41,46 +42,6 @@ layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 0
-mouse_filter = 2
-alignment = 1
-
-[node name="Gold Label" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 0
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "234"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Gold Flair" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-fit_content = true
-autowrap_mode = 0
-
-[node name="Gold Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "4/s"
-fit_content = true
-autowrap_mode = 0
-
 [node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 0
@@ -109,6 +70,46 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="Will Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "4/s"
+fit_content = true
+autowrap_mode = 0
+
+[node name="CoinComponents" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="Coin Label" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "234"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Coin Flair" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+
+[node name="Coin Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -231,6 +232,12 @@ text = "Upgrades"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="ThingyWidget" parent="VBoxContainer/Content" instance=ExtResource("11_lmscp")]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
 
 [node name="BottomPanel" type="MarginContainer" parent="."]
 visible = false

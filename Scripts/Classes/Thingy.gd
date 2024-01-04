@@ -9,6 +9,9 @@ enum Attribute {
 	OUTPUT,
 	COST,
 	CRIT,
+	TOTAL_COIN_FROM_CRIT,
+	TOTAL_OUTPUT_RANGE,
+	CURRENT_DURATION_RANGE,
 }
 
 signal timer_started
@@ -19,6 +22,7 @@ var level := LoudInt.new(1)
 var timer := Timer.new()
 var xp := ValuePair.new(1.0).do_not_cap_current()
 var inhand := Big.new(0, true)
+var inhand_coin := Big.new(0, true)
 var crit_success := LoudBool.new(false)
 var crit_multiplier := LoudFloat.new(1.0)
 var inhand_currency: Currency.Type
@@ -35,12 +39,6 @@ var will: Currency = wa.get_currency(Currency.Type.WILL)
 func _init(_index: int) -> void:
 	index = _index
 	details.color = th.next_thingy_color
-	#th.duration.changed.connect(duration_changed)
-	#th.duration_increase.changed.connect(duration_changed)
-	#th.duration_range.changed.connect(duration_changed)
-	#th.output.changed.connect(output_changed)
-	#th.output_increase.changed.connect(output_changed)
-	#th.output_range.changed.connect(output_changed)
 	xp.set_to(0)
 	xp.filled.connect(xp_filled)
 	level.changed.connect(level_changed)
@@ -65,19 +63,15 @@ func timer_timeout() -> void:
 	will.add(inhand)
 	if th.xp_unlocked.is_true():
 		xp.add(th.xp_gain.get_value())
+	if crit_success.is_true():
+		wa.get_currency(Currency.Type.COIN).amount.subtract_pending(inhand_coin)
+		wa.add(Currency.Type.COIN, inhand_coin)
+		if th.crit_chance.less(100):
+			wa.get_currency(Currency.Type.COIN).gain_rate.remove_change("added", self)
+		inhand_coin.reset()
 	crit_success.reset()
 	crit_multiplier.reset()
-	#critcrit_success.reset()
 	start_timer()
-
-
-func duration_changed() -> void:
-	pass#log_output_rate()
-	#print("time left at point of duration change: ", timer.time_left, " - new duration: ", get_duration())
-
-
-func output_changed() -> void:
-	pass#log_output_rate()
 
 
 func xp_filled() -> void:
@@ -102,6 +96,9 @@ func sync_xp() -> void:
 func log_output_rate() -> void:
 	var rate: Big = get_output_rate()
 	will.gain_rate.edit_change("added", self, rate)
+	if crit_success.is_true():
+		var coin_rate := Big.new(inhand_coin).d(timer.wait_time)
+		wa.get_currency(Currency.Type.COIN).gain_rate.edit_change("added", self, coin_rate)
 
 
 func start_timer() -> void:
@@ -116,6 +113,8 @@ func set_inhand() -> void:
 	var new_inhand := get_random_output()
 	if randf_range(0, 100) < th.crit_chance.get_value():
 		crit_multiplier.multiply(th.crit_range.get_random_point_in_center())
+		inhand_coin.set_to(th.crit_coin_output.get_random_point_in_center())
+		wa.get_currency(Currency.Type.COIN).amount.add_pending(inhand_coin)
 		while randf_range(0, 100) < th.crit_crit_chance.get_value():
 			crit_multiplier.multiply(th.crit_range.get_random_point_in_center())
 		new_inhand.m(crit_multiplier.get_value())
@@ -129,7 +128,7 @@ func set_inhand() -> void:
 
 
 func get_output() -> Big:
-	return Big.new(th.output_increase).power(level.get_value() - 1).m(th.output.get_value())
+	return Big.new(th.output_increase).power(level.get_value() - 1)
 
 
 func get_minimum_output() -> Big:
@@ -150,11 +149,19 @@ func get_average_output() -> Big:
 
 
 func get_duration() -> float:
-	return pow(th.duration_increase.get_value(), level.get_value() - 1) * th.duration.get_value()
+	return pow(th.duration_increase.get_value(), level.get_value() - 1)
 
 
 func get_random_duration() -> float:
 	return get_duration() * th.duration_range.get_random_point_in_center()
+
+
+func get_minimum_duration() -> float:
+	return get_duration() * th.duration_range.get_current()
+
+
+func get_maximum_duration() -> float:
+	return get_duration() * th.duration_range.get_total()
 
 
 func get_average_duration() -> float:

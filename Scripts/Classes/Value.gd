@@ -10,16 +10,7 @@ var saved_vars := [
 signal increased
 signal decreased
 
-var requires_sync := false:
-	set(val):
-		if requires_sync != val:
-			requires_sync = val
-			if requires_sync:
-				emit_signal("changed")
-var current: Big:
-	get:
-		sync()
-		return current
+var current: Big
 
 var added := Big.new(0, true)
 var subtracted := Big.new(0, true)
@@ -30,9 +21,9 @@ var divided := Big.new(1, true)
 
 func _init(base_value = 0.0) -> void:
 	current = Big.new(base_value, true)
-	current.connect("increased", emit_increase)
-	current.connect("decreased", emit_decrease)
-	current.connect("changed", emit_changed)
+	current.changed.connect(emit_changed)
+	current.increased.connect(emit_increase)
+	current.decreased.connect(emit_decrease)
 
 
 func emit_increase() -> void:
@@ -72,14 +63,12 @@ func subtract_pending(amount: Big) -> void:
 
 
 func sync() -> void:
-	if requires_sync:
-		requires_sync = false
-		var new_cur = Big.new(current.base)
-		new_cur.m(multiplied)
-		new_cur.d(divided)
-		new_cur.a(added)
-		new_cur.s(subtracted)
-		current.set_to(new_cur)
+	var new_cur = Big.new(current.base)
+	new_cur.m(multiplied)
+	new_cur.d(divided)
+	new_cur.a(added)
+	new_cur.s(subtracted)
+	current.set_to(new_cur)
 
 
 func get_text() -> String:
@@ -93,42 +82,42 @@ func get_value() -> Big:
 
 func increase_added(amount) -> void:
 	added.a(amount)
-	requires_sync = true
+	sync()
 
 
 func decrease_added(amount) -> void:
 	added.s(amount)
-	requires_sync = true
+	sync()
 
 
 func increase_subtracted(amount) -> void:
 	subtracted.a(amount)
-	requires_sync = true
+	sync()
 
 
 func decrease_subtracted(amount) -> void:
 	subtracted.s(amount)
-	requires_sync = true
+	sync()
 
 
 func increase_multiplied(amount) -> void:
 	multiplied.m(amount)
-	requires_sync = true
+	sync()
 
 
 func decrease_multiplied(amount) -> void:
 	multiplied.d(amount)
-	requires_sync = true
+	sync()
 
 
 func increase_divided(amount) -> void:
 	divided.m(amount)
-	requires_sync = true
+	sync()
 
 
 func decrease_divided(amount) -> void:
 	divided.d(amount)
-	requires_sync = true
+	sync()
 
 
 var log := {
@@ -158,24 +147,26 @@ func add_change(category: String, source, amount) -> void:
 
 func edit_change(category: String, source, amount) -> void:
 	if log[category].has(source):
-		remove_change(category, source)
+		remove_change(category, source, false)
 	add_change(category, source, amount)
 
 
-func remove_change(category: String, source) -> void:
+func remove_change(category: String, source, sync_afterwards := true) -> void:
 	if not source in log[category].keys():
 		return
 	var amount: Big = log[category][source]
 	match category:
 		"added":
-			decrease_added(amount)
+			added.s(amount)
 		"subtracted":
-			decrease_subtracted(amount)
+			subtracted.s(amount)
 		"multiplied":
-			decrease_multiplied(amount)
+			multiplied.d(amount)
 		"divided":
-			decrease_divided(amount)
+			divided.d(amount)
 	log[category].erase(source)
+	if sync_afterwards:
+		sync()
 
 
 

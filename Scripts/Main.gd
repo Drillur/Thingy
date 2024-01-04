@@ -40,9 +40,10 @@ func _ready() -> void:
 
 
 @onready var top_panel = %TopPanel
-@onready var gold_label = %"Gold Label"
-@onready var gold_flair = %"Gold Flair"
-@onready var gold_rate = %"Gold Rate"
+@onready var coin_components = %CoinComponents
+@onready var coin_label = %"Coin Label"
+@onready var coin_flair = %"Coin Flair"
+@onready var coin_rate = %"Coin Rate"
 @onready var will_label = %"Will Label"
 @onready var will_flair = %"Will Flair"
 @onready var will_rate = %"Will Rate"
@@ -51,27 +52,27 @@ func _ready() -> void:
 func setup_top_panel() -> void:
 	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name_text
 	will_rate.modulate = wa.get_color(Currency.Type.WILL)
-	#gold_flair.text = "[i]" + wa.get_details(Currency.Type.GOLD).icon_and_name_text
-	#gold_rate.modulate = wa.get_color(Currency.Type.GOLD)
 	wa.get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
 	wa.get_currency(Currency.Type.WILL).net_rate.changed.connect(will_rate_changed)
-	#wa.get_currency(Currency.Type.GOLD).amount.changed.connect(gold_changed)
-	#wa.get_currency(Currency.Type.GOLD).net_rate.changed.connect(gold_rate_changed)
-	#gold_changed()
-	#gold_rate_changed()
 	will_changed()
 	will_rate_changed()
+	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).icon_and_name_text
+	coin_rate.modulate = wa.get_color(Currency.Type.COIN)
+	wa.get_currency(Currency.Type.COIN).amount.changed.connect(coin_changed)
+	wa.get_currency(Currency.Type.COIN).net_rate.changed.connect(coin_rate_changed)
+	coin_changed()
+	coin_rate_changed()
 	top_panel.hide()
 
 
-func gold_changed() -> void:
-	gold_label.text = "[font_size=18][i]" + (
-		wa.get_details(Currency.Type.GOLD).color_text % wa.get_amount_text(Currency.Type.GOLD)
+func coin_changed() -> void:
+	coin_label.text = "[i]" + (
+		wa.get_details(Currency.Type.COIN).color_text % wa.get_amount_text(Currency.Type.COIN)
 	)
 
 
-func gold_rate_changed() -> void:
-	gold_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.GOLD).get_text()
+func coin_rate_changed() -> void:
+	coin_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.COIN).get_text()
 
 
 func will_changed() -> void:

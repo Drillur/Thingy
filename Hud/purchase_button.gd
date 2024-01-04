@@ -85,6 +85,7 @@ func connect_calls() -> void:
 		if currency.amount.changed.is_connected(set_eta_text):
 			return
 		currency.amount.changed.connect(set_eta_text)
+		currency.net_rate.changed.connect(set_eta_text)
 		currency.amount.changed.connect(update_progress_bar)
 
 
@@ -95,6 +96,7 @@ func disconnect_calls() -> void:
 		if not currency.amount.changed.is_connected(set_eta_text):
 			return
 		currency.amount.changed.disconnect(set_eta_text)
+		currency.net_rate.changed.disconnect(set_eta_text)
 		currency.amount.changed.disconnect(update_progress_bar)
 
 
@@ -170,3 +172,15 @@ func _on_button_button_down():
 
 func _on_button_button_up():
 	texture_rect.position.y = 0
+
+
+
+# - Action
+
+
+func lock() -> void:
+	texture_rect.texture = bag.get_resource("Locked")
+	cost_components.hide()
+	title.hide()
+	description.hide()
+	times_purchased.hide()

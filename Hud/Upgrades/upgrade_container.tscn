@@ -20,7 +20,6 @@ current_tab = 1
 [node name="Gamblin\' Man" type="ScrollContainer" parent="TabContainer"]
 visible = false
 layout_mode = 2
-mouse_filter = 2
 theme = ExtResource("2_0dyva")
 horizontal_scroll_mode = 0
 
@@ -44,15 +43,27 @@ alignment = 1
 [node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
+alignment = 1
+
+[node name="UpgradeButton2" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 8
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
+[node name="UpgradeButton3" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 7
+
+[node name="UpgradeButton4" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 9
+
 [node name="Firestarter" type="ScrollContainer" parent="TabContainer"]
 layout_mode = 2
-mouse_filter = 2
 theme = ExtResource("2_0dyva")
 horizontal_scroll_mode = 0
 
@@ -76,6 +87,7 @@ alignment = 1
 [node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
+alignment = 1
 
 [node name="UpgradeButton" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
@@ -90,15 +102,77 @@ layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="UpgradeButton2" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+[node name="UpgradeButton4" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
-upgrade_type = 5
+upgrade_type = 4
 
 [node name="UpgradeButton3" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 6
 
+[node name="UpgradeButton2" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 5
+
 [node name="HBoxContainer3" type="HBoxContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Voyager" type="ScrollContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+theme = ExtResource("2_0dyva")
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="TabContainer/Voyager"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Voyager/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+mouse_filter = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Voyager/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="UpgradeButton" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 1
+
+[node name="UpgradeButton2" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="TabContainer/Voyager/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="UpgradeButton4" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 4
+
+[node name="UpgradeButton3" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 6
+
+[node name="UpgradeButton2" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 5

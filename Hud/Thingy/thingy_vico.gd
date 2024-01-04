@@ -129,7 +129,10 @@ func selected_index_changed() -> void:
 
 
 func output_changed() -> void:
-	var text = "[b][i]+" + thingy.inhand.get_text()
+	var text = "[b][i]+%s[/i][/b] %s" % [
+		thingy.inhand.get_text(),
+		wa.get_details(Currency.Type.WILL).icon_text
+	]
 	output_label.text = text
 
 

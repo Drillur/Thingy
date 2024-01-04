@@ -5,7 +5,7 @@ extends Resource
 
 enum Type {
 	WILL,
-	GOLD,
+	COIN,
 	XP,
 }
 
@@ -32,8 +32,7 @@ func _init(_type: Type) -> void:
 		Type.WILL:
 			details.color = Color(1, 0.114, 0.278)
 			details.icon = bag.get_resource("Heart")
-		Type.GOLD:
-			details.name = "Coin"
+		Type.COIN:
 			details.color = Color(1, 0.867, 0)
 			details.icon = bag.get_resource("Coin")
 		Type.XP:
@@ -46,7 +45,7 @@ func _init(_type: Type) -> void:
 
 func set_starting_amount() -> void:
 	match type:
-		Type.GOLD:
+		Type.WILL:
 			amount = Big.new(1, true)
 		_:
 			amount = Big.new(0, true)

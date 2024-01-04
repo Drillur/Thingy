@@ -1,11 +1,13 @@
 VBoxContainer
-HBoxContainer
 MarginContainer
-TabContainer
+Label
 ScrollContainer
+HScrollBar
+Panel
+HBoxContainer
+TabContainer
 TextureRect
 Control
-Panel
 Button
 RichTextLabel
 Timer

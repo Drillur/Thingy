@@ -1,0 +1,138 @@
+[gd_scene load_steps=6 format=3 uid="uid://f0bw1mm367n6"]
+
+[ext_resource type="Script" path="res://Hud/Thingy/thingy_widget.gd" id="1_2biu5"]
+[ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Themes/Subtle Background.tres" id="1_n6n2h"]
+[ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Header.tscn" id="2_5ms20"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/RichLabel.tscn" id="4_wqyrf"]
+[ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/bar.tscn" id="5_wxj6c"]
+
+[node name="ThingyWidget" type="MarginContainer"]
+offset_right = 199.0
+offset_bottom = 328.0
+script = ExtResource("1_2biu5")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 2
+theme = ExtResource("1_n6n2h")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Header" parent="MarginContainer/VBoxContainer" instance=ExtResource("2_5ms20")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Thingy #1"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="XP Components" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Level" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Level 5"
+
+[node name="XP Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[color=#e482ff]14/20[/color] [img=<15> color=#e482ff]res://Art/Icons/Hud/Star.png[/img] Experience"
+
+[node name="XP Bar" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("5_wxj6c")]
+unique_name_in_owner = true
+modulate = Color(0.894118, 0.509804, 1, 1)
+layout_mode = 2
+
+[node name="Output" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Flair" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output" instance=ExtResource("4_wqyrf")]
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Boxing.png[/img] Output"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer"]
+layout_mode = 2
+
+[node name="Will Output" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Heart.png[/img] Will: [b]123e123-123e123"
+autowrap_mode = 0
+
+[node name="Crit Components" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Flair" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components" instance=ExtResource("4_wqyrf")]
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Dice.png[/img] Crit"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components/MarginContainer"]
+layout_mode = 2
+
+[node name="Crit Chance" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Chance: 9%"
+autowrap_mode = 0
+
+[node name="Crit Crit Chance" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Lucky Chance: 1%"
+autowrap_mode = 0
+
+[node name="Crit Multiplier" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Multiplier: [b]1.5x"
+autowrap_mode = 0
+
+[node name="Crit Coin" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Coin.png[/img] Coin: [b]0-2[/b]"
+autowrap_mode = 0
+
+[node name="Output3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Flair" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output3" instance=ExtResource("4_wqyrf")]
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Time.png[/img] Duration"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output3"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output3/MarginContainer"]
+layout_mode = 2
+
+[node name="Duration" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output3/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "4-5 seconds"
+autowrap_mode = 0
