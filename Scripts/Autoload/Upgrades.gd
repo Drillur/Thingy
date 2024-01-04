@@ -8,6 +8,7 @@ class UpgradeTree:
 		NONE,
 		GAMBLIN_MAN,
 		FIRESTARTER,
+		VOYAGER,
 	}
 	
 	var type: Type
@@ -35,7 +36,7 @@ var container: UpgradeContainer
 
 func _ready() -> void:
 	for upgrade_type in Upgrade.Type.values():
-		upgrades[upgrade_type] = Upgrade.new(upgrade_type)
+		upgrades[upgrade_type] = await Upgrade.new(upgrade_type)
 	for upgrade_tree in UpgradeTree.Type.values():
 		if upgrade_tree == UpgradeTree.Type.NONE:
 			continue

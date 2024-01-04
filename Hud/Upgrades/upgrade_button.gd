@@ -14,6 +14,7 @@ func _ready() -> void:
 	upgrade = up.get_upgrade(upgrade_type)
 	upgrade.unlocked.changed.connect(unlocked_changed)
 	pb.color = upgrade.details.color
+	pb.setup(upgrade.cost)
 	if upgrade.unlocked.is_true():
 		setup()
 	else:
@@ -35,7 +36,6 @@ func setup() -> void:
 		pb.description.hide()
 	upgrade.purchased.changed.connect(upgrade_purchased_changed)
 	pb.cost_components.show()
-	pb.setup(upgrade.cost)
 	if upgrade.purchase_limit > 1:
 		pb.times_purchased.show()
 		upgrade.times_purchased.changed.connect(times_purchased_changed)

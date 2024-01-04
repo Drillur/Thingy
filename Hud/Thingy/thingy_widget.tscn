@@ -48,10 +48,15 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Level 5"
 
+[node name="XP Range" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[img=<15> color=#e482ff]res://Art/Icons/Hud/Star.png[/img] Experience: [b]1"
+
 [node name="XP Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("4_wqyrf")]
 unique_name_in_owner = true
 layout_mode = 2
-text = "[color=#e482ff]14/20[/color] [img=<15> color=#e482ff]res://Art/Icons/Hud/Star.png[/img] Experience"
+text = "[color=#e482ff]14/20[/color]"
 
 [node name="XP Bar" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("5_wxj6c")]
 unique_name_in_owner = true

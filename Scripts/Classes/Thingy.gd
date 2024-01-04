@@ -12,6 +12,7 @@ enum Attribute {
 	TOTAL_COIN_FROM_CRIT,
 	TOTAL_OUTPUT_RANGE,
 	CURRENT_DURATION_RANGE,
+	TOTAL_XP,
 }
 
 signal timer_started
@@ -23,6 +24,7 @@ var timer := Timer.new()
 var xp := ValuePair.new(1.0).do_not_cap_current()
 var inhand := Big.new(0, true)
 var inhand_coin := Big.new(0, true)
+var inhand_xp := Big.new(0, true)
 var crit_success := LoudBool.new(false)
 var crit_multiplier := LoudFloat.new(1.0)
 var inhand_currency: Currency.Type
@@ -50,7 +52,7 @@ func _init(_index: int) -> void:
 	
 	sync_xp()
 	
-	log_output_rate()
+	log_rates()
 
 
 
@@ -62,7 +64,9 @@ func timer_timeout() -> void:
 	will.amount.subtract_pending(inhand)
 	will.add(inhand)
 	if th.xp_unlocked.is_true():
-		xp.add(th.xp_gain.get_value())
+		xp.add(inhand_xp)
+		wa.add(Currency.Type.XP, inhand_xp)
+		inhand_xp.reset()
 	if crit_success.is_true():
 		wa.get_currency(Currency.Type.COIN).amount.subtract_pending(inhand_coin)
 		wa.add(Currency.Type.COIN, inhand_coin)
@@ -93,23 +97,33 @@ func sync_xp() -> void:
 	)
 
 
-func log_output_rate() -> void:
-	var rate: Big = get_output_rate()
-	will.gain_rate.edit_change("added", self, rate)
+func log_rates() -> void:
+	wa.get_currency(
+		Currency.Type.XP
+	).gain_rate.edit_change(
+		"added", self, Big.new(inhand_xp).d(timer.wait_time)
+	)
+	will.gain_rate.edit_change("added", self, get_output_rate())
 	if crit_success.is_true():
-		var coin_rate := Big.new(inhand_coin).d(timer.wait_time)
-		wa.get_currency(Currency.Type.COIN).gain_rate.edit_change("added", self, coin_rate)
+		wa.get_currency(
+			Currency.Type.COIN
+		).gain_rate.edit_change(
+			"added", self, Big.new(inhand_coin).d(timer.wait_time)
+		)
 
 
 func start_timer() -> void:
 	set_inhand()
 	timer.start(get_random_duration())
 	timer_started.emit()
-	log_output_rate()
+	log_rates()
 	inhand_currency = Currency.Type.WILL
 
 
 func set_inhand() -> void:
+	inhand_xp.set_to(th.xp_range.get_random_point_in_center())
+	wa.get_currency(Currency.Type.XP).amount.add_pending(inhand_xp)
+	
 	var new_inhand := get_random_output()
 	if randf_range(0, 100) < th.crit_chance.get_value():
 		crit_multiplier.multiply(th.crit_range.get_random_point_in_center())

@@ -7,6 +7,7 @@ extends MarginContainer
 @onready var level = %Level
 @onready var xp_components = %"XP Components"
 @onready var xp_label = %"XP Label"
+@onready var xp_range = %"XP Range"
 @onready var xp_bar = %"XP Bar"
 @onready var will_output = %"Will Output"
 @onready var crit_components = %"Crit Components"
@@ -46,6 +47,7 @@ func connect_calls() -> void:
 	xp_bar.attach_attribute(thingy.xp)
 	thingy.level.changed.connect(level_changed)
 	thingy.xp.changed.connect(xp_changed)
+	th.xp_range.changed.connect(xp_range_changed)
 	th.output_increase.changed.connect(output_changed)
 	th.output_range.changed.connect(output_changed)
 	thingy.level.changed.connect(output_changed)
@@ -58,6 +60,7 @@ func connect_calls() -> void:
 	thingy.level.changed.connect(duration_changed)
 	level_changed()
 	xp_changed()
+	xp_range_changed()
 	xp_unlocked()
 	output_changed()
 	crit_chance_changed()
@@ -70,6 +73,7 @@ func connect_calls() -> void:
 func disconnect_calls() -> void:
 	thingy.level.changed.disconnect(level_changed)
 	thingy.xp.changed.disconnect(xp_changed)
+	th.xp_range.changed.disconnect(xp_range_changed)
 	th.output_increase.changed.disconnect(output_changed)
 	th.output_range.changed.disconnect(output_changed)
 	th.crit_chance.changed.disconnect(crit_chance_changed)
@@ -94,11 +98,26 @@ func level_changed() -> void:
 
 func xp_changed() -> void:
 	xp_label.text = wa.get_details(Currency.Type.XP).color_text % (
-		"%s/%s " % [
+		"%s/%s" % [
 			thingy.xp.get_current_text(),
 			thingy.xp.get_total_text()
 		]
-	) + wa.get_details(Currency.Type.XP).icon_and_name_text
+	)
+
+
+func xp_range_changed() -> void:
+	var text = wa.get_details(Currency.Type.XP).icon_and_name_text + ": "
+	text += wa.get_details(Currency.Type.XP).color_text
+	if th.xp_range.is_full():
+		text = text % th.xp_range.get_total_text()
+	else:
+		text = text % (
+			"%s-%s" % [
+				th.xp_range.get_current_text(),
+				th.xp_range.get_total_text()
+			]
+		)
+	xp_range.text = text
 
 
 func output_changed() -> void:

@@ -9,4 +9,5 @@ extends MarginContainer
 
 func _ready() -> void:
 	tab_container.set_tab_hidden(0, true)
+	tab_container.set_tab_hidden(2, true)
 	tab_container.current_tab = 1

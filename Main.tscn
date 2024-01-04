@@ -121,6 +121,46 @@ text = "4/s"
 fit_content = true
 autowrap_mode = 0
 
+[node name="XPComponents" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="XP Label" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/XPComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "234"
+fit_content = true
+autowrap_mode = 0
+
+[node name="XP Flair" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/XPComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+
+[node name="XP Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/XPComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "4/s"
+fit_content = true
+autowrap_mode = 0
+
 [node name="FPS" type="RichTextLabel" parent="VBoxContainer/TopPanel"]
 unique_name_in_owner = true
 layout_mode = 2

@@ -10,11 +10,10 @@ res://Hud/Thingy/thingy_vico.tscn
 res://Hud/Upgrades/upgrade_button.tscn
 res://Hud/purchase_button.tscn
 res://Hud/MenuButton.tscn
-res://Scripts/Classes/Upgrade/Upgrade.gd
-res://Scripts/Classes/Thingy.gd
 res://Hud/Thingy/thingy_widget.tscn
-res://Themes/Background.tres
-res://Hud/Thingy/thingy_widget.gd
-res://Scripts/Classes/LoudVar/LoudFloatPair.gd
+res://Scripts/Classes/Upgrade/Upgrade.gd
 res://Scripts/Autoload/Thingies.gd
-res://Hud/Thingy/thingy_vico.gd
+res://Scripts/Autoload/Upgrades.gd
+res://Hud/Upgrades/upgrade_button.gd
+res://Hud/Thingy/thingy_widget.gd
+res://Hud/price_and_currency.tscn

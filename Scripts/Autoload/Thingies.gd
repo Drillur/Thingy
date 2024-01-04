@@ -2,6 +2,7 @@ extends Node
 
 
 
+signal initialized
 signal container_loaded
 signal thingy_created
 
@@ -14,8 +15,8 @@ var cost: Cost
 
 var next_thingy_color := Color(1, 0.243, 0.208)
 
-var xp_gain := Value.new(1.0)
 var xp := Value.new(10)
+var xp_range := FloatPair.new(1.0, 1.0)
 var xp_increase := LoudFloat.new(1.1)
 var xp_unlocked := LoudBool.new(false)
 
@@ -35,6 +36,7 @@ var duration_increase := LoudFloat.new(1.1)
 func _ready():
 	cost = Cost.new({Currency.Type.WILL: Value.new(1)})
 	cost.increase_multiplier = 3.0
+	initialized.emit()
 	return
 	xp_unlocked.set_to(true)
 	crit_chance.set_to(5)
@@ -43,6 +45,7 @@ func _ready():
 	duration_range.current.set_to(0.9)
 	duration_range.total.set_to(1.1)
 	xp.set_to(1)
+	
 
 
 

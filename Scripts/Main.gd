@@ -47,6 +47,10 @@ func _ready() -> void:
 @onready var will_label = %"Will Label"
 @onready var will_flair = %"Will Flair"
 @onready var will_rate = %"Will Rate"
+@onready var xp_components = %XPComponents
+@onready var xp_label = %"XP Label"
+@onready var xp_flair = %"XP Flair"
+@onready var xp_rate = %"XP Rate"
 
 
 func setup_top_panel() -> void:
@@ -62,6 +66,12 @@ func setup_top_panel() -> void:
 	wa.get_currency(Currency.Type.COIN).net_rate.changed.connect(coin_rate_changed)
 	coin_changed()
 	coin_rate_changed()
+	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).icon_and_name_text
+	xp_rate.modulate = wa.get_color(Currency.Type.XP)
+	wa.get_currency(Currency.Type.XP).amount.changed.connect(xp_changed)
+	wa.get_currency(Currency.Type.XP).net_rate.changed.connect(xp_rate_changed)
+	xp_changed()
+	xp_rate_changed()
 	top_panel.hide()
 
 
@@ -85,6 +95,18 @@ func will_changed() -> void:
 
 func will_rate_changed() -> void:
 	will_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.WILL).get_text()
+
+
+func xp_changed() -> void:
+	xp_label.text = "[i]" + (
+		wa.get_details(Currency.Type.XP).color_text % (
+			wa.get_amount_text(Currency.Type.XP)
+		)
+	)
+
+
+func xp_rate_changed() -> void:
+	xp_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.XP).get_text()
 
 
 #endregion
