@@ -51,7 +51,7 @@ var icon: Texture:
 			icon_text = "[img=<15> color=#%s]%s[/img]" % [color.to_html(), icon.get_path()]
 		else:
 			icon_text = "[img=<15>]" + val.get_path() + "[/img]"
-		icon_and_name_text = icon_text + " " + name
+		icon_and_name = icon_text + " " + name
 		icon_and_plural_name_text = icon_text + " " + plural_name
 		if colored_name != "":
 			icon_and_colored_name = icon_text + " " + colored_name
@@ -60,7 +60,7 @@ var icon: Texture:
 		if alt_colored_name != "":
 			icon_and_alt_colored_name = icon_text + " " + alt_colored_name
 var icon_text: String
-var icon_and_name_text: String
+var icon_and_name: String
 var icon_and_plural_name_text: String
 
 var icon_and_colored_name: String
@@ -107,7 +107,7 @@ func get_colored_name(count = 1) -> String:
 
 func get_icon_and_name(count = 1) -> String:
 	if count_equals_one(count):
-		return icon_and_name_text
+		return icon_and_name
 	return icon_and_plural_name_text
 
 

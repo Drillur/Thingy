@@ -1,16 +1,15 @@
-[gd_scene load_steps=12 format=3 uid="uid://cmo5x3dcvsaet"]
+[gd_scene load_steps=11 format=3 uid="uid://cmo5x3dcvsaet"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_q04pk"]
 [ext_resource type="PackedScene" uid="uid://bn52kwycifxlc" path="res://Hud/Thingy/thingy_container.tscn" id="3_i7kju"]
 [ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Themes/Standard.tres" id="3_i8skv"]
+[ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://Themes/Subtle Background Rounded.tres" id="5_dm0ov"]
 [ext_resource type="Texture2D" uid="uid://bkebt7vnjp4bt" path="res://Art/Icons/Hud/activeBuffs.png" id="5_jecdi"]
 [ext_resource type="PackedScene" uid="uid://bfi0uovwegdxj" path="res://Hud/MenuButton.tscn" id="5_mtslg"]
 [ext_resource type="Texture2D" uid="uid://408er70eh4ns" path="res://Art/Icons/Hud/upgrades.png" id="6_jmjrv"]
-[ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Themes/Subtle Background.tres" id="6_yp6wy"]
-[ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Header.tscn" id="7_gtgho"]
 [ext_resource type="PackedScene" uid="uid://dq3cwy5fqfot5" path="res://Hud/Upgrades/upgrade_container.tscn" id="9_o0od1"]
+[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/purchase_button.tscn" id="9_x5lqm"]
 [ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Upgrades/upgrade_button.tscn" id="10_4ysqw"]
-[ext_resource type="PackedScene" uid="uid://f0bw1mm367n6" path="res://Hud/Thingy/thingy_widget.tscn" id="11_lmscp"]
 
 [node name="Main" type="CanvasLayer"]
 script = ExtResource("1_q04pk")
@@ -42,45 +41,6 @@ layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 0
-mouse_filter = 2
-alignment = 1
-
-[node name="Will Label" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 0
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "234"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Will Flair" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-fit_content = true
-autowrap_mode = 0
-
-[node name="Will Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "4/s"
-fit_content = true
-autowrap_mode = 0
-
 [node name="CoinComponents" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -110,6 +70,45 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="Coin Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "4/s"
+fit_content = true
+autowrap_mode = 0
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="Will Label" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "234"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Will Flair" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+
+[node name="Will Rate" type="RichTextLabel" parent="VBoxContainer/TopPanel/MarginContainer/HBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -214,70 +213,58 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Sidebar" type="MarginContainer" parent="VBoxContainer/Content"]
+[node name="Navigation Panel" type="MarginContainer" parent="VBoxContainer/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
-size_flags_vertical = 4
+size_flags_vertical = 8
 mouse_filter = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Content/Sidebar"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Content/Navigation Panel"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Bottom Panel Background" type="Panel" parent="VBoxContainer/Content/Sidebar/MarginContainer"]
+[node name="Background" type="Panel" parent="VBoxContainer/Content/Navigation Panel/MarginContainer"]
 layout_mode = 2
-theme = ExtResource("6_yp6wy")
+theme = ExtResource("5_dm0ov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Content/Sidebar/MarginContainer"]
-layout_mode = 2
-
-[node name="SidebarHeader" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer" instance=ExtResource("7_gtgho")]
-unique_name_in_owner = true
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Content/Navigation Panel/MarginContainer"]
 layout_mode = 2
 
-[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/SidebarHeader"]
-layout_mode = 2
-
-[node name="SidebarButton" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/SidebarHeader/MarginContainer2" instance=ExtResource("5_mtslg")]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-color = Color(0, 0, 0, 1)
-center_content = true
-
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Content/Navigation Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/MarginContainer"]
+[node name="VBoxContainer" type="HBoxContainer" parent="VBoxContainer/Content/Navigation Panel/MarginContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="Tab Thingy" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" instance=ExtResource("5_mtslg")]
+[node name="Tab Thingy" parent="VBoxContainer/Content/Navigation Panel/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" instance=ExtResource("5_mtslg")]
 unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("5_jecdi")
-text = "Thingies"
+text = ""
 
-[node name="Tab Upgrade" parent="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" instance=ExtResource("5_mtslg")]
+[node name="Tab Upgrade" parent="VBoxContainer/Content/Navigation Panel/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" instance=ExtResource("5_mtslg")]
 unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("6_jmjrv")
-text = "Upgrades"
+text = ""
 
 [node name="UnlockUpgradesButton" parent="VBoxContainer/Content" instance=ExtResource("10_4ysqw")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
-size_flags_vertical = 4
+size_flags_vertical = 8
 
-[node name="ThingyWidget" parent="VBoxContainer/Content" instance=ExtResource("11_lmscp")]
+[node name="Purchase Thingy" parent="VBoxContainer/Content" instance=ExtResource("9_x5lqm")]
+unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
+size_flags_vertical = 8
+icon = ExtResource("5_jecdi")
+text = "New Thingy"
 
 [node name="BottomPanel" type="MarginContainer" parent="."]
 visible = false
@@ -305,6 +292,6 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[connection signal="pressed" from="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/SidebarHeader/MarginContainer2/SidebarButton" to="." method="_on_sidebar_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Tab Thingy" to="." method="_on_tab_thingy_pressed"]
-[connection signal="pressed" from="VBoxContainer/Content/Sidebar/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Tab Upgrade" to="." method="_on_tab_upgrade_pressed"]
+[connection signal="pressed" from="VBoxContainer/Content/Navigation Panel/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Tab Thingy" to="." method="_on_tab_thingy_pressed"]
+[connection signal="pressed" from="VBoxContainer/Content/Navigation Panel/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Tab Upgrade" to="." method="_on_tab_upgrade_pressed"]
+[connection signal="pressed" from="VBoxContainer/Content/Purchase Thingy" to="." method="_on_purchase_thingy_pressed"]

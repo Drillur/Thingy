@@ -48,15 +48,19 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Level 5"
 
-[node name="XP Range" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("4_wqyrf")]
-unique_name_in_owner = true
-layout_mode = 2
-text = "[img=<15> color=#e482ff]res://Art/Icons/Hud/Star.png[/img] Experience: [b]1"
-
 [node name="XP Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("4_wqyrf")]
 unique_name_in_owner = true
 layout_mode = 2
 text = "[color=#e482ff]14/20[/color]"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="XP Increase Range" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components/MarginContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Increase: [b]1.15"
 
 [node name="XP Bar" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/XP Components" instance=ExtResource("5_wxj6c")]
 unique_name_in_owner = true
@@ -81,6 +85,27 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 text = "[img=<15>]res://Art/Icons/Hud/Heart.png[/img] Will: [b]123e123-123e123"
+autowrap_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="Output Increase Range" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer/MarginContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Arrow Up Fill.png[/img] [b]x1.15"
+
+[node name="XP Output Range" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[img=<15> color=#e482ff]res://Art/Icons/Hud/Star.png[/img] Experience: [b]1"
+autowrap_mode = 0
+
+[node name="Crit Coin" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Coin.png[/img] Coin: [b]0-2[/b] [font_size=10](on crit)"
 autowrap_mode = 0
 
 [node name="Crit Components" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
@@ -116,12 +141,6 @@ layout_mode = 2
 text = "Multiplier: [b]1.5x"
 autowrap_mode = 0
 
-[node name="Crit Coin" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Crit Components/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
-unique_name_in_owner = true
-layout_mode = 2
-text = "[img=<15>]res://Art/Icons/Hud/Coin.png[/img] Coin: [b]0-2[/b]"
-autowrap_mode = 0
-
 [node name="Output3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
@@ -141,3 +160,12 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "4-5 seconds"
 autowrap_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output3/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="Duration Increase" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output3/MarginContainer/VBoxContainer/MarginContainer" instance=ExtResource("4_wqyrf")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Increase: [b]1.15"

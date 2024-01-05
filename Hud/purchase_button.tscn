@@ -96,6 +96,7 @@ theme = ExtResource("3_cpise")
 bbcode_enabled = true
 text = "Increases the haste of all Thingies, reducing duration."
 fit_content = true
+autowrap_mode = 0
 
 [node name="CostComponents" type="VBoxContainer" parent="VBoxContainer"]
 unique_name_in_owner = true

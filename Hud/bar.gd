@@ -47,6 +47,7 @@ func _process(_delta) -> void:
 
 func _on_resized():
 	progress_bar.size.y = size.y
+	bar_size.set_to(min(progress * size.x, size.x))
 
 
 func bar_size_changed() -> void:

@@ -25,7 +25,7 @@ func _ready() -> void:
 	else:
 		fps.queue_free()
 	current_tab.changed.connect(current_tab_changed)
-	setup_sidebar()
+	setup_navigation_panel()
 	setup_top_panel()
 	th.thingy_created.connect(thingy_created)
 	
@@ -35,6 +35,29 @@ func _ready() -> void:
 	gv.root_ready.set_to(true)
 	
 	# when loading game, display top_panel
+
+
+#region Signals
+
+
+func thingy_created() -> void:
+	top_panel.show()
+	th.thingy_created.disconnect(thingy_created)
+
+
+func current_tab_changed() -> void:
+	tab_container.current_tab = current_tab.get_value()
+
+
+func _input(event):
+	if Input.is_action_just_pressed("TabThingies"):
+		current_tab.set_to(Tab.THINGY)
+	elif Input.is_action_just_pressed("TabUpgrades"):
+		current_tab.set_to(Tab.UPGRADE)
+
+
+#endregion
+
 
 #region Top Panel
 
@@ -54,19 +77,19 @@ func _ready() -> void:
 
 
 func setup_top_panel() -> void:
-	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name_text
+	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name
 	will_rate.modulate = wa.get_color(Currency.Type.WILL)
 	wa.get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
 	wa.get_currency(Currency.Type.WILL).net_rate.changed.connect(will_rate_changed)
 	will_changed()
 	will_rate_changed()
-	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).icon_and_name_text
+	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).icon_and_name
 	coin_rate.modulate = wa.get_color(Currency.Type.COIN)
 	wa.get_currency(Currency.Type.COIN).amount.changed.connect(coin_changed)
 	wa.get_currency(Currency.Type.COIN).net_rate.changed.connect(coin_rate_changed)
 	coin_changed()
 	coin_rate_changed()
-	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).icon_and_name_text
+	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).icon_and_name
 	xp_rate.modulate = wa.get_color(Currency.Type.XP)
 	wa.get_currency(Currency.Type.XP).amount.changed.connect(xp_changed)
 	wa.get_currency(Currency.Type.XP).net_rate.changed.connect(xp_rate_changed)
@@ -112,50 +135,40 @@ func xp_rate_changed() -> void:
 #endregion
 
 
-
-func thingy_created() -> void:
-	top_panel.show()
-	th.thingy_created.disconnect(thingy_created)
+#region Navigation Panel
 
 
-func current_tab_changed() -> void:
-	tab_container.current_tab = current_tab.get_value()
-
-#region Sidebar
-
-
-@onready var sidebar = %Sidebar
+@onready var navigation_panel = %"Navigation Panel"
 @onready var tab_thingy = %"Tab Thingy"
 @onready var tab_upgrade = %"Tab Upgrade"
-@onready var sidebar_button = %SidebarButton
-@onready var sidebar_header = %SidebarHeader
+@onready var navigation_panel_button = %navigation_panelButton
 @onready var unlock_upgrades_button = %UnlockUpgradesButton
+@onready var purchase_thingy = %"Purchase Thingy"
 
-var sidebar_open := LoudBool.new(true)
+var navigation_panel_open := LoudBool.new(true)
 
 
-func setup_sidebar() -> void:
+func setup_navigation_panel() -> void:
 	up.get_upgrade(
 		Upgrade.Type.UNLOCK_UPGRADES
-	).purchased.changed.connect(update_sidebar_visibility)
-	update_sidebar_visibility()
+	).purchased.changed.connect(update_navigation_panel_visibility)
+	update_navigation_panel_visibility()
 	th.thingy_created.connect(update_unlock_upgrades_button_visibility)
 	update_unlock_upgrades_button_visibility()
-	sidebar_open.became_true.connect(tab_thingy.show_text)
-	sidebar_open.became_true.connect(tab_upgrade.show_text)
-	sidebar_open.became_false.connect(tab_thingy.hide_text)
-	sidebar_open.became_false.connect(tab_upgrade.hide_text)
-	sidebar_open.set_to(false)
+	navigation_panel_open.became_true.connect(tab_thingy.show_text)
+	navigation_panel_open.became_true.connect(tab_upgrade.show_text)
+	navigation_panel_open.became_false.connect(tab_thingy.hide_text)
+	navigation_panel_open.became_false.connect(tab_upgrade.hide_text)
+	navigation_panel_open.set_to(false)
 	
 	th.thingy_created.connect(update_tab_thingy_color)
 	update_tab_thingy_color()
-	await th.container_loaded
-	th.container.selected_index.changed.connect(update_sidebar_button_color)
-	sidebar_header.color = tab_thingy.color
+	purchase_thingy.setup(th.cost)
+	purchase_thingy.color = th.next_thingy_color
 
 
-func _on_sidebar_button_pressed():
-	sidebar_open.invert()
+func _on_navigation_panel_button_pressed():
+	navigation_panel_open.invert()
 
 
 func _on_tab_thingy_pressed():
@@ -166,28 +179,30 @@ func _on_tab_upgrade_pressed():
 	current_tab.set_to(Tab.UPGRADE)
 
 
+func _on_purchase_thingy_pressed():
+	th.purchase_thingy()
+	purchase_thingy.color = th.next_thingy_color
+
+
 func update_tab_thingy_color() -> void:
 	tab_thingy.color = th.next_thingy_color
 
 
-func update_sidebar_button_color() -> void:
-	sidebar_header.color = th.get_color(th.container.selected_index.get_value())
-
-
-func update_sidebar_visibility() -> void:
-	sidebar.visible = up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES)
+func update_navigation_panel_visibility() -> void:
+	navigation_panel.visible = up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES)
 	unlock_upgrades_button.hide()
-	if sidebar.visible:
-		gv.flash(sidebar, th.get_latest_color())
+	if navigation_panel.visible:
+		gv.flash(navigation_panel, th.get_latest_color())
 	
 
 
 func update_unlock_upgrades_button_visibility() -> void:
-	unlock_upgrades_button.visible = th.get_count() >= 3 and not sidebar.visible
+	unlock_upgrades_button.visible = th.get_count() >= 3 and not navigation_panel.visible
 	if unlock_upgrades_button.visible:
 		gv.flash(unlock_upgrades_button, unlock_upgrades_button.upgrade.details.color)
 
 
 #endregion
+
 
 

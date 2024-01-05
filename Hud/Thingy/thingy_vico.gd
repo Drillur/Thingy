@@ -9,10 +9,9 @@ extends MarginContainer
 @onready var progress_label = %"Progress Label"
 @onready var output_label = %"Output Label"
 @onready var index_label = %"Index Label"
-@onready var xp_label = %"XP Label"
-@onready var max_xp_label = %"Max XP Label"
 @onready var selected = %Selected
 @onready var xp_labels = %"XP Labels"
+@onready var level_label = %"Level Label"
 @onready var border = %Border
 @onready var crit_success = %CritSuccess
 
@@ -67,13 +66,11 @@ func connect_calls() -> void:
 	thingy.inhand.changed.connect(output_changed)
 	thingy.timer_started.connect(timer_wait_time_changed)
 	thingy.crit_success.changed.connect(crit_success_changed)
-	thingy.xp.current.changed.connect(xp_current_changed)
-	thingy.xp.total.changed.connect(xp_total_changed)
+	thingy.level.changed.connect(level_changed)
 	xp_bar.attach_attribute(thingy.xp)
 	output_changed()
 	timer_wait_time_changed()
-	xp_current_changed()
-	xp_total_changed()
+	level_changed()
 	crit_success_changed()
 
 
@@ -82,8 +79,7 @@ func disconnect_calls() -> void:
 	thingy.inhand.changed.disconnect(output_changed)
 	thingy.timer_started.disconnect(timer_wait_time_changed)
 	thingy.crit_success.changed.disconnect(crit_success_changed)
-	thingy.xp.current.changed.disconnect(xp_current_changed)
-	thingy.xp.total.changed.disconnect(xp_total_changed)
+	thingy.level.changed.disconnect(level_changed)
 	xp_bar.remove_value()
 
 
@@ -155,12 +151,8 @@ func timer_wait_time_changed() -> void:
 	)
 
 
-func xp_current_changed() -> void:
-	xp_label.text = thingy.xp.get_current_text()
-
-
-func xp_total_changed() -> void:
-	max_xp_label.text = thingy.xp.get_total_text()
+func level_changed() -> void:
+	level_label.text = wa.get_details(Currency.Type.XP).icon_text + " [b][i]" + thingy.level.get_text()
 
 
 func xp_unlocked_changed() -> void:
@@ -173,7 +165,7 @@ func xp_unlocked_changed() -> void:
 
 
 func level_increased() -> void:
-	gv.flash(self, thingy.details.color)
+	gv.flash(level_label, thingy.details.color)
 
 
 func thingy_created() -> void:

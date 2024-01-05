@@ -4,6 +4,7 @@ res://Themes/ShadowText.tres
 res://Themes/Invis.tres
 res://Themes/Title.tres
 res://Themes/Subtle Background.tres
+res://Themes/Subtle Background Rounded.tres
 res://Main.tscn
 res://Hud/Thingy/thingy_container.tscn
 res://Hud/Thingy/thingy_vico.tscn
@@ -11,9 +12,7 @@ res://Hud/Upgrades/upgrade_button.tscn
 res://Hud/purchase_button.tscn
 res://Hud/MenuButton.tscn
 res://Hud/Thingy/thingy_widget.tscn
+res://Hud/bar.tscn
 res://Scripts/Classes/Upgrade/Upgrade.gd
 res://Scripts/Autoload/Thingies.gd
-res://Scripts/Autoload/Upgrades.gd
-res://Hud/Upgrades/upgrade_button.gd
-res://Hud/Thingy/thingy_widget.gd
-res://Hud/price_and_currency.tscn
+res://Scripts/Classes/Thingy.gd

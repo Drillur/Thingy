@@ -15,22 +15,24 @@ var cost: Cost
 
 var next_thingy_color := Color(1, 0.243, 0.208)
 
-var xp := Value.new(10)
-var xp_range := FloatPair.new(1.0, 1.0)
-var xp_increase := LoudFloat.new(1.1)
+var xp_output_range := FloatPair.new(1.0, 1.0)
+var xp_increase_range := FloatPair.new(1.15, 1.15)
+var xp_multiplier := LoudFloat.new(1.0)
 var xp_unlocked := LoudBool.new(false)
+var crits_apply_to_xp := LoudBool.new(false)
+var crits_apply_to_coin := LoudBool.new(false)
 
 var output_range := FloatPair.new(1.0, 1.0)
-var output_increase := Big.new(1.15, true)
+var output_increase_range := FloatPair.new(1.15, 1.15)
 
 var crit_chance := LoudFloat.new(0.0)
 var crit_range := FloatPair.new(1.5, 1.5)
 var crit_crit_chance := LoudFloat.new(0.0)
-
 var crit_coin_output := FloatPair.new(0.0, 0.0)
 
 var duration_range := FloatPair.new(5.0, 5.0)
-var duration_increase := LoudFloat.new(1.1)
+var duration_increase_range := FloatPair.new(1.1, 1.1)
+
 
 
 func _ready():
@@ -44,8 +46,6 @@ func _ready():
 	output_range.total.set_to(2)
 	duration_range.current.set_to(0.9)
 	duration_range.total.set_to(1.1)
-	xp.set_to(1)
-	
 
 
 

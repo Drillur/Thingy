@@ -1,10 +1,10 @@
-VBoxContainer
+HBoxContainer
 MarginContainer
+VBoxContainer
 Label
 ScrollContainer
 HScrollBar
 Panel
-HBoxContainer
 TabContainer
 TextureRect
 Control

@@ -28,7 +28,7 @@ func update_text_cost() -> void:
 	text = "[center]%s%s %s" % [
 		currency.details.color_text % (currency.amount.get_text() + "/"),
 		currency.details.color_text % cost_value.get_text(),
-		currency.details.icon_and_name_text
+		currency.details.icon_and_name
 	]
 
 

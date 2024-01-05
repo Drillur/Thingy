@@ -55,6 +55,7 @@ func _ready() -> void:
 		title.show()
 	if icon:
 		texture_rect.texture = icon
+	pressed.connect(pressed_emitted)
 
 
 
@@ -62,7 +63,7 @@ func setup(_cost: Cost) -> void:
 	cost = _cost
 	if not is_node_ready():
 		await ready
-	custom_minimum_size.x = 170
+	cost_components.custom_minimum_size.x = 170
 	for cur in cost.amount:
 		var label = bag.get_resource("RichLabel").instantiate()
 		label.disable_autowrap()
@@ -115,6 +116,10 @@ func _on_button_pressed():
 					gv.flash(content[cur], Color.RED)
 	else:
 		pressed.emit()
+
+
+func pressed_emitted() -> void:
+	gv.flash(self, color)
 
 
 func _on_button_gui_input(event: InputEvent):

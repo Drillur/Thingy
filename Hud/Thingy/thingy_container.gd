@@ -10,7 +10,6 @@ extends MarginContainer
 @onready var th4 = %th4 as ThingyVico
 @onready var th5 = %th5 as ThingyVico
 @onready var th6 = %th6 as ThingyVico
-@onready var purchase_thingy = %"Purchase Thingy"
 
 @onready var _up = %Up
 @onready var to_top = %ToTop
@@ -24,10 +23,9 @@ var selected_index := LoudInt.new(-1)
 func _ready():
 	selected_index.changed.connect(selected_index_changed)
 	hide_all_thingies()
-	purchase_thingy.setup(th.cost)
-	purchase_thingy.color = th.next_thingy_color
 	th.thingy_created.connect(thingy_created)
 	thingy_created()
+	display_navigators()
 
 
 func _input(_event) -> void:
@@ -45,12 +43,7 @@ func _input(_event) -> void:
 
 func selected_index_changed() -> void:
 	update_navigator_colors()
-
-
-
-func _on_purchase_thingy_pressed():
-	th.purchase_thingy()
-	purchase_thingy.color = th.next_thingy_color
+	display_navigators()
 
 
 func _on_up_pressed():
@@ -71,22 +64,11 @@ func _on_to_bot_pressed():
 
 func thingy_created() -> void:
 	match th.get_count():
-		0, 1:
+		1:
 			snap_to_index(0)
-			_up.hide()
-			to_top.hide()
-			down.hide()
-			to_bot.hide()
-		2:
-			_up.show()
-			to_top.hide()
-			down.show()
-			to_bot.hide()
-		3:
-			_up.show()
-			to_top.show()
-			down.show()
-			to_bot.show()
+			display_navigators()
+		2, 3:
+			display_navigators()
 
 
 
@@ -113,3 +95,10 @@ func update_navigator_colors() -> void:
 	to_top.color = th.get_color(th.get_top_index())
 	down.color = th.get_color(th.get_previous_index())
 	to_bot.color = th.get_color(th.get_bottom_index())
+
+
+func display_navigators() -> void:
+	to_bot.visible = th.get_count() > 2
+	down.visible = th.get_count() > 1
+	to_top.visible = th.get_count() > 2
+	_up.visible = th.get_count() > 1
