@@ -1,18 +1,26 @@
-res://Hud/Upgrades/upgrade_container.tscn
+res://Main.tscn
 res://Themes/Standard.tres
 res://Themes/ShadowText.tres
 res://Themes/Invis.tres
 res://Themes/Title.tres
 res://Themes/Subtle Background.tres
 res://Themes/Subtle Background Rounded.tres
-res://Main.tscn
 res://Hud/Thingy/thingy_container.tscn
 res://Hud/Thingy/thingy_vico.tscn
 res://Hud/Upgrades/upgrade_button.tscn
 res://Hud/purchase_button.tscn
+res://Hud/Upgrades/upgrade_container.tscn
 res://Hud/MenuButton.tscn
 res://Hud/Thingy/thingy_widget.tscn
 res://Hud/bar.tscn
+res://Hud/Header.tscn
+res://Hud/Header.gd
+res://Scripts/Main.gd
+res://Scripts/Autoload/Upgrades.gd
 res://Scripts/Classes/Upgrade/Upgrade.gd
-res://Scripts/Autoload/Thingies.gd
-res://Scripts/Classes/Thingy.gd
+res://Hud/Upgrades/upgrade_container.gd
+res://Scripts/Autoload/Overseer.gd
+res://Hud/Thingy/thingy_container.gd
+res://Scripts/Classes/Value.gd
+res://Scripts/Classes/Currency.gd
+res://Scripts/Classes/LoudVar/LoudFloat.gd

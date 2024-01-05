@@ -20,63 +20,68 @@ mouse_filter = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/separation = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="ThingyContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer"]
+[node name="ThingyContainer" type="VBoxContainer" parent="HBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="th0" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th0" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="th1" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th1" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 
-[node name="th2" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th2" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 
-[node name="th3" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th3" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="th4" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th4" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 
-[node name="th5" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th5" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 
-[node name="th6" parent="HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
+[node name="th6" parent="HBoxContainer/HBoxContainer/VBoxContainer/ThingyContainer" instance=ExtResource("2_y25jd")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="VBoxContainer4" type="VBoxContainer" parent="HBoxContainer"]
+[node name="VBoxContainer4" type="VBoxContainer" parent="HBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="HBoxContainer/VBoxContainer4"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="HBoxContainer/HBoxContainer/VBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="ToTop" parent="HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
+[node name="ToTop" parent="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -84,7 +89,7 @@ size_flags_vertical = 4
 icon = ExtResource("6_5vs1g")
 remove_cost_components = true
 
-[node name="Up" parent="HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
+[node name="Up" parent="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -92,7 +97,7 @@ size_flags_vertical = 4
 icon = ExtResource("5_jrt6d")
 remove_cost_components = true
 
-[node name="Down" parent="HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
+[node name="Down" parent="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -100,7 +105,7 @@ size_flags_vertical = 4
 icon = ExtResource("5_vkcv4")
 remove_cost_components = true
 
-[node name="ToBot" parent="HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
+[node name="ToBot" parent="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -108,12 +113,12 @@ size_flags_vertical = 4
 icon = ExtResource("8_dgp3g")
 remove_cost_components = true
 
-[node name="ThingyWidget" parent="." instance=ExtResource("8_lyght")]
+[node name="ThingyWidget" parent="HBoxContainer" instance=ExtResource("8_lyght")]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
 
-[connection signal="pressed" from="HBoxContainer/VBoxContainer4/VBoxContainer3/ToTop" to="." method="_on_to_top_pressed"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer4/VBoxContainer3/Up" to="." method="_on_up_pressed"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer4/VBoxContainer3/Down" to="." method="_on_down_pressed"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer4/VBoxContainer3/ToBot" to="." method="_on_to_bot_pressed"]
+[connection signal="pressed" from="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3/ToTop" to="." method="_on_to_top_pressed"]
+[connection signal="pressed" from="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3/Up" to="." method="_on_up_pressed"]
+[connection signal="pressed" from="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3/Down" to="." method="_on_down_pressed"]
+[connection signal="pressed" from="HBoxContainer/HBoxContainer/VBoxContainer4/VBoxContainer3/ToBot" to="." method="_on_to_bot_pressed"]

@@ -1,12 +1,12 @@
+TextureRect
 HBoxContainer
 MarginContainer
+Panel
 VBoxContainer
 Label
 ScrollContainer
 HScrollBar
-Panel
 TabContainer
-TextureRect
 Control
 Button
 RichTextLabel

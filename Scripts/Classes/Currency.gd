@@ -77,12 +77,12 @@ func sync_rate() -> void:
 
 
 
-func add_pending(amount: Big) -> void:
-	amount.add_pending(amount)
+func add_pending(_amount: Big) -> void:
+	amount.add_pending(_amount)
 
 
-func subtract_pending(amount: Big) -> void:
-	amount.subtract_pending(amount)
+func subtract_pending(_amount: Big) -> void:
+	amount.subtract_pending(_amount)
 
 
 

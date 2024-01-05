@@ -2,20 +2,11 @@ extends CanvasLayer
 
 
 
-@onready var tab_container = %TabContainer
-
 #region Dev
 @onready var fps = %FPS
 func fps_timer_timeout() -> void:
 	fps.text = "FPS: " + str(Engine.get_frames_per_second())
 #endregion
-
-enum Tab {
-	THINGY,
-	UPGRADE,
-}
-
-var current_tab := LoudInt.new(0)
 
 
 func _ready() -> void:
@@ -24,7 +15,7 @@ func _ready() -> void:
 		fps.get_node("Timer").timeout.connect(fps_timer_timeout)
 	else:
 		fps.queue_free()
-	current_tab.changed.connect(current_tab_changed)
+	setup_sidebar()
 	setup_navigation_panel()
 	setup_top_panel()
 	th.thingy_created.connect(thingy_created)
@@ -45,15 +36,19 @@ func thingy_created() -> void:
 	th.thingy_created.disconnect(thingy_created)
 
 
-func current_tab_changed() -> void:
-	tab_container.current_tab = current_tab.get_value()
-
-
-func _input(event):
-	if Input.is_action_just_pressed("TabThingies"):
-		current_tab.set_to(Tab.THINGY)
-	elif Input.is_action_just_pressed("TabUpgrades"):
-		current_tab.set_to(Tab.UPGRADE)
+func _input(_event):
+	if Input.is_action_just_pressed("ui_cancel"):
+		current_tab.reset()
+	if Input.is_action_just_pressed("Normal Upgrades"):
+		if up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES):
+			current_tab.set_to(Tab.UPGRADE)
+	if not gv.node_has_point(sidebar, sidebar.get_global_mouse_position()):
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_DOWN):
+			if th.has_thingy(th.get_selected_index() - 1):
+				th.container.snap_to_index(th.get_selected_index() - 1)
+		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_UP):
+			if th.has_thingy(th.get_selected_index() + 1):
+				th.container.snap_to_index(th.get_selected_index() + 1)
 
 
 #endregion
@@ -139,9 +134,7 @@ func xp_rate_changed() -> void:
 
 
 @onready var navigation_panel = %"Navigation Panel"
-@onready var tab_thingy = %"Tab Thingy"
 @onready var tab_upgrade = %"Tab Upgrade"
-@onready var navigation_panel_button = %navigation_panelButton
 @onready var unlock_upgrades_button = %UnlockUpgradesButton
 @onready var purchase_thingy = %"Purchase Thingy"
 
@@ -155,14 +148,10 @@ func setup_navigation_panel() -> void:
 	update_navigation_panel_visibility()
 	th.thingy_created.connect(update_unlock_upgrades_button_visibility)
 	update_unlock_upgrades_button_visibility()
-	navigation_panel_open.became_true.connect(tab_thingy.show_text)
 	navigation_panel_open.became_true.connect(tab_upgrade.show_text)
-	navigation_panel_open.became_false.connect(tab_thingy.hide_text)
 	navigation_panel_open.became_false.connect(tab_upgrade.hide_text)
 	navigation_panel_open.set_to(false)
 	
-	th.thingy_created.connect(update_tab_thingy_color)
-	update_tab_thingy_color()
 	purchase_thingy.setup(th.cost)
 	purchase_thingy.color = th.next_thingy_color
 
@@ -171,21 +160,16 @@ func _on_navigation_panel_button_pressed():
 	navigation_panel_open.invert()
 
 
-func _on_tab_thingy_pressed():
-	current_tab.set_to(Tab.THINGY)
-
-
 func _on_tab_upgrade_pressed():
-	current_tab.set_to(Tab.UPGRADE)
+	if current_tab.equal(Tab.UPGRADE):
+		current_tab.reset()
+	else:
+		current_tab.set_to(Tab.UPGRADE)
 
 
 func _on_purchase_thingy_pressed():
 	th.purchase_thingy()
 	purchase_thingy.color = th.next_thingy_color
-
-
-func update_tab_thingy_color() -> void:
-	tab_thingy.color = th.next_thingy_color
 
 
 func update_navigation_panel_visibility() -> void:
@@ -205,4 +189,46 @@ func update_unlock_upgrades_button_visibility() -> void:
 #endregion
 
 
+#region Sidebar
 
+
+@onready var sidebar = %Sidebar
+@onready var tab_container = %TabContainer
+@onready var upgrade_container = %UpgradeContainer as UpgradeContainer
+@onready var sidebar_header = %"Sidebar Header"
+
+
+enum Tab {
+	UPGRADE,
+}
+
+var current_tab := LoudInt.new(-1)
+
+
+
+func setup_sidebar() -> void:
+	sidebar.hide()
+	current_tab.changed.connect(current_tab_changed)
+	upgrade_container.tab_container.tab_changed.connect(upgrade_container_tab_changed)
+	upgrade_container_tab_changed(1)
+
+
+
+func current_tab_changed() -> void:
+	if current_tab.less(0):
+		sidebar.hide()
+	else:
+		tab_container.current_tab = current_tab.get_value()
+		sidebar.show()
+
+
+func upgrade_container_tab_changed(index: int) -> void:
+	var tree: up.UpgradeTree = up.get_upgrade_tree(index + 1)
+	sidebar_header.color = tree.details.color
+	sidebar_header.text = tree.details.name
+	sidebar_header.icon = tree.details.icon
+	tab_upgrade.color = tree.details.color
+	upgrade_container.color_tab(tree.details.color)
+
+
+#endregion

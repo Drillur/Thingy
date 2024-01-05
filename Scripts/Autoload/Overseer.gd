@@ -32,3 +32,15 @@ func flash(parent: Node, color = Color(1, 0, 0)) -> void:
 	var _flash = bag.get_resource("flash").instantiate()
 	parent.add_child(_flash)
 	_flash.flash(color)
+
+
+#region Get
+
+
+func node_has_point(node: Node, point: Vector2) -> bool:
+	if not node.is_visible_in_tree():
+		return false
+	return node.get_global_rect().has_point(point)
+
+
+#endregion

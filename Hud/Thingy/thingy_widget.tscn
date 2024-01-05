@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://f0bw1mm367n6"]
+[gd_scene load_steps=7 format=3 uid="uid://f0bw1mm367n6"]
 
 [ext_resource type="Script" path="res://Hud/Thingy/thingy_widget.gd" id="1_2biu5"]
 [ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Themes/Subtle Background.tres" id="1_n6n2h"]
 [ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Header.tscn" id="2_5ms20"]
 [ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/RichLabel.tscn" id="4_wqyrf"]
+[ext_resource type="Texture2D" uid="uid://bkebt7vnjp4bt" path="res://Art/Icons/Hud/activeBuffs.png" id="4_xlnmm"]
 [ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/bar.tscn" id="5_wxj6c"]
 
 [node name="ThingyWidget" type="MarginContainer"]
@@ -26,6 +27,8 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "Thingy #1"
+center_content = true
+icon = ExtResource("4_xlnmm")
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2

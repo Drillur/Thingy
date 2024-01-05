@@ -28,15 +28,6 @@ func _ready():
 	display_navigators()
 
 
-func _input(_event) -> void:
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_DOWN):
-		if th.has_thingy(selected_index.get_value() - 1):
-			snap_to_index(selected_index.get_value() - 1)
-	elif Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_UP):
-		if th.has_thingy(selected_index.get_value() + 1):
-			snap_to_index(selected_index.get_value() + 1)
-
-
 
 # - Signal
 

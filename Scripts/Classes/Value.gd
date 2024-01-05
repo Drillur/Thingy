@@ -64,10 +64,10 @@ func subtract_pending(amount: Big) -> void:
 
 func sync() -> void:
 	var new_cur = Big.new(current.base)
-	new_cur.m(multiplied)
-	new_cur.d(divided)
 	new_cur.a(added)
 	new_cur.s(subtracted)
+	new_cur.m(multiplied)
+	new_cur.d(divided)
 	current.set_to(new_cur)
 
 
