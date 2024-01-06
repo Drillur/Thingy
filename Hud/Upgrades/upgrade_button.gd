@@ -3,6 +3,15 @@ extends MarginContainer
 
 
 @export var upgrade_type: Upgrade.Type
+@export var wrap_description := false:
+	set(val):
+		wrap_description = val
+		if not is_node_ready():
+			await ready
+		if val:
+			pb.description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		else:
+			pb.description.autowrap_mode = TextServer.AUTOWRAP_OFF
 
 @onready var pb = $"Purchase Button" as PurchaseButton
 

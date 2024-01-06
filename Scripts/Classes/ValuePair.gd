@@ -96,16 +96,6 @@ func add_percent(percent: float) -> void:
 	add(amount)
 
 
-
-func add_pending(amount: Big) -> void:
-	current.add_pending(amount)
-
-
-func subtract_pending(amount: Big) -> void:
-	current.subtract_pending(amount)
-
-
-
 func set_amount_to_deficit_if_necessary(amount) -> Big:
 	if not amount is Big:
 		amount = Big.new(amount)

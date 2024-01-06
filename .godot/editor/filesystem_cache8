@@ -1,6 +1,6 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1704460664
-Main.tscn::PackedScene::5645872838050092923::1704460664::0::1::::<><>::res://Scripts/Main.gd<>uid://bn52kwycifxlc::::res://Hud/Thingy/thingy_container.tscn<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://dowun7x403k8u::::res://Hud/Header.tscn<>uid://dlojc3h2w34po::::res://Themes/Subtle Background Rounded.tres<>uid://bkebt7vnjp4bt::::res://Art/Icons/Hud/activeBuffs.png<>uid://bfi0uovwegdxj::::res://Hud/MenuButton.tscn<>uid://408er70eh4ns::::res://Art/Icons/Hud/upgrades.png<>uid://dq3cwy5fqfot5::::res://Hud/Upgrades/upgrade_container.tscn<>uid://dky60pdpk0ffa::::res://Hud/purchase_button.tscn<>uid://bbq5xo6rr5ldf::::res://Hud/Upgrades/upgrade_button.tscn
+::res://::1704507079
+Main.tscn::PackedScene::5645872838050092923::1704507063::0::1::::<><>::res://Scripts/Main.gd<>uid://bn52kwycifxlc::::res://Hud/Thingy/thingy_container.tscn<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://dowun7x403k8u::::res://Hud/Header.tscn<>uid://dlojc3h2w34po::::res://Themes/Subtle Background Rounded.tres<>uid://bkebt7vnjp4bt::::res://Art/Icons/Hud/activeBuffs.png<>uid://bfi0uovwegdxj::::res://Hud/MenuButton.tscn<>uid://408er70eh4ns::::res://Art/Icons/Hud/upgrades.png<>uid://dq3cwy5fqfot5::::res://Hud/Upgrades/upgrade_container.tscn<>uid://dky60pdpk0ffa::::res://Hud/purchase_button.tscn<>uid://bbq5xo6rr5ldf::::res://Hud/Upgrades/upgrade_button.tscn
 ::res://Art/::1704164153
 ::res://Art/Animations/::1704164150
 autobuyer.tres::SpriteFrames::488814233663903401::1704164150::0::1::::<><>::uid://cr4l3mfnstu7e::::res://Art/Animations/autobuyerwheel/g0.png<>uid://b6aysh6avx233::::res://Art/Animations/autobuyerwheel/g1.png<>uid://b5e4svihijflh::::res://Art/Animations/autobuyerwheel/g2.png<>uid://b1q0dbf4fj55q::::res://Art/Animations/autobuyerwheel/g3.png<>uid://ct8wekd1ph548::::res://Art/Animations/autobuyerwheel/g4.png<>uid://7heifd7iqek2::::res://Art/Animations/autobuyerwheel/g5.png<>uid://bj03k52svgj8r::::res://Art/Animations/autobuyerwheel/g6.png<>uid://c2vb2u4asemb8::::res://Art/Animations/autobuyerwheel/g7.png<>uid://y7hmt6sv6va0::::res://Art/Animations/autobuyerwheel/g8.png<>uid://pgx23o225x4u::::res://Art/Animations/autobuyerwheel/g9.png<>uid://cyl2ommu6isuj::::res://Art/Animations/autobuyerwheel/g10.png<>uid://k66hx233u8r3::::res://Art/Animations/autobuyerwheel/g11.png<>uid://b7385gdaxeqma::::res://Art/Animations/autobuyerwheel/g12.png<>uid://cqoimu8okqlyb::::res://Art/Animations/autobuyerwheel/g13.png<>uid://bpkn02jw2l7xw::::res://Art/Animations/autobuyerwheel/g14.png<>uid://ckb4ds0qk0b8u::::res://Art/Animations/autobuyerwheel/g15.png
@@ -23,7 +23,7 @@ g14.png::CompressedTexture2D::3460732514627595180::1694472821::1704164150::1::::
 g15.png::CompressedTexture2D::5478561316474255906::1694472821::1704164150::1::::<><>::
 ::res://Art/Icons/::1704164154
 Icon.svg::CompressedTexture2D::4080189130818979512::1701557189::1704164154::1::::<><>::
-::res://Art/Icons/Hud/::1704460717
+::res://Art/Icons/Hud/::1704460725
 activeBuffs.png::CompressedTexture2D::3096662991958031505::1694472833::1704164154::1::::<><>::
 Alarm.png::CompressedTexture2D::7492213759576313981::1694472833::1704164154::1::::<><>::
 alert2.png::CompressedTexture2D::3108793708227896723::1694472833::1704164154::1::::<><>::
@@ -114,13 +114,13 @@ Roboto-Medium.ttf::FontFile::4781694139716567338::1695178044::1702513360::1::::<
 Roboto-MediumItalic.ttf::FontFile::1872232576374603663::1695178044::1702513360::1::::<><>::
 Roboto-Thin.ttf::FontFile::3709016443829214519::1695178044::1702513360::1::::<><>::
 Roboto-ThinItalic.ttf::FontFile::665327978364826632::1695178044::1702513360::1::::<><>::
-::res://Hud/::1704460561
+::res://Hud/::1704507064
 bar.gd::GDScript::-1::1704401108::0::1::::Bar<>MarginContainer<>::
 bar.tscn::PackedScene::328529745101296062::1704459379::0::1::::<><>::res://Hud/bar.gd<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://6iv2varciqdf::::res://Themes/ProgressBar.tres
 Flash.gd::GDScript::-1::1697423098::0::1::::<>Panel<>::
 flash.tscn::PackedScene::-1::1696205255::0::1::::<><>::
 Header.gd::GDScript::-1::1704460504::0::1::::<>MarginContainer<>::
-Header.tscn::PackedScene::8188561445407019630::1704460561::0::1::::<><>::res://Hud/Header.gd<>uid://cw23v8nlfy06y::::res://Themes/Title.tres
+Header.tscn::PackedScene::8188561445407019630::1704507064::0::1::::<><>::res://Hud/Header.gd<>uid://cw23v8nlfy06y::::res://Themes/Title.tres
 icon_button.gd::GDScript::-1::1702520495::0::1::::IconButton<>MarginContainer<>::
 icon_button.tscn::PackedScene::4901093482139040154::1704164153::0::1::::<><>::res://Hud/icon_button.gd<>uid://rfljn78ajnbs::::res://Themes/Invis.tres<>uid://g71x1b7vd3pt::::res://Art/Animations/autobuyer.tres<>uid://dlxx28hr2xdck::::res://Art/Icons/Hud/Check.png<>uid://408er70eh4ns::::res://Art/Icons/Hud/upgrades.png
 MenuButton.gd::GDScript::-1::1704250323::0::1::::_MenuButton<>MarginContainer<>::
@@ -129,57 +129,57 @@ purchase_button.gd::GDScript::-1::1704419035::0::1::::PurchaseButton<>MarginCont
 purchase_button.tscn::PackedScene::7912623218360993094::1704459379::0::1::::<><>::res://Hud/purchase_button.gd<>uid://cw23v8nlfy06y::::res://Themes/Title.tres<>uid://crf5gyv8gm6r1::::res://Themes/Subtle Background.tres<>uid://exe3ppvvv74m::::res://Hud/bar.tscn<>uid://ygxbtnng8h6u::::res://Art/Icons/Hud/Locked.png<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://rfljn78ajnbs::::res://Themes/Invis.tres
 RichLabel.gd::GDScript::-1::1704410242::0::1::::<>RichTextLabel<>::
 RichLabel.tscn::PackedScene::5735237608591359768::1704232971::0::1::::<><>::uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>res://Hud/RichLabel.gd
-::res://Hud/Thingy/::1704460561
-thingy_container.gd::GDScript::-1::1704414299::0::1::::ThingyContainer<>MarginContainer<>::
-thingy_container.tscn::PackedScene::3362465393043852988::1704460560::0::1::::<><>::res://Hud/Thingy/thingy_container.gd<>uid://btmej8oakg4f1::::res://Hud/Thingy/thingy_vico.tscn<>uid://dky60pdpk0ffa::::res://Hud/purchase_button.tscn<>uid://c81tbq6j5hhl6::::res://Art/Icons/Hud/arrow-up-s-line.png<>uid://d328m6cljbdnh::::res://Art/Icons/Hud/arrow-down-s-line.png<>uid://dsiwa3s1c7mj::::res://Art/Icons/Hud/Up Skip.png<>uid://td87cqg3l2dp::::res://Art/Icons/Hud/Down Skip.png<>uid://f0bw1mm367n6::::res://Hud/Thingy/thingy_widget.tscn
-thingy_vico.gd::GDScript::-1::1704416709::0::1::::ThingyVico<>MarginContainer<>::
+::res://Hud/Thingy/::1704507064
+thingy_container.gd::GDScript::-1::1704461941::0::1::::ThingyContainer<>MarginContainer<>::
+thingy_container.tscn::PackedScene::3362465393043852988::1704507064::0::1::::<><>::res://Hud/Thingy/thingy_container.gd<>uid://btmej8oakg4f1::::res://Hud/Thingy/thingy_vico.tscn<>uid://dky60pdpk0ffa::::res://Hud/purchase_button.tscn<>uid://c81tbq6j5hhl6::::res://Art/Icons/Hud/arrow-up-s-line.png<>uid://d328m6cljbdnh::::res://Art/Icons/Hud/arrow-down-s-line.png<>uid://dsiwa3s1c7mj::::res://Art/Icons/Hud/Up Skip.png<>uid://td87cqg3l2dp::::res://Art/Icons/Hud/Down Skip.png<>uid://f0bw1mm367n6::::res://Hud/Thingy/thingy_widget.tscn
+thingy_vico.gd::GDScript::-1::1704506567::0::1::::ThingyVico<>MarginContainer<>::
 thingy_vico.tscn::PackedScene::3745041940892093064::1704459379::0::1::::<><>::res://Hud/Thingy/thingy_vico.gd<>uid://exe3ppvvv74m::::res://Hud/bar.tscn<>uid://d0f4im7h1ne7c::::res://Themes/ShadowText.tres<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://cb3ej8nlybhvm::::res://Hud/icon_button.tscn
-thingy_widget.gd::GDScript::-1::1704425340::0::1::::ThingyWidget<>MarginContainer<>::
-thingy_widget.tscn::PackedScene::402655051228985617::1704460561::0::1::::<><>::res://Hud/Thingy/thingy_widget.gd<>uid://crf5gyv8gm6r1::::res://Themes/Subtle Background.tres<>uid://dowun7x403k8u::::res://Hud/Header.tscn<>uid://cnygr4pwivdv1::::res://Hud/RichLabel.tscn<>uid://exe3ppvvv74m::::res://Hud/bar.tscn
-::res://Hud/Upgrades/::1704460561
+thingy_widget.gd::GDScript::-1::1704506530::0::1::::ThingyWidget<>MarginContainer<>::
+thingy_widget.tscn::PackedScene::402655051228985617::1704507064::0::1::::<><>::res://Hud/Thingy/thingy_widget.gd<>uid://crf5gyv8gm6r1::::res://Themes/Subtle Background.tres<>uid://dowun7x403k8u::::res://Hud/Header.tscn<>uid://cnygr4pwivdv1::::res://Hud/RichLabel.tscn<>uid://bkebt7vnjp4bt::::res://Art/Icons/Hud/activeBuffs.png<>uid://exe3ppvvv74m::::res://Hud/bar.tscn
+::res://Hud/Upgrades/::1704507070
 upgrade_button.gd::GDScript::-1::1704381687::0::1::::<>MarginContainer<>::
 upgrade_button.tscn::PackedScene::2491502938451047159::1704459379::0::1::::<><>::uid://dky60pdpk0ffa::::res://Hud/purchase_button.tscn<>res://Hud/Upgrades/upgrade_button.gd
-upgrade_container.gd::GDScript::-1::1704380851::0::1::::UpgradeContainer<>MarginContainer<>::
-upgrade_container.tscn::PackedScene::8340248155006243492::1704460561::0::1::::<><>::res://Hud/Upgrades/upgrade_container.gd<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://bbq5xo6rr5ldf::::res://Hud/Upgrades/upgrade_button.tscn
-::res://Scripts/::1704460560
-Main.gd::GDScript::-1::1704460560::0::1::::<>CanvasLayer<>::
-::res://Scripts/Autoload/::1704460648
-Overseer.gd::GDScript::-1::1704414919::0::1::::<>Node<>::
+upgrade_container.gd::GDScript::-1::1704462783::0::1::::UpgradeContainer<>MarginContainer<>::
+upgrade_container.tscn::PackedScene::8340248155006243492::1704507070::0::1::::<><>::res://Hud/Upgrades/upgrade_container.gd<>uid://b8t7tkhvril5g::::res://Themes/Standard.tres<>uid://bbq5xo6rr5ldf::::res://Hud/Upgrades/upgrade_button.tscn
+::res://Scripts/::1704506265
+Main.gd::GDScript::-1::1704506265::0::1::::<>CanvasLayer<>::
+::res://Scripts/Autoload/::1704506605
+Overseer.gd::GDScript::-1::1704461916::0::1::::<>Node<>::
 Resources.gd::GDScript::-1::1704164271::0::1::::<>Node<>::
-Thingies.gd::GDScript::-1::1704427199::0::1::::<>Node<>::
+Thingies.gd::GDScript::-1::1704506605::0::1::::<>Node<>::
 TimeParser.gd::GDScript::-1::1704288921::0::1::::TimeParser<>Node<>::
-Upgrades.gd::GDScript::-1::1704460648::0::1::::<>Node<>::
-Wallet.gd::GDScript::-1::1704294860::0::1::::<>Node<>::
-::res://Scripts/Classes/::1704457415
-Big.gd::GDScript::-1::1704243655::0::1::::Big<>Resource<>::
-Cost.gd::GDScript::-1::1704238215::0::1::::Cost<>RefCounted<>::
-Currency.gd::GDScript::-1::1704325214::0::1::::Currency<>Resource<>::
+Upgrades.gd::GDScript::-1::1704461006::0::1::::<>Node<>::
+Wallet.gd::GDScript::-1::1704506510::0::1::::<>Node<>::
+::res://Scripts/Classes/::1704506595
+Big.gd::GDScript::-1::1704494995::0::1::::Big<>Resource<>::
+Cost.gd::GDScript::-1::1704495537::0::1::::Cost<>RefCounted<>::
+Currency.gd::GDScript::-1::1704505952::0::1::::Currency<>Resource<>::
 Details.gd::GDScript::-1::1704410242::0::1::::Details<>RefCounted<>::
-Thingy.gd::GDScript::-1::1704457415::0::1::::Thingy<>Resource<>::
-Value.gd::GDScript::-1::1704322800::0::1::::Value<>Resource<>::
-ValuePair.gd::GDScript::-1::1702605619::0::1::::ValuePair<>Resource<>::
-::res://Scripts/Classes/LoudVar/::1704413346
+Thingy.gd::GDScript::-1::1704506595::0::1::::Thingy<>Resource<>::
+Value.gd::GDScript::-1::1704495475::0::1::::Value<>Resource<>::
+ValuePair.gd::GDScript::-1::1704495020::0::1::::ValuePair<>Resource<>::
+::res://Scripts/Classes/LoudVar/::1704465185
 LoudBool.gd::GDScript::-1::1702513271::0::1::::LoudBool<>Resource<>::
-LoudFloat.gd::GDScript::-1::1704413346::0::1::::LoudFloat<>Resource<>::
+LoudFloat.gd::GDScript::-1::1704465185::0::1::::LoudFloat<>Resource<>::
 LoudFloatPair.gd::GDScript::-1::1704402672::0::1::::FloatPair<>Resource<>::
 LoudInt.gd::GDScript::-1::1704210415::0::1::::LoudInt<>Resource<>::
 LoudString.gd::GDScript::-1::1701557307::0::1::::LoudString<>Resource<>::
-::res://Scripts/Classes/Upgrade/::1704457489
-Upgrade.gd::GDScript::-1::1704457489::0::1::::Upgrade<>RefCounted<>::
-::res://Themes/::1704458923
+::res://Scripts/Classes/Upgrade/::1704507070
+Upgrade.gd::GDScript::-1::1704507070::0::1::::Upgrade<>RefCounted<>::
+::res://Themes/::1704500067
 Backdrop.tres::StyleBoxFlat::5304665560953821616::1694472834::0::1::::<><>::
 Background.tres::Theme::3219689336373708926::1704458139::0::1::::<><>::
-Invis.tres::Theme::1204216923419455568::1704458450::0::1::::<><>::
+Invis.tres::Theme::1204216923419455568::1704500067::0::1::::<><>::
 ProgressBar.tres::StyleBoxFlat::2193693551860770987::1704163332::0::1::::<><>::
 RoundedBackground.tres::StyleBoxFlat::2018241675329142414::1703809027::0::1::::<><>::
 RoundedBackgroundNoShadow.tres::StyleBoxFlat::260234574384433898::1700410699::0::1::::<><>::
 RoundedTop.tres::StyleBoxFlat::1701306149503731752::1699657612::0::1::::<><>::
 RoundedTopWithShadow.tres::StyleBoxFlat::4134906987486025550::1703809027::0::1::::<><>::
-ShadowText.tres::Theme::8926080790009130682::1704458450::0::1::::<><>::uid://cubavfw1lomep::::res://Fonts/Roboto-Black.ttf<>uid://d2cepijgbnmb1::::res://Fonts/Roboto-BlackItalic.ttf<>uid://1w6nq6sovkc2::::res://Fonts/Roboto-MediumItalic.ttf<>uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf
+ShadowText.tres::Theme::8926080790009130682::1704500067::0::1::::<><>::uid://cubavfw1lomep::::res://Fonts/Roboto-Black.ttf<>uid://d2cepijgbnmb1::::res://Fonts/Roboto-BlackItalic.ttf<>uid://1w6nq6sovkc2::::res://Fonts/Roboto-MediumItalic.ttf<>uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf
 SolidBackground.tres::StyleBoxFlat::3307126565005289449::1700430324::0::1::::<><>::
-Standard.tres::Theme::4743853111952347486::1704458923::0::1::::<><>::uid://cubavfw1lomep::::res://Fonts/Roboto-Black.ttf<>uid://d2cepijgbnmb1::::res://Fonts/Roboto-BlackItalic.ttf<>uid://1w6nq6sovkc2::::res://Fonts/Roboto-MediumItalic.ttf<>uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf
-Subtle Background Rounded.tres::Theme::7960792126901929568::1704458450::0::1::::<><>::
-Subtle Background.tres::Theme::5978207117058666104::1704458450::0::1::::<><>::
+Standard.tres::Theme::4743853111952347486::1704500067::0::1::::<><>::uid://cubavfw1lomep::::res://Fonts/Roboto-Black.ttf<>uid://d2cepijgbnmb1::::res://Fonts/Roboto-BlackItalic.ttf<>uid://1w6nq6sovkc2::::res://Fonts/Roboto-MediumItalic.ttf<>uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf
+Subtle Background Rounded.tres::Theme::7960792126901929568::1704500067::0::1::::<><>::
+Subtle Background.tres::Theme::5978207117058666104::1704500067::0::1::::<><>::
 TextButton.tres::Theme::5481715579893497555::1703809027::0::1::::<><>::uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf
 TextButtonAlternate.tres::Theme::2306309963710176350::1703809027::0::1::::<><>::uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf
-Title.tres::Theme::6374473458112449098::1704458450::0::1::::<><>::uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf<>uid://cubavfw1lomep::::res://Fonts/Roboto-Black.ttf<>uid://d2cepijgbnmb1::::res://Fonts/Roboto-BlackItalic.ttf<>uid://1w6nq6sovkc2::::res://Fonts/Roboto-MediumItalic.ttf
+Title.tres::Theme::6374473458112449098::1704500067::0::1::::<><>::uid://caej2ljgikhb3::::res://Fonts/Roboto-Medium.ttf<>uid://cubavfw1lomep::::res://Fonts/Roboto-Black.ttf<>uid://d2cepijgbnmb1::::res://Fonts/Roboto-BlackItalic.ttf<>uid://1w6nq6sovkc2::::res://Fonts/Roboto-MediumItalic.ttf

@@ -114,5 +114,5 @@ func get_progress_percent() -> float:
 	for cur in amount:
 		var currency = wa.get_currency(cur)
 		var _amount = amount[cur].get_value()
-		percent += currency.amount.percent(_amount)
+		percent += currency.get_amount().percent(_amount)
 	return percent / total_percent

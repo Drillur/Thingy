@@ -18,9 +18,9 @@ var next_thingy_color := Color(1, 0.243, 0.208)
 var xp_output_range := FloatPair.new(1.0, 1.0)
 var xp_increase_range := FloatPair.new(1.15, 1.15)
 var xp_multiplier := LoudFloat.new(1.0)
-var xp_unlocked := LoudBool.new(false)
 var crits_apply_to_xp := LoudBool.new(false)
 var crits_apply_to_coin := LoudBool.new(false)
+var crits_apply_to_duration := LoudBool.new(false)
 
 var output_range := FloatPair.new(1.0, 1.0)
 var output_increase_range := FloatPair.new(1.15, 1.15)
@@ -33,6 +33,13 @@ var crit_coin_output := FloatPair.new(0.0, 0.0)
 var duration_range := FloatPair.new(5.0, 5.0)
 var duration_increase_range := FloatPair.new(1.1, 1.1)
 
+var juice_output_range := FloatPair.new(1.0, 1.0)
+var juice_input_range := FloatPair.new(1.0, 1.0)
+var juice_output_increase_range := FloatPair.new(1.1, 1.1)
+var juice_input_increase_range := FloatPair.new(1.1, 1.1)
+var juice_multiplier_range := FloatPair.new(2.0, 2.0)
+var max_juice_use := Value.new(0.0)
+
 
 
 func _ready():
@@ -40,7 +47,6 @@ func _ready():
 	cost.increase_multiplier = 3.0
 	initialized.emit()
 	return
-	xp_unlocked.set_to(true)
 	crit_chance.set_to(5)
 	crit_range.total.set_to(2.5)
 	output_range.total.set_to(2)

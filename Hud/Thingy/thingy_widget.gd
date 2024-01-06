@@ -26,7 +26,7 @@ var thingy: Thingy
 
 func _ready() -> void:
 	hide()
-	th.xp_unlocked.changed.connect(xp_unlocked)
+	wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked)
 	await th.container_loaded
 	th.container.selected_index.changed.connect(selected_index_changed)
 
@@ -102,7 +102,7 @@ func disconnect_calls() -> void:
 
 
 func xp_unlocked() -> void:
-	xp_components.visible = th.xp_unlocked.get_value()
+	xp_components.visible = wa.is_unlocked(Currency.Type.XP)
 	xp_output_range.visible = xp_components.visible
 	xp_increase_range.visible = xp_components.visible
 	output_increase_range.visible = xp_components.visible

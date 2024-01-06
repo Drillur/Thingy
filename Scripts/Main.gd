@@ -54,7 +54,7 @@ func _input(_event):
 #endregion
 
 
-#region Top Panel
+#region Currency Panel
 
 
 @onready var top_panel = %TopPanel
@@ -69,33 +69,61 @@ func _input(_event):
 @onready var xp_label = %"XP Label"
 @onready var xp_flair = %"XP Flair"
 @onready var xp_rate = %"XP Rate"
+@onready var juice_components = %JuiceComponents
+@onready var juice_label = %"Juice Label"
+@onready var juice_rate = %"Juice Rate"
+@onready var juice_flair = %"Juice Flair"
+@onready var will_components = %WillComponents
 
 
 func setup_top_panel() -> void:
 	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name
 	will_rate.modulate = wa.get_color(Currency.Type.WILL)
-	wa.get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
+	wa.get_currency(Currency.Type.WILL).amount.pending_changed.connect(will_changed)
 	wa.get_currency(Currency.Type.WILL).net_rate.changed.connect(will_rate_changed)
 	will_changed()
 	will_rate_changed()
+	
 	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).icon_and_name
 	coin_rate.modulate = wa.get_color(Currency.Type.COIN)
-	wa.get_currency(Currency.Type.COIN).amount.changed.connect(coin_changed)
+	wa.get_currency(Currency.Type.COIN).amount.pending_changed.connect(coin_changed)
 	wa.get_currency(Currency.Type.COIN).net_rate.changed.connect(coin_rate_changed)
+	wa.get_currency(Currency.Type.COIN).unlocked.changed.connect(coin_unlocked_changed)
 	coin_changed()
 	coin_rate_changed()
+	coin_unlocked_changed()
+	
 	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).icon_and_name
 	xp_rate.modulate = wa.get_color(Currency.Type.XP)
-	wa.get_currency(Currency.Type.XP).amount.changed.connect(xp_changed)
+	wa.get_currency(Currency.Type.XP).amount.pending_changed.connect(xp_changed)
 	wa.get_currency(Currency.Type.XP).net_rate.changed.connect(xp_rate_changed)
+	wa.get_currency(Currency.Type.XP).unlocked.changed.connect(xp_unlocked_changed)
 	xp_changed()
 	xp_rate_changed()
+	xp_unlocked_changed()
+	
+	juice_flair.text = "[i]" + wa.get_details(Currency.Type.JUICE).icon_and_name
+	juice_rate.modulate = wa.get_color(Currency.Type.JUICE)
+	wa.get_currency(Currency.Type.JUICE).amount.changed.connect(juice_changed)
+	wa.get_currency(Currency.Type.JUICE).amount.pending_changed.connect(juice_changed)
+	th.max_juice_use.changed.connect(juice_rate_changed)
+	wa.get_currency(Currency.Type.JUICE).unlocked.changed.connect(juice_unlocked_changed)
+	juice_changed()
+	juice_rate_changed()
+	juice_unlocked_changed()
+	
 	top_panel.hide()
+
+
+func coin_unlocked_changed() -> void:
+	coin_components.visible = wa.is_unlocked(Currency.Type.COIN)
 
 
 func coin_changed() -> void:
 	coin_label.text = "[i]" + (
-		wa.get_details(Currency.Type.COIN).color_text % wa.get_amount_text(Currency.Type.COIN)
+		wa.get_details(Currency.Type.COIN).color_text % (
+			"+" + wa.get_currency(Currency.Type.COIN).amount.get_pending_text()
+		)
 	)
 
 
@@ -106,7 +134,7 @@ func coin_rate_changed() -> void:
 func will_changed() -> void:
 	will_label.text = "[i]" + (
 		wa.get_details(Currency.Type.WILL).color_text % (
-			wa.get_amount_text(Currency.Type.WILL)
+			"+" + wa.get_currency(Currency.Type.WILL).amount.get_pending_text()
 		)
 	)
 
@@ -115,16 +143,61 @@ func will_rate_changed() -> void:
 	will_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.WILL).get_text()
 
 
+func xp_unlocked_changed() -> void:
+	xp_components.visible = wa.is_unlocked(Currency.Type.XP)
+
+
 func xp_changed() -> void:
 	xp_label.text = "[i]" + (
 		wa.get_details(Currency.Type.XP).color_text % (
-			wa.get_amount_text(Currency.Type.XP)
+			"+" + wa.get_currency(Currency.Type.XP).amount.get_pending_text()
 		)
 	)
 
 
 func xp_rate_changed() -> void:
 	xp_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.XP).get_text()
+
+
+func juice_unlocked_changed() -> void:
+	juice_components.visible = wa.is_unlocked(Currency.Type.JUICE)
+
+
+func juice_changed() -> void:
+	juice_label.text = "[i]" + (
+		wa.get_details(Currency.Type.JUICE).color_text % (
+			wa.get_amount_text(Currency.Type.JUICE) + "+" +
+			wa.get_pending_amount(Currency.Type.JUICE).text
+		)
+	)
+
+
+func juice_rate_changed() -> void:
+	juice_rate.text = "[i](%s)" % th.max_juice_use.get_text()
+
+
+func _on_coin_components_resized():
+	if is_node_ready():
+		if coin_components.size.x > coin_components.custom_minimum_size.x:
+			coin_components.custom_minimum_size.x = coin_components.size.x
+
+
+func _on_will_components_resized():
+	if is_node_ready():
+		if will_components.size.x > will_components.custom_minimum_size.x:
+			will_components.custom_minimum_size.x = will_components.size.x
+
+
+func _on_xp_components_resized():
+	if is_node_ready():
+		if xp_components.size.x > xp_components.custom_minimum_size.x:
+			xp_components.custom_minimum_size.x = xp_components.size.x
+
+
+func _on_juice_components_resized():
+	if is_node_ready():
+		if juice_components.size.x > juice_components.custom_minimum_size.x:
+			juice_components.custom_minimum_size.x = juice_components.size.x
 
 
 #endregion

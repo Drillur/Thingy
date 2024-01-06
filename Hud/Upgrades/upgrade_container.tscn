@@ -86,9 +86,9 @@ layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="UpgradeButton5" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer4" instance=ExtResource("2_yq021")]
+[node name="UpgradeButton8" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer4" instance=ExtResource("2_yq021")]
 layout_mode = 2
-upgrade_type = 19
+upgrade_type = 24
 
 [node name="UpgradeButton6" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer4" instance=ExtResource("2_yq021")]
 layout_mode = 2
@@ -105,7 +105,7 @@ alignment = 1
 
 [node name="UpgradeButton5" parent="TabContainer/Gamblin\' Man/MarginContainer/VBoxContainer/HBoxContainer5" instance=ExtResource("2_yq021")]
 layout_mode = 2
-upgrade_type = 24
+upgrade_type = 28
 
 [node name="Firestarter" type="ScrollContainer" parent="TabContainer"]
 visible = false
@@ -186,6 +186,16 @@ upgrade_type = 26
 [node name="UpgradeButton6" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer3" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 27
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="UpgradeButton6" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer5" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 29
+wrap_description = true
 
 [node name="Voyager" type="ScrollContainer" parent="TabContainer"]
 visible = false

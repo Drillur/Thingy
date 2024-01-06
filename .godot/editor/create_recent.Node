@@ -1,8 +1,8 @@
-TextureRect
-HBoxContainer
-MarginContainer
-Panel
 VBoxContainer
+MarginContainer
+HBoxContainer
+TextureRect
+Panel
 Label
 ScrollContainer
 HScrollBar

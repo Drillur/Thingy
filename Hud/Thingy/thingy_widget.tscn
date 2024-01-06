@@ -102,7 +102,7 @@ text = "[img=<15>]res://Art/Icons/Hud/Arrow Up Fill.png[/img] [b]x1.15"
 [node name="XP Output Range" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
 unique_name_in_owner = true
 layout_mode = 2
-text = "[img=<15> color=#e482ff]res://Art/Icons/Hud/Star.png[/img] Experience: [b]1"
+text = "[img=<15> color=#6cf420]res://Art/Icons/Hud/Juice.png[/img] Experience: [b]1"
 autowrap_mode = 0
 
 [node name="Crit Coin" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]

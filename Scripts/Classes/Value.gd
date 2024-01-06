@@ -9,8 +9,10 @@ var saved_vars := [
 
 signal increased
 signal decreased
+signal pending_changed
 
 var current: Big
+var pending := Big.new(0.0, true)
 
 var added := Big.new(0, true)
 var subtracted := Big.new(0, true)
@@ -18,20 +20,24 @@ var multiplied := Big.new(1, true)
 var divided := Big.new(1, true)
 
 
-
 func _init(base_value = 0.0) -> void:
 	current = Big.new(base_value, true)
 	current.changed.connect(emit_changed)
 	current.increased.connect(emit_increase)
 	current.decreased.connect(emit_decrease)
+	pending.changed.connect(emit_pending_changed)
 
 
 func emit_increase() -> void:
-	emit_signal("increased")
+	increased.emit()
 
 
 func emit_decrease() -> void:
-	emit_signal("decreased")
+	decreased.emit()
+
+
+func emit_pending_changed() -> void:
+	pending_changed.emit()
 
 
 func set_to(amount) -> void:
@@ -46,19 +52,13 @@ func add(amount) -> void:
 	current.a(amount)
 
 
-func subtract(amount: Big) -> void:
+func subtract(amount) -> void:
+	if not amount is Big:
+		amount = Big.new(amount)
 	if amount.greater_equal(current):
 		current.set_to(0)
 	else:
 		current.s(amount)
-
-
-func add_pending(amount: Big) -> void:
-	current.add_pending(amount)
-
-
-func subtract_pending(amount: Big) -> void:
-	current.subtract_pending(amount)
 
 
 
@@ -69,10 +69,6 @@ func sync() -> void:
 	new_cur.m(multiplied)
 	new_cur.d(divided)
 	current.set_to(new_cur)
-
-
-func get_text() -> String:
-	return current.text
 
 
 func get_value() -> Big:
@@ -125,6 +121,7 @@ var log := {
 	"subtracted": {},
 	"multiplied": {},
 	"divided": {},
+	"pending": {},
 }
 
 
@@ -143,6 +140,8 @@ func add_change(category: String, source, amount) -> void:
 			increase_multiplied(amount)
 		"divided":
 			increase_divided(amount)
+		"pending":
+			pending.a(amount)
 
 
 func edit_change(category: String, source, amount) -> void:
@@ -164,6 +163,8 @@ func remove_change(category: String, source, sync_afterwards := true) -> void:
 			multiplied.d(amount)
 		"divided":
 			divided.d(amount)
+		"pending":
+			pending.s(amount)
 	log[category].erase(source)
 	if sync_afterwards:
 		sync()
@@ -179,7 +180,15 @@ func reset():
 
 
 
-# - Get
+#region Get
+
+
+func get_text() -> String:
+	return current.text
+
+
+func get_pending_text() -> String:
+	return pending.text
 
 
 func get_as_float() -> float:
@@ -209,6 +218,8 @@ func less_equal(value) -> bool:
 func equal(value) -> bool:
 	return current.equal(value)
 
+
+#endregion
 
 
 # - Dev

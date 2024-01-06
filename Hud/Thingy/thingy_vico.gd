@@ -32,11 +32,10 @@ func _ready() -> void:
 	xp_labels.hide()
 	xp_bar.hide()
 	crit_success.hide()
-	output_label.modulate = wa.get_color(Currency.Type.WILL)
 	await th.container_loaded
 	th.thingy_created.connect(thingy_created)
 	th.container.selected_index.changed.connect(selected_index_changed)
-	th.xp_unlocked.changed.connect(xp_unlocked_changed)
+	wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked_changed)
 	xp_unlocked_changed()
 	
 	match get_index():
@@ -63,7 +62,8 @@ func _process(_delta):
 
 func connect_calls() -> void:
 	thingy.level.increased.connect(level_increased)
-	thingy.inhand.changed.connect(output_changed)
+	thingy.inhand_will.changed.connect(output_changed)
+	thingy.inhand_juice.changed.connect(output_changed)
 	thingy.timer_started.connect(timer_wait_time_changed)
 	thingy.crit_success.changed.connect(crit_success_changed)
 	thingy.level.changed.connect(level_changed)
@@ -76,7 +76,8 @@ func connect_calls() -> void:
 
 func disconnect_calls() -> void:
 	thingy.level.increased.disconnect(level_increased)
-	thingy.inhand.changed.disconnect(output_changed)
+	thingy.inhand_will.changed.disconnect(output_changed)
+	thingy.inhand_juice.changed.disconnect(output_changed)
 	thingy.timer_started.disconnect(timer_wait_time_changed)
 	thingy.crit_success.changed.disconnect(crit_success_changed)
 	thingy.level.changed.disconnect(level_changed)
@@ -125,10 +126,22 @@ func selected_index_changed() -> void:
 
 
 func output_changed() -> void:
-	var text = "[b][i]+%s[/i][/b] %s" % [
-		thingy.inhand.get_text(),
-		wa.get_details(Currency.Type.WILL).icon_text
-	]
+	var text: String
+	match thingy.output_currency.get_value():
+		Currency.Type.WILL:
+			text = wa.get_details(Currency.Type.WILL).color_text % (
+				"[b][i]+%s[/i][/b] %s" % [
+					thingy.inhand_will.get_text(),
+					wa.get_details(Currency.Type.WILL).icon_text
+				]
+			)
+		Currency.Type.JUICE:
+			text = wa.get_details(Currency.Type.JUICE).color_text % (
+				"[b][i]+%s[/i][/b] %s" % [
+					thingy.inhand_juice.get_text(),
+					wa.get_details(Currency.Type.JUICE).icon_text
+				]
+			)
 	output_label.text = text
 
 
@@ -136,7 +149,7 @@ func crit_success_changed() -> void:
 	if thingy.crit_success.is_true():
 		crit_success.show()
 		crit_success.text = "[img=<15> color=#%s]%s[/img] [b][i]x%s" % [
-			wa.get_color(thingy.inhand_currency).to_html(),
+			thingy.details.color.to_html(),
 			bag.get_resource("Dice").get_path(),
 			thingy.crit_multiplier.get_text()
 		]
@@ -156,7 +169,7 @@ func level_changed() -> void:
 
 
 func xp_unlocked_changed() -> void:
-	if th.xp_unlocked.is_true():
+	if wa.is_unlocked(Currency.Type.XP):
 		xp_labels.show()
 		xp_bar.show()
 	else:

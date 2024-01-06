@@ -120,9 +120,6 @@ autowrap_mode = 0
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 10
-theme_override_constants/separation = 0
-alignment = 1
 
 [node name="Output Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 unique_name_in_owner = true

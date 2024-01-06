@@ -7,13 +7,16 @@ enum Type {
 	WILL,
 	COIN,
 	XP,
+	JUICE,
 }
 
 var type: Type
 var key: String
 var details := Details.new()
 
-var amount: Big
+var amount: Value
+
+var unlocked := LoudBool.new(false)
 
 var net_rate := Big.new(0, true)
 var gain_rate := Value.new(0)
@@ -32,6 +35,7 @@ func _init(_type: Type) -> void:
 		Type.WILL:
 			details.color = Color(1, 0.114, 0.278)
 			details.icon = bag.get_resource("Heart")
+			unlocked = LoudBool.new(true)
 		Type.COIN:
 			details.color = Color(1, 0.867, 0)
 			details.icon = bag.get_resource("Coin")
@@ -39,6 +43,9 @@ func _init(_type: Type) -> void:
 			details.name = "Experience"
 			details.color = Color(0.894, 0.51, 1)
 			details.icon = bag.get_resource("Star")
+		Type.JUICE:
+			details.color = Color(0.424, 0.957, 0.125)
+			details.icon = bag.get_resource("Juice")
 
 
 
@@ -46,9 +53,9 @@ func _init(_type: Type) -> void:
 func set_starting_amount() -> void:
 	match type:
 		Type.WILL:
-			amount = Big.new(1, true)
+			amount = Value.new(1)
 		_:
-			amount = Big.new(0, true)
+			amount = Value.new(0)
 
 
 
@@ -58,11 +65,11 @@ func set_starting_amount() -> void:
 
 
 func add(_amount) -> void:
-	amount.a(_amount)
+	amount.add(_amount)
 
 
 func subtract(_amount) -> void:
-	amount.s(_amount)
+	amount.subtract(_amount)
 
 
 func sync_rate() -> void:
@@ -77,25 +84,23 @@ func sync_rate() -> void:
 
 
 
-func add_pending(_amount: Big) -> void:
-	amount.add_pending(_amount)
-
-
-func subtract_pending(_amount: Big) -> void:
-	amount.subtract_pending(_amount)
-
-
-
-# - Get
+#region Get
 
 
 func get_eta(threshold: Big) -> Big:
 	if (
-		amount.greater_equal(threshold)
+		get_amount().greater_equal(threshold)
 		or net_rate.equal(0)
 		or net_rate.positive.is_false()
 	):
 		return Big.new(0)
 	
-	var deficit = Big.new(threshold).s(amount)
+	var deficit = Big.new(threshold).s(get_amount())
 	return deficit.d(net_rate)
+
+
+func get_amount() -> Big:
+	return amount.get_value()
+
+
+#endregion

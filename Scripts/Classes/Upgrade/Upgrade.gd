@@ -32,6 +32,8 @@ enum Type {
 	DURATION03,
 	OUTPUT03,
 	COIN01,
+	CRITS_APPLY_TO_DURATION,
+	UNLOCK_JUICE,
 }
 
 var type: Type
@@ -222,7 +224,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Arrow Up Fill")
 			cost = Cost.new({
 				Currency.Type.XP: Value.new(40),
-				Currency.Type.WILL: Value.new(100)
+				Currency.Type.WILL: Value.new(200)
 			})
 			cost.increase_multiplier = 3.0
 			purchase_limit = 3
@@ -237,7 +239,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Boxing")
 			cost = Cost.new({
 				Currency.Type.XP: Value.new(30),
-				Currency.Type.WILL: Value.new(175)
+				Currency.Type.WILL: Value.new(350)
 			})
 			cost.increase_multiplier = 4.0
 			purchase_limit = 5
@@ -266,7 +268,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Star")
 			cost = Cost.new({
 				Currency.Type.XP: Value.new(100),
-				Currency.Type.WILL: Value.new(350),
+				Currency.Type.WILL: Value.new(2500),
 				Currency.Type.COIN: Value.new(1)
 			})
 			cost.increase_multiplier = 4.0
@@ -281,7 +283,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Speed")
 			cost = Cost.new({
 				Currency.Type.XP: Value.new(120),
-				Currency.Type.WILL: Value.new(420),
+				Currency.Type.WILL: Value.new(3500),
 			})
 			cost.increase_multiplier = 4.0
 			purchase_limit = 3
@@ -295,7 +297,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Speed")
 			cost = Cost.new({
 				Currency.Type.XP: Value.new(50),
-				Currency.Type.WILL: Value.new(1000),
+				Currency.Type.WILL: Value.new(4000),
 				Currency.Type.COIN: Value.new(15),
 			})
 			cost.increase_multiplier = 2.0
@@ -306,18 +308,18 @@ func _init(_type: Type) -> void:
 		Type.CRITS_AFFECT_XP_GAIN:
 			required_upgrade = Type.UNLOCK_CRIT
 			details.name = "Rogue and Scholar"
-			details.description = "All crits apply to %s output." % (
+			details.description = "Crits apply to %s output." % (
 				wa.get_details(Currency.Type.XP).icon_and_name
 			)
 			details.icon = bag.get_resource("Star")
 			cost = Cost.new({
 				Currency.Type.XP: Value.new(250),
-				Currency.Type.WILL: Value.new(500),
+				Currency.Type.WILL: Value.new(1000),
 			})
 		Type.CRITS_AFFECT_COIN_GAIN:
 			required_upgrade = Type.CRIT01
 			details.name = "Through and Through"
-			details.description = "All crits apply to %s output." % (
+			details.description = "Crits apply to %s output." % (
 				wa.get_details(Currency.Type.COIN).icon_and_name
 			)
 			details.icon = bag.get_resource("Coin")
@@ -331,7 +333,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Speed")
 			cost = Cost.new({
 				Currency.Type.COIN: Value.new(10),
-				Currency.Type.WILL: Value.new(800),
+				Currency.Type.WILL: Value.new(3000),
 			})
 			cost.increase_multiplier = 3.0
 			purchase_limit = 5
@@ -347,7 +349,7 @@ func _init(_type: Type) -> void:
 			details.icon = bag.get_resource("Boxing")
 			cost = Cost.new({
 				Currency.Type.COIN: Value.new(15),
-				Currency.Type.WILL: Value.new(2000),
+				Currency.Type.WILL: Value.new(10000),
 			})
 			cost.increase_multiplier = 2.0
 			purchase_limit = 4
@@ -391,7 +393,7 @@ func _init(_type: Type) -> void:
 			cost = Cost.new({
 				Currency.Type.WILL: Value.new(5000),
 			})
-			cost.increase_multiplier = 5.0
+			cost.increase_multiplier = 8.0
 			purchase_limit = 3
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
 			category = "multiplied"
@@ -409,6 +411,24 @@ func _init(_type: Type) -> void:
 			thingy_attribute = Thingy.Attribute.CRIT_COIN_OUTPUT
 			category = "added"
 			mod = 1
+		Type.CRITS_APPLY_TO_DURATION:
+			required_upgrade = Type.CRITS_AFFECT_COIN_GAIN
+			details.name = "Theif's Gait"
+			details.description = "Crits apply to duration."
+			details.icon = bag.get_resource("Speed")
+			cost = Cost.new({
+				Currency.Type.COIN: Value.new(100),
+			})
+		Type.UNLOCK_JUICE:
+			details.name = "Unlock Juice"
+			details.description = "Thingies may consume %s to become [i][wave amp=20 freq=1]juiced![/wave][/i], reducing duration and increasing primary output." % (
+				wa.get_details(Currency.Type.JUICE).icon_and_name
+			)
+			details.icon = bag.get_resource("Juice")
+			details.color = wa.get_color(Currency.Type.JUICE)
+			cost = Cost.new({
+				Currency.Type.WILL: Value.new("1e6"),
+			})
 	
 	match thingy_attribute:
 		Thingy.Attribute.XP:
@@ -556,7 +576,13 @@ func remove() -> void:
 		Type.CRITS_AFFECT_COIN_GAIN:
 			th.crits_apply_to_coin.set_to(false)
 		Type.UNLOCK_XP:
-			th.xp_unlocked.set_to(false)
+			wa.lock(Currency.Type.XP)
+		Type.CRITS_APPLY_TO_DURATION:
+			th.crits_apply_to_duration.set_to(false)
+		Type.CRITS_GIVE_GOLD:
+			wa.lock(Currency.Type.COIN)
+		Type.UNLOCK_JUICE:
+			wa.lock(Currency.Type.JUICE)
 
 
 func apply() -> void:
@@ -570,7 +596,13 @@ func apply() -> void:
 		Type.CRITS_AFFECT_COIN_GAIN:
 			th.crits_apply_to_coin.set_to(true)
 		Type.UNLOCK_XP:
-			th.xp_unlocked.set_to(true)
+			wa.unlock(Currency.Type.XP)
+		Type.CRITS_APPLY_TO_DURATION:
+			th.crits_apply_to_duration.set_to(true)
+		Type.CRITS_GIVE_GOLD:
+			wa.unlock(Currency.Type.COIN)
+		Type.UNLOCK_JUICE:
+			wa.unlock(Currency.Type.JUICE)
 
 
 

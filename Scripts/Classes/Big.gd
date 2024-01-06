@@ -83,7 +83,6 @@ const MIN_INTEGER: int = -9223372036854775807
 const MAX_INTEGER: int = 9223372036854775806
 
 var base := {"mantissa": 1.0, "exponent": 0}
-var pending := {"mantissa": 0.0, "exponent": 0}
 var emit_changes: bool
 
 
@@ -115,8 +114,6 @@ func _init(mant = 1.0, _emit_changes := false):
 func reset() -> void:
 	mantissa = base.mantissa
 	exponent = base.exponent
-	pending.mantissa = 0.0
-	pending.exponent = 0
 	emit_decrease()
 	calculate(self)
 
@@ -265,30 +262,6 @@ func set_to(n) -> Big:
 	elif smaller:
 		emit_decrease()
 	return self
-
-
-func add_pending(n) -> void:
-	n = type_check(n)
-	var exp_diff = n.exponent - exponent
-	if exp_diff < 248:
-		var scaled_mantissa = n.mantissa * pow(10, exp_diff)
-		pending.mantissa += scaled_mantissa
-	elif less(n):
-		pending.mantissa = n.mantissa #when difference between values is big, throw away small number
-		pending.exponent = n.exponent
-	calculate(pending)
-
-
-func subtract_pending(n) -> void:
-	n = type_check(n)
-	var exp_diff = n.exponent - exponent #abs?
-	if exp_diff < 248:
-		var scaled_mantissa = n.mantissa * pow(10, exp_diff)
-		pending.mantissa -= scaled_mantissa
-	elif less(n):
-		pending.mantissa = -MANTISSA_PRECISSION
-		pending.exponent = n.exponent
-	calculate(pending)
 
 
 func percent(n) -> float:
@@ -514,8 +487,8 @@ func pow10(value:int):
 	exponent = int(value)
 
 
-func toFloat() -> float:
-	return snappedf(float(str(mantissa) + "e" + str(exponent)),0.01)
+func toFloat(big = self) -> float:
+	return snappedf(float(str(big.mantissa) + "e" + str(big.exponent)),0.01)
 
 
 func toInt() -> int:
@@ -553,26 +526,30 @@ static func get_big_float_text(value: float) -> String:
 	
 	return output # 342,945
 
+
 func get_text() -> String:
 	return text
 
+
 func toScientific():
 	return Big.get_float_text(mantissa) + "e" + format_exponent(exponent)
+
 
 func toEngineering():
 	var mod = exponent % 3
 	return Big.get_float_text(mantissa * pow(10, mod)) + "e" + Big.get_float_text(exponent - mod)
 
-func toLog():
-	var exponent_text := "e" + format_exponent(exponent)
-	if exponent >= 1000:
+
+func toLog(big = self):
+	var exponent_text := "e" + format_exponent(big.exponent)
+	if big.exponent >= 1000:
 		return exponent_text
 	
 	var dec := "."
-	var altered_mantissa := log(mantissa) / log(10) * 10
+	var altered_mantissa := log(big.mantissa) / log(10) * 10
 	var padded_zeroes: int
 	
-	if exponent >= 100:
+	if big.exponent >= 100:
 		padded_zeroes = 1
 	else:
 		padded_zeroes = 2
