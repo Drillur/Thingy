@@ -1,0 +1,163 @@
+[gd_scene load_steps=8 format=3 uid="uid://dky60pdpk0ffa"]
+
+[ext_resource type="Script" path="res://Hud/Scenes/purchase_button.gd" id="1_c15yb"]
+[ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Hud/Themes/Subtle Background.tres" id="2_c4q5t"]
+[ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/Scenes/bar.tscn" id="3_406o2"]
+[ext_resource type="Texture2D" uid="uid://ygxbtnng8h6u" path="res://Art/Icons/Hud/Locked.png" id="3_bxao5"]
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="4_dhfok"]
+[ext_resource type="Theme" uid="uid://cw23v8nlfy06y" path="res://Hud/Themes/Title.tres" id="5_aof47"]
+[ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Hud/Themes/Invis.tres" id="7_d7nvp"]
+
+[node name="Purchase Button" type="MarginContainer"]
+offset_right = 44.0
+offset_bottom = 44.0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+script = ExtResource("1_c15yb")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 2
+theme = ExtResource("2_c4q5t")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Details" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Details"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="TitleComponents" type="HBoxContainer" parent="VBoxContainer/Details/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IconContainer" type="Control" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Texture Rect" type="TextureRect" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/IconContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+offset_right = 24.0
+offset_bottom = 24.0
+size_flags_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("3_bxao5")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Title" type="RichTextLabel" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("4_dhfok")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+
+[node name="TimesPurchased" type="RichTextLabel" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("4_dhfok")
+bbcode_enabled = true
+text = "4/16"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Description" type="RichTextLabel" parent="VBoxContainer/Details/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+theme = ExtResource("4_dhfok")
+bbcode_enabled = true
+text = "Increases the haste of all Thingies, reducing duration."
+fit_content = true
+autowrap_mode = 0
+
+[node name="CostComponents" type="VBoxContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/CostComponents"]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+
+[node name="title bg" type="Panel" parent="VBoxContainer/CostComponents/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("5_aof47")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/CostComponents/MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 9
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 9
+
+[node name="Check" type="CheckBox" parent="VBoxContainer/CostComponents/MarginContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+focus_mode = 0
+mouse_filter = 2
+theme = ExtResource("5_aof47")
+text = "44 seconds"
+
+[node name="MarginContainer3" type="MarginContainer" parent="VBoxContainer/CostComponents"]
+layout_mode = 2
+
+[node name="Bar" parent="VBoxContainer/CostComponents/MarginContainer3" instance=ExtResource("3_406o2")]
+unique_name_in_owner = true
+layout_mode = 2
+kill_background = true
+
+[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/CostComponents/MarginContainer3"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content Parent" type="VBoxContainer" parent="VBoxContainer/CostComponents/MarginContainer3/MarginContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Button" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme = ExtResource("7_d7nvp")
+
+[connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
+[connection signal="focus_exited" from="." to="." method="_on_focus_exited"]
+[connection signal="button_down" from="Button" to="." method="_on_button_button_down"]
+[connection signal="button_up" from="Button" to="." method="_on_button_button_up"]
+[connection signal="gui_input" from="Button" to="." method="_on_button_gui_input"]
+[connection signal="mouse_entered" from="Button" to="." method="_on_button_mouse_entered"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

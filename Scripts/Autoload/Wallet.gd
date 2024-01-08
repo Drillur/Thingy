@@ -3,12 +3,25 @@ extends Node
 
 
 var currencies := {}
+var soul_gain := Big.new(0)
 
 
 
 func _ready() -> void:
 	for cur in Currency.Type.values():
 		currencies[cur] = Currency.new(cur)
+	get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
+
+
+
+func will_changed() -> void:
+	var new_amount = Big.new(
+		maxf(
+			0,
+			pow(get_amount(Currency.Type.WILL).logN(15), 1.5) - 8
+		)
+	).roundDown()
+	soul_gain.set_to(new_amount)
 
 
 

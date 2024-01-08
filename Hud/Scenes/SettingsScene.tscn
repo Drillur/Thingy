@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=3 uid="uid://cqkk62rlbp3l"]
+
+[ext_resource type="Script" path="res://Hud/Scenes/Settings.gd" id="1_fcgah"]
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="4_7cy5f"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="5_w75e1"]
+
+[node name="Settings" type="MarginContainer"]
+offset_right = 158.0
+offset_bottom = 68.0
+script = ExtResource("1_fcgah")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Fullscreen" type="CheckBox" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("4_7cy5f")
+text = "Fullscreen"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2"]
+layout_mode = 2
+
+[node name="JoypadAllowed" type="CheckBox" parent="VBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("4_7cy5f")
+button_pressed = true
+text = "Joypad allowed"
+
+[node name="JoypadAllowedDetails" type="MarginContainer" parent="VBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer2/VBoxContainer/JoypadAllowedDetails"]
+layout_mode = 2
+
+[node name="RichTextLabel" parent="VBoxContainer2/VBoxContainer/JoypadAllowedDetails/HBoxContainer" instance=ExtResource("5_w75e1")]
+layout_mode = 2
+text = "Joypad detected?"
+autowrap_mode = 0
+
+[node name="JoypadDetected" type="CheckBox" parent="VBoxContainer2/VBoxContainer/JoypadAllowedDetails/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("4_7cy5f")
+disabled = true
+button_pressed = true

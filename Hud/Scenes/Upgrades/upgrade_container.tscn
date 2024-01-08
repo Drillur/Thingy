@@ -1,0 +1,214 @@
+[gd_scene load_steps=4 format=3 uid="uid://dq3cwy5fqfot5"]
+
+[ext_resource type="Script" path="res://Hud/Scenes/Upgrades/upgrade_container.gd" id="1_ymtti"]
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="2_0dyva"]
+[ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Scenes/Upgrades/upgrade_button.tscn" id="2_yq021"]
+
+[node name="UpgradeContainer" type="MarginContainer"]
+offset_right = 639.0
+offset_bottom = 723.0
+mouse_filter = 2
+script = ExtResource("1_ymtti")
+
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("2_0dyva")
+tab_alignment = 1
+tab_focus_mode = 0
+
+[node name="Firestarter" type="ScrollContainer" parent="TabContainer"]
+layout_mode = 2
+theme = ExtResource("2_0dyva")
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="TabContainer/Firestarter"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 250
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Firestarter/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+mouse_filter = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="GridContainer3" type="GridContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="haste 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
+layout_mode = 2
+size_flags_horizontal = 3
+upgrade_type = 1
+
+[node name="output 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
+layout_mode = 2
+size_flags_horizontal = 3
+upgrade_type = 2
+
+[node name="unlock crit" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
+layout_mode = 2
+size_flags_horizontal = 3
+upgrade_type = 7
+
+[node name="unlock xp" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
+layout_mode = 2
+size_flags_horizontal = 3
+upgrade_type = 6
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
+
+[node name="current duration range 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 11
+
+[node name="crits give gold" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 9
+
+[node name="crit 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 8
+
+[node name="output 02" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 15
+
+[node name="total output range 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 10
+
+[node name="crit range 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 21
+
+[node name="xp gain 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+size_flags_horizontal = 3
+upgrade_type = 16
+
+[node name="total xp gain 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 12
+
+[node name="crits affect xp gain" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 20
+
+[node name="GridContainer2" type="GridContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="duration 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 18
+
+[node name="output 03" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 26
+
+[node name="duration 02" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 24
+
+[node name="crits affect coin gain" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 22
+
+[node name="xp 02" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 4
+
+[node name="xp 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 17
+
+[node name="coin 01" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 27
+
+[node name="crits apply to duration" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 28
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="unlock voyager" parent="TabContainer/Firestarter/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 5
+
+[node name="Voyager" type="ScrollContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+theme = ExtResource("2_0dyva")
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="TabContainer/Voyager"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 250
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Voyager/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+mouse_filter = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="unlock juice" parent="TabContainer/Voyager/MarginContainer/VBoxContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 29
+wrap_description = true
+
+[node name="GridContainer4" type="GridContainer" parent="TabContainer/Voyager/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="duration 03" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 25
+
+[node name="output increase 01" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 14
+
+[node name="current xp increase range 01" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 13
+
+[node name="output increase range total 01" parent="TabContainer/Voyager/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 23
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="tab_changed" from="TabContainer" to="." method="_on_tab_container_tab_changed"]

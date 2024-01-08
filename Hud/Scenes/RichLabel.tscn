@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://cnygr4pwivdv1"]
+
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="1_uuvv5"]
+[ext_resource type="Script" path="res://Hud/Scenes/RichLabel.gd" id="2_7d7ni"]
+
+[node name="RichTextLabel" type="RichTextLabel"]
+offset_right = 51.0
+offset_bottom = 15.0
+mouse_filter = 2
+theme = ExtResource("1_uuvv5")
+bbcode_enabled = true
+text = "poopy"
+fit_content = true
+script = ExtResource("2_7d7ni")

@@ -1,16 +1,20 @@
-[gd_scene load_steps=12 format=3 uid="uid://cmo5x3dcvsaet"]
+[gd_scene load_steps=16 format=3 uid="uid://cmo5x3dcvsaet"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_q04pk"]
-[ext_resource type="PackedScene" uid="uid://bn52kwycifxlc" path="res://Hud/Thingy/thingy_container.tscn" id="3_i7kju"]
-[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Themes/Standard.tres" id="3_i8skv"]
-[ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Header.tscn" id="4_bh3ko"]
-[ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://Themes/Subtle Background Rounded.tres" id="5_dm0ov"]
+[ext_resource type="PackedScene" uid="uid://bn52kwycifxlc" path="res://Hud/Scenes/Thingy/thingy_container.tscn" id="3_i7kju"]
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="3_i8skv"]
+[ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Scenes/Header.tscn" id="4_bh3ko"]
+[ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://Hud/Themes/Subtle Background Rounded.tres" id="5_dm0ov"]
+[ext_resource type="PackedScene" uid="uid://cugpk4lkaganr" path="res://Hud/Scenes/MenuScene.tscn" id="5_i0mom"]
 [ext_resource type="Texture2D" uid="uid://bkebt7vnjp4bt" path="res://Art/Icons/Hud/activeBuffs.png" id="5_jecdi"]
-[ext_resource type="PackedScene" uid="uid://bfi0uovwegdxj" path="res://Hud/MenuButton.tscn" id="5_mtslg"]
+[ext_resource type="PackedScene" uid="uid://bfi0uovwegdxj" path="res://Hud/Scenes/MenuButton.tscn" id="5_mtslg"]
+[ext_resource type="PackedScene" uid="uid://cqkk62rlbp3l" path="res://Hud/Scenes/SettingsScene.tscn" id="6_81evl"]
 [ext_resource type="Texture2D" uid="uid://408er70eh4ns" path="res://Art/Icons/Hud/upgrades.png" id="6_jmjrv"]
-[ext_resource type="PackedScene" uid="uid://dq3cwy5fqfot5" path="res://Hud/Upgrades/upgrade_container.tscn" id="9_o0od1"]
-[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/purchase_button.tscn" id="9_x5lqm"]
-[ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Upgrades/upgrade_button.tscn" id="10_4ysqw"]
+[ext_resource type="PackedScene" uid="uid://dq3cwy5fqfot5" path="res://Hud/Scenes/Upgrades/upgrade_container.tscn" id="9_o0od1"]
+[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/purchase_button.tscn" id="9_x5lqm"]
+[ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Scenes/Upgrades/upgrade_button.tscn" id="10_4ysqw"]
+[ext_resource type="Texture2D" uid="uid://bvb4ehu30w7iu" path="res://Art/Icons/Hud/Settings.png" id="12_dnau6"]
+[ext_resource type="Texture2D" uid="uid://bihfgl6qch4gh" path="res://Art/Icons/Hud/Skull.png" id="15_im36d"]
 
 [node name="Main" type="CanvasLayer"]
 script = ExtResource("1_q04pk")
@@ -36,7 +40,7 @@ alignment = 1
 [node name="MarginBotLeft" type="MarginContainer" parent="Content/HBoxContainer"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_bottom = 84
+theme_override_constants/margin_top = 84
 
 [node name="Sidebar" type="MarginContainer" parent="Content/HBoxContainer/MarginBotLeft"]
 unique_name_in_owner = true
@@ -56,6 +60,7 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "Upgrades"
+color = Color(1, 0, 0.282353, 1)
 center_content = true
 
 [node name="MarginContainer" type="MarginContainer" parent="Content/HBoxContainer/MarginBotLeft/Sidebar/VBoxContainer"]
@@ -73,16 +78,18 @@ theme = ExtResource("3_i8skv")
 tabs_visible = false
 metadata/_edit_lock_ = true
 
-[node name="UpgradeContainer" parent="Content/HBoxContainer/MarginBotLeft/Sidebar/VBoxContainer/MarginContainer/TabContainer" instance=ExtResource("9_o0od1")]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(450, 400)
+[node name="Menu" parent="Content/HBoxContainer/MarginBotLeft/Sidebar/VBoxContainer/MarginContainer/TabContainer" instance=ExtResource("5_i0mom")]
 layout_mode = 2
 
-[node name="UnlockUpgradesButton" parent="Content/HBoxContainer/MarginBotLeft" instance=ExtResource("10_4ysqw")]
-unique_name_in_owner = true
+[node name="Settings" parent="Content/HBoxContainer/MarginBotLeft/Sidebar/VBoxContainer/MarginContainer/TabContainer" instance=ExtResource("6_81evl")]
+visible = false
 layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
+
+[node name="UpgradeContainer" parent="Content/HBoxContainer/MarginBotLeft/Sidebar/VBoxContainer/MarginContainer/TabContainer" instance=ExtResource("9_o0od1")]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(450, 400)
+layout_mode = 2
 
 [node name="ThingyContainer" parent="Content/HBoxContainer" instance=ExtResource("3_i7kju")]
 unique_name_in_owner = true
@@ -90,6 +97,15 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 metadata/_edit_lock_ = true
+
+[node name="Purchase Thingy" parent="Content/HBoxContainer/ThingyContainer" instance=ExtResource("9_x5lqm")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+focus_mode = 2
+icon = ExtResource("5_jecdi")
+text = "New Thingy"
 
 [node name="MarginContainer" type="MarginContainer" parent="Content"]
 layout_mode = 2
@@ -101,10 +117,23 @@ theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 metadata/_edit_lock_ = true
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="Content"]
+[node name="MarginBotLeft2" type="MarginContainer" parent="Content"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_top = 84
+metadata/_edit_lock_ = true
+
+[node name="UnlockUpgradesButton" parent="Content/MarginBotLeft2" instance=ExtResource("10_4ysqw")]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
-size_flags_vertical = 8
+size_flags_vertical = 0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Content"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 theme_override_constants/separation = 16
 
 [node name="Navigation Panel" type="MarginContainer" parent="Content/HBoxContainer2"]
@@ -129,15 +158,41 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBoxContainer" type="HBoxContainer" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer"]
+[node name="Navigation Buttons" type="HBoxContainer" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="Tab Upgrade" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/VBoxContainer" instance=ExtResource("5_mtslg")]
+[node name="Tab Menu" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+
+[node name="Tab Settings" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("12_dnau6")
+text = ""
+
+[node name="Tab Upgrade" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
 unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("6_jmjrv")
 text = ""
+
+[node name="DevButton" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("15_im36d")
+text = ""
+color = Color(1, 0, 0, 1)
+
+[node name="DevButton2" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("15_im36d")
+text = ""
+color = Color(1, 0, 0, 1)
 
 [node name="TopPanel" type="MarginContainer" parent="Content/HBoxContainer2"]
 unique_name_in_owner = true
@@ -322,12 +377,56 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="Purchase Thingy" parent="Content" instance=ExtResource("9_x5lqm")]
+[node name="SoulComponents" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 8
-icon = ExtResource("5_jecdi")
-text = "New Thingy"
+size_flags_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="Soul Label" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "234"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Soul Rate" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "4/s"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Soul Flair" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+
+[node name="DEV" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
 
 [node name="BottomPanel" type="MarginContainer" parent="."]
 visible = false
@@ -375,9 +474,14 @@ autowrap_mode = 0
 [node name="Timer" type="Timer" parent="FPS"]
 autostart = true
 
-[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/VBoxContainer/Tab Upgrade" to="." method="_on_tab_upgrade_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer/ThingyContainer/Purchase Thingy" to="." method="_on_purchase_thingy_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Menu" to="." method="_on_tab_menu_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Settings" to="." method="_on_tab_settings_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Upgrade" to="." method="_on_tab_upgrade_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/DevButton" to="." method="_on_dev_button_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/DevButton2" to="." method="_on_dev_button_2_pressed"]
 [connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/CoinComponents" to="." method="_on_coin_components_resized"]
 [connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/WillComponents" to="." method="_on_will_components_resized"]
 [connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/XPComponents" to="." method="_on_xp_components_resized"]
 [connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/JuiceComponents" to="." method="_on_juice_components_resized"]
-[connection signal="pressed" from="Content/Purchase Thingy" to="." method="_on_purchase_thingy_pressed"]
+[connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents" to="." method="_on_soul_components_resized"]

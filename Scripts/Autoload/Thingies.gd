@@ -39,6 +39,7 @@ var juice_output_increase_range := FloatPair.new(1.1, 1.1)
 var juice_input_increase_range := FloatPair.new(1.1, 1.1)
 var juice_multiplier_range := FloatPair.new(2.0, 2.0)
 var max_juice_use := Value.new(0.0)
+var smart_juice := LoudBool.new(false)
 
 
 

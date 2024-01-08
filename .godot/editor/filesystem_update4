@@ -1,22 +1,27 @@
-res://Hud/Upgrades/upgrade_container.tscn
-res://Themes/Standard.tres
-res://Themes/ShadowText.tres
-res://Themes/Invis.tres
-res://Themes/Title.tres
-res://Themes/Subtle Background.tres
-res://Themes/Subtle Background Rounded.tres
-res://Scripts/Classes/Upgrade/Upgrade.gd
-res://Hud/Upgrades/upgrade_button.tscn
-res://Hud/Upgrades/upgrade_button.gd
+res://Hud/Scenes/SettingsScene.tscn
+res://Hud/Themes/Standard.tres
+res://Hud/Themes/ShadowText.tres
+res://Hud/Themes/Invis.tres
+res://Hud/Themes/Subtle Background.tres
+res://Hud/Themes/Title.tres
+res://Hud/Themes/Subtle Background Rounded.tres
 res://Main.tscn
-res://Hud/Thingy/thingy_container.tscn
-res://Hud/Thingy/thingy_widget.tscn
-res://Hud/Header.tscn
-res://Hud/purchase_button.tscn
-res://Scripts/Classes/Thingy.gd
-res://Scripts/Autoload/Thingies.gd
-res://Hud/Thingy/thingy_vico.tscn
-res://Hud/Thingy/thingy_vico.gd
-res://Scripts/Autoload/Wallet.gd
+res://Hud/Scenes/Thingy/thingy_container.tscn
+res://Hud/Scenes/Thingy/thingy_widget.tscn
+res://Hud/Scenes/Upgrades/upgrade_container.tscn
+res://Hud/Scenes/Upgrades/upgrade_button.tscn
+res://Hud/Scenes/purchase_button.tscn
+res://Hud/Scenes/Menu.tscn
+res://Scripts/Autoload/Settings.gd
+res://Hud/Scenes/Settings.gd
+res://Scripts/Autoload/Overseer.gd
 res://Scripts/Main.gd
+res://Scripts/Classes/Upgrade/Upgrade.gd
+res://Scripts/Classes/Big.gd
+res://Hud/Scenes/MenuScene.tscn
+res://Scripts/Classes/BigFloat.gd
 res://Scripts/Classes/Value.gd
+res://Scripts/Classes/Thingy.gd
+res://Scripts/Classes/Currency.gd
+res://Scripts/Autoload/Wallet.gd
+res://Hud/Scenes/Upgrades/upgrade_container.gd

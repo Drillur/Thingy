@@ -8,6 +8,10 @@ var saved_vars := [
 	"exponent",
 ]
 
+const MANTISSA_PRECISSION = 0.0000001
+const MIN_INTEGER: int = -9223372036854775807
+const MAX_INTEGER: int = 9223372036854775806
+
 signal increased
 signal decreased
 
@@ -77,16 +81,10 @@ var text: String:
 		return text
 var text_requires_update := true
 
-const MANTISSA_PRECISSION = 0.0000001
-
-const MIN_INTEGER: int = -9223372036854775807
-const MAX_INTEGER: int = 9223372036854775806
-
 var base := {"mantissa": 1.0, "exponent": 0}
-var emit_changes: bool
 
 
-func _init(mant = 1.0, _emit_changes := false):
+func _init(mant = 1.0):
 	if mant is String:
 		var scientific = mant.split("e")
 		mantissa = float(scientific[0])
@@ -101,13 +99,9 @@ func _init(mant = 1.0, _emit_changes := false):
 		mantissa = mant
 		exponent = 0
 	
+	calculate(self)
 	base.mantissa = mantissa
 	base.exponent = exponent
-	
-	emit_changes = _emit_changes
-	
-	calculate(base)
-	calculate(self)
 
 
 
@@ -125,7 +119,7 @@ func change_base(new_base: float) -> void:
 
 
 func emit_change() -> void:
-	if change_queued or not emit_changes:
+	if change_queued:
 		return
 	if change_on_cooldown:
 		change_queued = true
@@ -136,7 +130,7 @@ func emit_change() -> void:
 
 
 func emit_increase() -> void:
-	if increase_queued or not emit_changes:
+	if increase_queued:
 		return
 	if increase_on_cooldown:
 		increase_queued = true
@@ -147,7 +141,7 @@ func emit_increase() -> void:
 
 
 func emit_decrease() -> void:
-	if decrease_queued or not emit_changes:
+	if decrease_queued:
 		return
 	if decrease_on_cooldown:
 		decrease_queued = true
@@ -451,11 +445,8 @@ func roundDown() -> Big:
 		var precision = 1.0
 		for i in range(min(8, exponent)):
 			precision /= 10.0
-		if precision < MANTISSA_PRECISSION:
-			precision = MANTISSA_PRECISSION
-		mantissa = snapped(mantissa, precision)
+		mantissa = floorf(mantissa / precision) * precision
 		return self
-
 
 func round_up_tens() -> Big:
 	if mantissa == 1.0:
@@ -479,6 +470,8 @@ func ln():
 
 
 func logN(n):
+	if equal(0):
+		return 0.0
 	return (2.302585092994046 / log(n)) * (exponent + log10(mantissa))
 
 
@@ -562,6 +555,10 @@ func toLog(big = self):
 func format_exponent(value: int) -> String:
 	if value < 1000:
 		return str(value)
+	elif value > 1000000:
+		var temp_big = {"mantissa": value, "exponent": 0}
+		calculate(temp_big)
+		return toLog(temp_big)
 	var string = str(value)
 	var mod = string.length() % 3
 	var output = ""

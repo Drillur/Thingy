@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbq5xo6rr5ldf"]
+
+[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/purchase_button.tscn" id="1_6pr3e"]
+[ext_resource type="Script" path="res://Hud/Scenes/Upgrades/upgrade_button.gd" id="1_s0467"]
+
+[node name="UpgradeButton" type="MarginContainer"]
+offset_right = 103.0
+offset_bottom = 99.0
+focus_mode = 2
+mouse_filter = 2
+script = ExtResource("1_s0467")
+
+[node name="Purchase Button" parent="." instance=ExtResource("1_6pr3e")]
+layout_mode = 2
+focus_mode = 2
+allow_focus = true
+
+[connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
+[connection signal="pressed" from="Purchase Button" to="." method="_on_purchase_button_pressed"]
+[connection signal="right_clicked" from="Purchase Button" to="." method="_on_purchase_button_right_clicked"]

@@ -13,8 +13,10 @@ func _ready() -> void:
 	randomize()
 	if gv.dev_mode:
 		fps.get_node("Timer").timeout.connect(fps_timer_timeout)
+		wa.get_currency(Currency.Type.WILL).amount.changed.connect(dev_text)
 	else:
 		fps.queue_free()
+		dev.queue_free()
 	setup_sidebar()
 	setup_navigation_panel()
 	setup_top_panel()
@@ -24,6 +26,7 @@ func _ready() -> void:
 	up.container = %UpgradeContainer
 	
 	gv.root_ready.set_to(true)
+	gv.root = self
 	
 	# when loading game, display top_panel
 
@@ -36,19 +39,89 @@ func thingy_created() -> void:
 	th.thingy_created.disconnect(thingy_created)
 
 
-func _input(_event):
-	if Input.is_action_just_pressed("ui_cancel"):
+func _input(event):
+	
+	if Input.is_action_just_pressed("ui_paste"):
+		Settings.joypad_allowed.invert()
+	
+	if (
+		gv.input_is_action_just_pressed("ui_menu")
+		and (
+			current_tab.equal(-1)
+			or current_tab.equal(Tab.MENU)
+		)
+		and up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES)
+	):
+		if current_tab.equal(Tab.MENU):
+			current_tab.reset()
+			purchase_thingy.grab_focus()
+		else:
+			current_tab.set_to(Tab.MENU)
+	elif gv.input_is_action_just_pressed("ui_cancel"):
 		current_tab.reset()
-	if Input.is_action_just_pressed("Normal Upgrades"):
+	elif (
+		gv.input_is_action_just_pressed("open_upgrades")
+		and up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES)
+	):
+		if current_tab.equal(Tab.UPGRADE):
+			current_tab.reset()
+			purchase_thingy.grab_focus()
+		else:
+			current_tab.set_to(Tab.UPGRADE)
+	elif (
+		gv.input_is_action_just_pressed("ui_settings")
+		and up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES)
+	):
+		if current_tab.equal(Tab.SETTINGS):
+			current_tab.reset()
+			purchase_thingy.grab_focus()
+		else:
+			current_tab.set_to(Tab.SETTINGS)
+	elif Input.is_action_just_pressed("upgrades0"):
 		if up.is_purchased(Upgrade.Type.UNLOCK_UPGRADES):
 			current_tab.set_to(Tab.UPGRADE)
-	if not gv.node_has_point(sidebar, sidebar.get_global_mouse_position()):
-		if Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_DOWN):
-			if th.has_thingy(th.get_selected_index() - 1):
-				th.container.snap_to_index(th.get_selected_index() - 1)
+	elif gv.input_is_action_just_pressed("ui_up"):
+		if current_tab.less(0):
+			scroll_thingies_up()
+	elif gv.input_is_action_just_pressed("ui_down"):
+		if current_tab.less(0):
+			scroll_thingies_down()
+	elif gv.input_is_action_just_pressed("joy_to_top"):
+		th.container.snap_to_index(th.get_top_index())
+	elif gv.input_is_action_just_pressed("joy_to_bot"):
+		th.container.snap_to_index(th.get_bottom_index())
+	
+	if Input.is_action_just_pressed("ui_accept_nojoy"):
+		purchase_thingy._on_button_pressed()
+	
+	if event is InputEventMouseButton:
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			if sidebar.visible:
+				if (
+					not gv.node_has_point(sidebar, event.position)
+					and not gv.node_has_point(purchase_thingy, event.position)
+					and not gv.node_has_point(tab_upgrade, event.position)
+					and not gv.node_has_point(tab_settings, event.position)
+					and not gv.node_has_point(tab_menu, event.position)
+				):
+					current_tab.set_to(-1)
+		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_DOWN):
+			if not gv.node_has_point(sidebar, sidebar.get_global_mouse_position()):
+				scroll_thingies_down()
 		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_UP):
-			if th.has_thingy(th.get_selected_index() + 1):
-				th.container.snap_to_index(th.get_selected_index() + 1)
+			if not gv.node_has_point(sidebar, sidebar.get_global_mouse_position()):
+				scroll_thingies_up()
+		
+
+
+func scroll_thingies_up() -> void:
+	if th.has_thingy(th.get_selected_index() + 1):
+		th.container.snap_to_index(th.get_selected_index() + 1)
+
+
+func scroll_thingies_down() -> void:
+	if th.has_thingy(th.get_selected_index() - 1):
+		th.container.snap_to_index(th.get_selected_index() - 1)
 
 
 #endregion
@@ -74,6 +147,12 @@ func _input(_event):
 @onready var juice_rate = %"Juice Rate"
 @onready var juice_flair = %"Juice Flair"
 @onready var will_components = %WillComponents
+@onready var soul_components = %SoulComponents
+@onready var soul_label = %"Soul Label"
+@onready var soul_rate = %"Soul Rate"
+@onready var soul_flair = %"Soul Flair"
+
+@onready var dev = %DEV
 
 
 func setup_top_panel() -> void:
@@ -111,6 +190,14 @@ func setup_top_panel() -> void:
 	juice_changed()
 	juice_rate_changed()
 	juice_unlocked_changed()
+	
+	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).icon_and_name
+	soul_rate.modulate = wa.get_color(Currency.Type.SOUL)
+	wa.soul_gain.changed.connect(soul_changed)
+	wa.get_currency(Currency.Type.SOUL).unlocked.changed.connect(soul_unlocked_changed)
+	soul_changed()
+	soul_rate_changed()
+	soul_unlocked_changed()
 	
 	top_panel.hide()
 
@@ -176,6 +263,22 @@ func juice_rate_changed() -> void:
 	juice_rate.text = "[i](%s)" % th.max_juice_use.get_text()
 
 
+func soul_unlocked_changed() -> void:
+	soul_components.visible = wa.is_unlocked(Currency.Type.SOUL)
+
+
+func soul_changed() -> void:
+	soul_label.text = "[i]" + (
+		wa.get_details(Currency.Type.SOUL).color_text % (
+			"+" + wa.soul_gain.text
+		)
+	)
+
+
+func soul_rate_changed() -> void:
+	soul_rate.text = "[i](On reset)"
+
+
 func _on_coin_components_resized():
 	if is_node_ready():
 		if coin_components.size.x > coin_components.custom_minimum_size.x:
@@ -200,6 +303,12 @@ func _on_juice_components_resized():
 			juice_components.custom_minimum_size.x = juice_components.size.x
 
 
+func _on_soul_components_resized():
+	if is_node_ready():
+		if soul_components.size.x > soul_components.custom_minimum_size.x:
+			soul_components.custom_minimum_size.x = soul_components.size.x
+
+
 #endregion
 
 
@@ -207,11 +316,12 @@ func _on_juice_components_resized():
 
 
 @onready var navigation_panel = %"Navigation Panel"
-@onready var tab_upgrade = %"Tab Upgrade"
 @onready var unlock_upgrades_button = %UnlockUpgradesButton
 @onready var purchase_thingy = %"Purchase Thingy"
-
-var navigation_panel_open := LoudBool.new(true)
+@onready var navigation_buttons = %"Navigation Buttons"
+@onready var tab_upgrade = %"Tab Upgrade"
+@onready var tab_settings = %"Tab Settings"
+@onready var tab_menu = %"Tab Menu"
 
 
 func setup_navigation_panel() -> void:
@@ -221,16 +331,25 @@ func setup_navigation_panel() -> void:
 	update_navigation_panel_visibility()
 	th.thingy_created.connect(update_unlock_upgrades_button_visibility)
 	update_unlock_upgrades_button_visibility()
-	navigation_panel_open.became_true.connect(tab_upgrade.show_text)
-	navigation_panel_open.became_false.connect(tab_upgrade.hide_text)
-	navigation_panel_open.set_to(false)
+	tab_settings.color = Settings.color
+	tab_menu.color = SaveManager.color.get_value()
+	Settings.joypad_allowed.changed.connect(update_navigation_button_focus_modes)
+	gv.joypad_detected.changed.connect(update_navigation_button_focus_modes)
+	update_navigation_button_focus_modes()
 	
 	purchase_thingy.setup(th.cost)
 	purchase_thingy.color = th.next_thingy_color
 
 
-func _on_navigation_panel_button_pressed():
-	navigation_panel_open.invert()
+func update_navigation_button_focus_modes() -> void:
+	if Settings.joypad_allowed.is_true() and gv.joypad_detected.is_true():
+		for node in navigation_buttons.get_children():
+			node.focus_mode = Control.FOCUS_ALL
+			node.button.focus_mode = Control.FOCUS_ALL
+	else:
+		for node in navigation_buttons.get_children():
+			node.focus_mode = Control.FOCUS_NONE
+			node.button.focus_mode = Control.FOCUS_NONE
 
 
 func _on_tab_upgrade_pressed():
@@ -238,6 +357,20 @@ func _on_tab_upgrade_pressed():
 		current_tab.reset()
 	else:
 		current_tab.set_to(Tab.UPGRADE)
+
+
+func _on_tab_settings_pressed():
+	if current_tab.equal(Tab.SETTINGS):
+		current_tab.reset()
+	else:
+		current_tab.set_to(Tab.SETTINGS)
+
+
+func _on_tab_menu_pressed():
+	if current_tab.equal(Tab.MENU):
+		current_tab.reset()
+	else:
+		current_tab.set_to(Tab.MENU)
 
 
 func _on_purchase_thingy_pressed():
@@ -266,12 +399,14 @@ func update_unlock_upgrades_button_visibility() -> void:
 
 
 @onready var sidebar = %Sidebar
-@onready var tab_container = %TabContainer
 @onready var upgrade_container = %UpgradeContainer as UpgradeContainer
 @onready var sidebar_header = %"Sidebar Header"
+@onready var tab_container = %TabContainer
 
 
 enum Tab {
+	MENU,
+	SETTINGS,
 	UPGRADE,
 }
 
@@ -282,8 +417,8 @@ var current_tab := LoudInt.new(-1)
 func setup_sidebar() -> void:
 	sidebar.hide()
 	current_tab.changed.connect(current_tab_changed)
-	upgrade_container.tab_container.tab_changed.connect(upgrade_container_tab_changed)
-	upgrade_container_tab_changed(1)
+	upgrade_container.tab_container.tab_changed.connect(upgrade_tab_changed)
+	upgrade_tab_changed()
 
 
 
@@ -293,9 +428,20 @@ func current_tab_changed() -> void:
 	else:
 		tab_container.current_tab = current_tab.get_value()
 		sidebar.show()
+		match current_tab.get_value():
+			Tab.MENU:
+				sidebar_header.color = SaveManager.color.get_value()
+				sidebar_header.text = "Thingy\n1.0.0"
+				sidebar_header.icon = bag.get_icon("activeBuffs")
+			Tab.SETTINGS:
+				sidebar_header.color = Settings.color
+				sidebar_header.text = "Settings"
+				sidebar_header.icon = bag.get_icon("Settings")
+			Tab.UPGRADE:
+				upgrade_tab_changed()
 
 
-func upgrade_container_tab_changed(index: int) -> void:
+func upgrade_tab_changed(index: int = upgrade_container.tab_container.current_tab) -> void:
 	var tree: up.UpgradeTree = up.get_upgrade_tree(index + 1)
 	sidebar_header.color = tree.details.color
 	sidebar_header.text = tree.details.name
@@ -305,3 +451,28 @@ func upgrade_container_tab_changed(index: int) -> void:
 
 
 #endregion
+
+
+#region Dev
+
+func _on_dev_button_pressed():
+	wa.get_amount(Currency.Type.WILL).m(1.1)
+	#dev.text = mynum.text + " = " + Big.new(mynum).power(0.12).text
+
+func _on_dev_button_2_pressed():
+	wa.get_amount(Currency.Type.WILL).d(2)
+
+
+func dev_text() -> void:
+	pass
+	
+	#var test = Big.new(wa.get_amount(Currency.Type.WILL)).squareRoot().squareRoot().squareRoot()
+	#dev.text = test.text + " (%s)" % Big.new(test.roundDown()).text + " - " + (
+		#Big.new("1e6").squareRoot().squareRoot().squareRoot().text
+	#)
+
+
+#endregion
+
+
+

@@ -12,16 +12,16 @@ signal decreased
 signal pending_changed
 
 var current: Big
-var pending := Big.new(0.0, true)
+var pending := Big.new(0.0)
 
-var added := Big.new(0, true)
-var subtracted := Big.new(0, true)
-var multiplied := Big.new(1, true)
-var divided := Big.new(1, true)
+var added := Big.new(0)
+var subtracted := Big.new(0)
+var multiplied := Big.new(1)
+var divided := Big.new(1)
 
 
 func _init(base_value = 0.0) -> void:
-	current = Big.new(base_value, true)
+	current = Big.new(base_value)
 	current.changed.connect(emit_changed)
 	current.increased.connect(emit_increase)
 	current.decreased.connect(emit_decrease)

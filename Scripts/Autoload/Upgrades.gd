@@ -6,7 +6,6 @@ class UpgradeTree:
 	
 	enum Type {
 		NONE,
-		GAMBLIN_MAN,
 		FIRESTARTER,
 		VOYAGER,
 	}
@@ -26,10 +25,6 @@ class UpgradeTree:
 			Type.FIRESTARTER:
 				details.color = Color(0.89, 0.118, 0.263)
 				details.icon = bag.get_resource("Fire")
-			Type.GAMBLIN_MAN:
-				details.name = "Gamblin' Man"
-				details.color = Color(0.89, 0.698, 0.118)
-				details.icon = bag.get_resource("Coin Hand")
 			Type.VOYAGER:
 				details.color = Color(0.118, 0.725, 0.89)
 				details.icon = bag.get_resource("Map")

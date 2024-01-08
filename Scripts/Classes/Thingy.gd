@@ -44,16 +44,16 @@ var details = Details.new()
 var level := LoudInt.new(1)
 var timer := Timer.new()
 
-var output_multiplier := Big.new(1.0, true)
+var output_multiplier := Big.new(1.0)
 var xp := ValuePair.new(10.0).do_not_cap_current()
 var xp_modifier := LoudFloat.new(1.0)
 var duration_modifier := LoudFloat.new(1.0)
 var juice_output_modifier := LoudFloat.new(1.0)
 var juice_input_modifier := LoudFloat.new(1.0)
-var inhand_will := Big.new(0, true)
-var inhand_coin := Big.new(0, true)
-var inhand_xp := Big.new(0, true)
-var inhand_juice := Big.new(0, true)
+var inhand_will := Big.new(0)
+var inhand_coin := Big.new(0)
+var inhand_xp := Big.new(0)
+var inhand_juice := Big.new(0)
 var crit_success := LoudBool.new(false)
 var crit_multiplier := LoudFloat.new(1.0)
 var juiced := LoudBool.new(false)
@@ -206,14 +206,24 @@ func start_timer() -> void:
 
 
 func get_output_currency() -> Currency.Type:
-	if wa.is_unlocked(Currency.Type.JUICE):
-		#if wa.get_effective_amount(Currency.Type.JUICE).less(
-			#get_maximum_juice_input() * 2 * th.get_count()
-		#):
-		if wa.get_effective_amount(Currency.Type.JUICE).less(
-			th.max_juice_use.get_value()
-		):
-			return Currency.Type.JUICE
+	if (
+		wa.is_unlocked(Currency.Type.JUICE)
+		and (
+			(
+				th.smart_juice.is_true()
+				and wa.get_effective_amount(Currency.Type.JUICE).less(
+					th.max_juice_use.get_value()
+				)
+			)
+			or (
+				th.smart_juice.is_false()
+				and wa.get_amount(Currency.Type.JUICE).less(
+					get_maximum_juice_input()
+				)
+			)
+		)
+	):
+		return Currency.Type.JUICE
 	return Currency.Type.WILL
 
 

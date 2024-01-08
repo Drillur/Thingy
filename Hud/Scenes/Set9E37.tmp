@@ -1,0 +1,67 @@
+[gd_scene load_steps=7 format=3 uid="uid://cqkk62rlbp3l"]
+
+[ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Hud/Themes/Subtle Background.tres" id="1_7at7r"]
+[ext_resource type="Script" path="res://Hud/Scenes/Settings.gd" id="1_fcgah"]
+[ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Scenes/Header.tscn" id="2_6njcy"]
+[ext_resource type="Texture2D" uid="uid://bvb4ehu30w7iu" path="res://Art/Icons/Hud/Settings.png" id="3_ko0y2"]
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="4_7cy5f"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="5_w75e1"]
+
+[node name="Settings" type="MarginContainer"]
+offset_right = 167.0
+offset_bottom = 62.0
+script = ExtResource("1_fcgah")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 2
+theme = ExtResource("1_7at7r")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Header" parent="VBoxContainer" instance=ExtResource("2_6njcy")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Settings"
+center_content = true
+icon = ExtResource("3_ko0y2")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="JoypadAllowed" type="CheckBox" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("4_7cy5f")
+button_pressed = true
+text = "Joypad allowed"
+
+[node name="JoypadAllowedDetails" type="MarginContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer/VBoxContainer/JoypadAllowedDetails"]
+layout_mode = 2
+
+[node name="RichTextLabel" parent="VBoxContainer/MarginContainer/VBoxContainer/JoypadAllowedDetails/HBoxContainer" instance=ExtResource("5_w75e1")]
+layout_mode = 2
+text = "Joypad detected?"
+autowrap_mode = 0
+
+[node name="JoypadDetected" type="CheckBox" parent="VBoxContainer/MarginContainer/VBoxContainer/JoypadAllowedDetails/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("4_7cy5f")
+disabled = true
+button_pressed = true
+
+[connection signal="pressed" from="VBoxContainer/MarginContainer/VBoxContainer/JoypadAllowed" to="." method="_on_joypad_allowed_pressed"]

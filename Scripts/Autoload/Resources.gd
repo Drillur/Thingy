@@ -54,5 +54,27 @@ func get_resource(_name: String) -> Resource:
 	return resource_preloader.get_resource(_name)
 
 
+func get_icon(_name: String) -> Texture2D:
+	return get_resource(_name)
+
+
+func get_progress_icon(percent: float) -> Texture2D:
+	if percent <= 0.125:
+		return get_icon("progress 1")
+	if percent <= 0.25:
+		return get_icon("progress 2")
+	if percent <= 0.375:
+		return get_icon("progress 3")
+	if percent <= 0.5:
+		return get_icon("progress 4")
+	if percent <= 0.625:
+		return get_icon("progress 5")
+	if percent <= 0.75:
+		return get_icon("progress 6")
+	if percent <= 0.875:
+		return get_icon("progress 7")
+	return get_icon("progress 8")
+
+
 func get_resource_path(_name: String) -> String:
 	return resource_preloader.get_resource(_name).get_path()

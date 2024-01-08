@@ -8,6 +8,7 @@ enum Type {
 	COIN,
 	XP,
 	JUICE,
+	SOUL,
 }
 
 var type: Type
@@ -18,7 +19,7 @@ var amount: Value
 
 var unlocked := LoudBool.new(false)
 
-var net_rate := Big.new(0, true)
+var net_rate := Big.new(0)
 var gain_rate := Value.new(0)
 var loss_rate := Value.new(0)
 
@@ -46,6 +47,9 @@ func _init(_type: Type) -> void:
 		Type.JUICE:
 			details.color = Color(0.424, 0.957, 0.125)
 			details.icon = bag.get_resource("Juice")
+		Type.SOUL:
+			details.color = Color(0.918, 0.2, 0.553)
+			details.icon = bag.get_resource("Ghost")
 
 
 
