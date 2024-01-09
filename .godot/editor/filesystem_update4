@@ -41,3 +41,5 @@ res://Scripts/Classes/LoudVar/LoudFloat.gd
 res://Hud/Scenes/MenuScene.gd
 res://Scripts/Autoload/SaveManager.gd
 res://Hud/Scenes/Settings.gd
+res://Scripts/Autoload/Resources.gd
+res://Hud/Scenes/MenuButton.gd

@@ -13,7 +13,6 @@ func _ready() -> void:
 	for variable in gv.get_script_variables(get_script()):
 		if has_method(variable + "_changed"):
 			get(variable).changed.connect(get(variable + "_changed"))
-			print(variable + "_changed")
 
 
 

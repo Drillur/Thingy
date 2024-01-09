@@ -1,8 +1,9 @@
+class_name Bag
 extends Node
 
 
 
-var resource_preloader := ResourcePreloader.new()
+var resources := {}
 
 
 
@@ -31,17 +32,22 @@ func dir_contents(path):
 			else:
 				if (
 					file_name.ends_with(".png")
+					or file_name.ends_with(".import")
 					or file_name.ends_with(".svg")
 					or file_name.ends_with(".tscn")
+					or file_name.ends_with(".remap")
 					or file_name.ends_with(".tres")
 					or file_name.ends_with(".dialogue")
 				):
 					var _name := file_name.split(".")[0]
-					var _path = path + "/" + file_name
-					if gv.dev_mode:
-						if resource_preloader.has_resource(_name):
+					var _path: String = path + "/" + file_name
+					_path = _path.trim_suffix(".remap")
+					_path = _path.trim_suffix(".import")
+					if resources.has(_name):
+						if gv.dev_mode:
 							printerr(_name, " already in resource_preloader! Change resource name!")
-					resource_preloader.add_resource(_name, load(_path))
+					else:
+						resources[_name] = load(_path)
 			file_name = dir.get_next()
 
 
@@ -51,7 +57,7 @@ func get_icon_text(_name: String, size := 15) -> String:
 
 
 func get_resource(_name: String) -> Resource:
-	return resource_preloader.get_resource(_name)
+	return resources[_name]
 
 
 func get_icon(_name: String) -> Texture2D:
@@ -77,4 +83,4 @@ func get_progress_icon(percent: float) -> Texture2D:
 
 
 func get_resource_path(_name: String) -> String:
-	return resource_preloader.get_resource(_name).get_path()
+	return resources[_name].get_path()

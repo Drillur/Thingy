@@ -111,7 +111,7 @@ func save_game(method := default_save_method) -> void:
 		SaveMethod.TO_CLIPBOARD:
 			DisplayServer.clipboard_set(save_text)
 		SaveMethod.TO_CONSOLE:
-			print("Your LORED save data is below! Click Expand, if necessary, for your save may be very large, and then save it in any text document!")
+			print("Your Thingy save data is below! Click Expand, if necessary, for your save may be very large, and then save it in any text document!")
 			print(Marshalls.variant_to_base64(save_text))
 		SaveMethod.TEST:
 			test_data = save_text
@@ -306,7 +306,7 @@ func unpack_color(_color: Color, packed_color: Dictionary) -> void:
 
 
 func update_save_version() -> void:
-	var version_text = ProjectSettings.get("application/config/Version").split(".")
+	var version_text = ProjectSettings.get("application/config/version").split(".")
 	save_version.major = version_text[0]
 	save_version.minor = version_text[1]
 	save_version.revision = version_text[2]
@@ -379,7 +379,7 @@ func script_has_exported_variable(script: Script) -> bool:
 
 
 func is_version_changed_since_save() -> bool:
-	var version_text = ProjectSettings.get("application/config/Version").split(".")
+	var version_text = ProjectSettings.get("application/config/version").split(".")
 	var version := {
 		"major": version_text[0],
 		"minor": version_text[1],

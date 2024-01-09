@@ -18,10 +18,7 @@ signal pressed
 		text = val
 		if not is_node_ready():
 			await ready
-		if text == "GameName":
-			label.text = "[b][i]LORED\n[color=#000000cc]" + ProjectSettings.get("application/config/Version")
-		else:
-			label.text = text
+		label.text = text
 		if text == "":
 			label.hide()
 		else:

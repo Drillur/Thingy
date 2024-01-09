@@ -57,7 +57,6 @@ func _ready():
 
 
 func thingy_wants_to_fucking_die(_index: int) -> void:
-	#print("erasing ", _index)
 	thingies.erase(_index)
 
 

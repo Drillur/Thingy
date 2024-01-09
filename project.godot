@@ -11,10 +11,13 @@ config_version=5
 [application]
 
 config/name="Thingy"
+config/version="0.1.0"
 run/main_scene="res://Main.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Thingy"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://Art/Icons/Icon.svg"
-config/Version="1.0.0"
+config/windows_native_icon="res://Art/Icons/Hud/activeBuffs.ico"
 
 [autoload]
 
