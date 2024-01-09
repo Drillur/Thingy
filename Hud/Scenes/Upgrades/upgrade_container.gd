@@ -4,8 +4,11 @@ extends MarginContainer
 
 
 @onready var tab_container = $TabContainer as TabContainer
+@onready var joypad_controls = %JoypadControls
+@onready var lb = %LB
+@onready var rb = %RB
 
-const SCROLL_SPEED := 2
+const SCROLL_SPEED := 25
 
 var focus: UpgradeButton
 var current_scroll_container: ScrollContainer
@@ -19,28 +22,52 @@ func _ready() -> void:
 		node.get_v_scroll_bar().self_modulate = up.get_upgrade_tree(
 			node.get_index() + 1
 		).details.color
-	_on_tab_container_tab_changed(0)
 	get_viewport().gui_focus_changed.connect(focus_changed)
+	gv.joypad_detected.changed.connect(joypad_detected_changed)
+	joypad_detected_changed()
+	up.get_upgrade_tree(up.UpgradeTree.Type.VOYAGER).unlocked.changed.connect(voyager_unlocked_changed)
+	_on_tab_container_tab_changed(0)
+	SaveManager.loading.became_false.connect(_on_tab_container_tab_changed)
 
 
 
 #region Signals
 
 
-func _process(delta):
-	if is_visible_in_tree():
-		if gv.input_is_action_pressed("joy_scroll_down"):
-			current_scroll_container.scroll_vertical += Input.get_action_strength("joy_scroll_down") * SCROLL_SPEED
-		elif gv.input_is_action_pressed("joy_scroll_up"):
-			current_scroll_container.scroll_vertical -= Input.get_action_strength("joy_scroll_up") * SCROLL_SPEED
+func _input(_event):
+	if Input.is_action_just_pressed("upgrades0"):
+		tab_container.current_tab = 0
+	elif (
+		Input.is_action_just_pressed("upgrades1")
+		and up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER)
+	):
+		tab_container.current_tab = 1
+
+
+func _physics_process(_delta):
+	if not is_visible_in_tree():
+		return
+	if gv.joypad_detected.is_true():
+		if Input.is_action_pressed("joy_scroll_down"):
+			current_scroll_container.scroll_vertical += int(Input.get_action_strength("joy_scroll_down") * SCROLL_SPEED)
+		elif Input.is_action_pressed("joy_scroll_up"):
+			current_scroll_container.scroll_vertical -= int(Input.get_action_strength("joy_scroll_up") * SCROLL_SPEED)
+		if Input.is_action_pressed("joy_next_upgrade_tree"):
+			tab_container.current_tab += 1
+		elif Input.is_action_pressed("joy_prev_upgrade_tree"):
+			tab_container.current_tab -= 1
 
 
 func _on_visibility_changed():
 	if is_visible_in_tree():
-		if focus:
+		if focus and focus.focus_mode == Control.FOCUS_ALL:
 			focus.grab_focus()
 		else:
 			determine_focus()
+
+
+func joypad_detected_changed() -> void:
+	joypad_controls.visible = gv.joypad_detected.get_value()
 
 
 func focus_changed(node: Node) -> void:
@@ -50,8 +77,25 @@ func focus_changed(node: Node) -> void:
 		determine_focus()
 
 
-func _on_tab_container_tab_changed(tab):
+func _on_tab_container_tab_changed(tab = tab_container.current_tab):
 	current_scroll_container = tab_container.get_child(tab)
+	
+	tab += 1
+	if up.tree_exists_and_is_unlocked(tab + 1):
+		var next_tree = up.get_upgrade_tree(tab + 1)
+		rb.modulate = next_tree.details.color
+		return
+	if up.tree_exists_and_is_unlocked(tab - 1):
+		var prev_tree = up.get_upgrade_tree(tab - 1)
+		lb.modulate = prev_tree.details.color
+		return
+	var cur_tree = up.get_upgrade_tree(tab)
+	rb.modulate = cur_tree.details.color
+	lb.modulate = cur_tree.details.color
+
+
+func voyager_unlocked_changed() -> void:
+	tab_container.tabs_visible = up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER)
 
 
 #endregion
@@ -64,7 +108,8 @@ func determine_focus() -> void:
 	var current_tab_vbox: VBoxContainer = tab_container.get_child(tab_container.current_tab).get_child(0).get_child(0)
 	get_focus_in_children(current_tab_vbox)
 	focus_set = false
-	focus.grab_focus()
+	if focus:
+		focus.grab_focus()
 
 
 func get_focus_in_children(parent: Node) -> void:

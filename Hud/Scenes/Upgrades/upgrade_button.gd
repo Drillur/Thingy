@@ -17,6 +17,7 @@ extends MarginContainer
 @onready var pb = $"Purchase Button" as PurchaseButton
 
 var upgrade: Upgrade
+var setup_done := false
 
 
 
@@ -25,7 +26,9 @@ func _ready() -> void:
 	gv.joypad_detected.changed.connect(update_focus)
 	upgrade = up.get_upgrade(upgrade_type)
 	upgrade.unlocked.changed.connect(unlocked_changed)
+	upgrade.unlocked.changed.connect(update_focus)
 	upgrade.purchased.changed.connect(upgrade_purchased_changed)
+	upgrade.purchased.changed.connect(update_focus)
 	update_focus()
 	pb.color = upgrade.details.color
 	pb.setup(upgrade.cost)
@@ -33,24 +36,50 @@ func _ready() -> void:
 		setup()
 	else:
 		pb.lock()
+	await up.container_loaded
+	set_tab()
+
+
+func set_tab() -> void:
+	var tab = get_parent_until_scroll_container(get_parent())
+	match tab:
+		1, 2:
+			upgrade.persist.through_tier(1)
+		3, 4:
+			upgrade.persist.through_tier(2)
+		5, 6:
+			upgrade.persist.through_tier(3)
+		7, 8:
+			upgrade.persist.through_tier(4)
+
+
+func get_parent_until_scroll_container(node) -> int:
+	if node is ScrollContainer:
+		return node.get_index()
+	if not node.get_parent():
+		return -1
+	return get_parent_until_scroll_container(node.get_parent())
 
 
 func setup() -> void:
-	if upgrade.details.name != "":
-		pb.title_components.show()
-		pb.title.text = upgrade.details.name
-		pb.title.show()
-		pb.texture_rect.texture = upgrade.details.icon
-	else:
-		pb.title_components.hide()
+	pb.title_components.show()
+	pb.title.show()
 	if upgrade.details.description != "":
-		upgrade.times_purchased.changed.connect(set_description_text)
-		set_description_text()
 		pb.description.show()
 	else:
 		pb.description.hide()
-	pb.cost_components.show()
-	if upgrade.purchase_limit > 1:
+	if upgrade.get_purchase_limit() > 1:
+		pb.times_purchased.show()
+	if setup_done:
+		return
+	setup_done = true
+	pb.title.text = upgrade.details.name
+	pb.texture_rect.texture = upgrade.details.icon
+	if upgrade.details.description != "":
+		upgrade.times_purchased.changed.connect(set_description_text)
+		set_description_text()
+	set_cost_visibility()
+	if upgrade.get_purchase_limit() > 1:
 		pb.times_purchased.show()
 		upgrade.times_purchased.changed.connect(times_purchased_changed)
 		times_purchased_changed()
@@ -62,16 +91,21 @@ func _on_purchase_button_pressed():
 
 
 func upgrade_purchased_changed() -> void:
-	pb.cost_components.visible = not upgrade.purchased.get_value()
+	set_cost_visibility()
 	if upgrade.purchased.is_true():
 		pb.disconnect_calls()
 	else:
 		pb.connect_calls()
 	if upgrade.purchased.is_true():
 		pb.button.mouse_default_cursor_shape = CURSOR_ARROW
-		update_focus()
 	else:
 		pb.button.mouse_default_cursor_shape = CURSOR_POINTING_HAND
+
+
+func set_cost_visibility() -> void:
+	pb.cost_components.visible = upgrade.unlocked.is_true() and upgrade.purchased.is_false()
+	if pb.cost_components.visible:
+		pb.update()
 
 
 func _on_purchase_button_right_clicked():
@@ -83,7 +117,7 @@ func _on_purchase_button_right_clicked():
 func times_purchased_changed() -> void:
 	pb.times_purchased.text = "%s/%s" % [
 		upgrade.times_purchased.get_text(),
-		str(upgrade.purchase_limit)
+		str(upgrade.get_purchase_limit())
 	]
 
 
@@ -94,18 +128,16 @@ func set_description_text() -> void:
 func unlocked_changed() -> void:
 	if upgrade.unlocked.is_true():
 		setup()
-		update_focus()
 	else:
 		pb.lock()
 
 
 func update_focus() -> void:
-	if Settings.joypad_allowed.is_true() and gv.joypad_detected.is_true():
+	if gv.joypad_detected.is_true():
 		if upgrade.unlocked.is_false() or upgrade.purchased.is_true():
 			focus_mode = FOCUS_NONE
 			pb.focus_mode = FOCUS_NONE
 			pb.button.focus_mode = FOCUS_NONE
-			get_viewport().gui_focus_changed.emit(null)
 			await get_tree().physics_frame
 			gv.find_nearest_focus(self)
 		elif upgrade.unlocked.is_true() and upgrade.purchased.is_false():

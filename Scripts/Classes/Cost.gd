@@ -1,11 +1,14 @@
 class_name Cost
-extends RefCounted
+extends Resource
 
 
+
+signal reset
 
 var amount := {}
+@export var times_purchased := LoudInt.new(0)
+var times_increased := 0
 var affordable := LoudBool.new(false)
-var times_purchased := LoudInt.new(0)
 var increase_multiplier: float
 var longest_eta_currency_type := -1
 
@@ -14,6 +17,7 @@ var longest_eta_currency_type := -1
 func _init(_amount: Dictionary) -> void:
 	amount = _amount
 	check()
+	times_purchased.changed.connect(times_purchased_changed)
 	for cur in amount:
 		wa.get_currency(cur).amount.increased.connect(currency_amount_increased)
 		wa.get_currency(cur).amount.decreased.connect(currency_amount_decreased)
@@ -22,6 +26,11 @@ func _init(_amount: Dictionary) -> void:
 
 
 # - Signal
+
+
+func times_purchased_changed() -> void:
+	while times_increased < times_purchased.get_value():
+		increase()
 
 
 func currency_amount_increased() -> void:
@@ -61,16 +70,34 @@ func can_afford() -> bool:
 # - Action
 
 
+func purchase() -> void:
+	spend()
+	times_purchased.add(1)
+
+
+func increase() -> void:
+	times_increased += 1
+	set_amounts()
+
+
+func set_amounts() -> void:
+	if increase_multiplier > 0:
+		for cur in amount:
+			amount[cur].edit_change("multiplied", self, pow(increase_multiplier, times_increased))
+	check()
+
+
 func spend() -> void:
 	for cur in amount:
 		wa.subtract(cur, get_amount_value(cur))
 
 
-func increase() -> void:
-	for cur in amount:
-		amount[cur].increase_multiplied(increase_multiplier)
-	check()
-
+func reset_now() -> void:
+	times_increased = 0
+	times_purchased.reset()
+	set_amounts()
+	longest_eta_currency_type = -1
+	reset.emit()
 
 
 # - Get

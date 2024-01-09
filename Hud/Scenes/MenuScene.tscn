@@ -1,5 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://cugpk4lkaganr"]
+[gd_scene load_steps=11 format=3 uid="uid://cugpk4lkaganr"]
 
+[ext_resource type="Script" path="res://Hud/Scenes/MenuScene.gd" id="1_80rt2"]
 [ext_resource type="PackedScene" uid="uid://bfi0uovwegdxj" path="res://Hud/Scenes/MenuButton.tscn" id="1_shmbd"]
 [ext_resource type="Texture2D" uid="uid://cya8ro2s324t3" path="res://Art/Icons/Hud/Save.png" id="2_p4et0"]
 [ext_resource type="Texture2D" uid="uid://i5w3qd2sgfwm" path="res://Art/Icons/Hud/Load.png" id="3_3i7a7"]
@@ -13,6 +14,7 @@
 [node name="Menu" type="MarginContainer"]
 offset_right = 158.0
 offset_bottom = 68.0
+script = ExtResource("1_80rt2")
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -21,27 +23,32 @@ theme_override_constants/separation = 16
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2"]
 layout_mode = 2
 
-[node name="Menu Button" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+[node name="Save" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("2_p4et0")
 text = "Save Now"
 
-[node name="Menu Button2" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+[node name="Load" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("3_3i7a7")
 text = "Load"
 
-[node name="Menu Button3" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+[node name="Export" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("4_uume6")
 text = "Export"
 
-[node name="Menu Button4" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+[node name="New Game" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("5_cre7v")
 text = "New Game"
 
-[node name="Menu Button5" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+[node name="Hard Reset" parent="VBoxContainer2/VBoxContainer" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("6_ax21o")
 text = "Hard Reset"
@@ -50,23 +57,29 @@ color = Color(1, 0, 0, 1)
 [node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer2"]
 layout_mode = 2
 
-[node name="Menu Button" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+[node name="Set Color" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("7_5bt0n")
 text = "Set Color"
 
-[node name="Menu Button2" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+[node name="Rename" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("8_nwgm4")
 text = "Rename"
 
-[node name="Menu Button3" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+[node name="Duplicate" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("9_1nt00")
 text = "Duplicate"
 
-[node name="Menu Button4" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+[node name="Delete Save" parent="VBoxContainer2/VBoxContainer2" instance=ExtResource("1_shmbd")]
+unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("9_1nt00")
 text = "Delete Save"
 color = Color(1, 0, 0, 1)
+
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Save" to="." method="_on_save_pressed"]

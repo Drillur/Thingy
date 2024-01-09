@@ -12,7 +12,7 @@ signal filled
 signal emptied
 
 var cap_current := true
-var current: Value
+@export var current: Value
 var total: Value
 
 var full := false:

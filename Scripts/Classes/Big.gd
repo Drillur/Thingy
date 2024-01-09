@@ -54,12 +54,12 @@ var change_queued := false
 
 var positive := LoudBool.new(true)
 
-@export var mantissa: float = 0.0:
+@export var mantissa: float = 1.0:
 	set(val):
 		if mantissa != val:
 			mantissa = val
 			text_requires_update = true
-@export var exponent: int = 1:
+@export var exponent: int = 0:
 	set(val):
 		if exponent != val:
 			exponent = val
@@ -109,7 +109,8 @@ func reset() -> void:
 	mantissa = base.mantissa
 	exponent = base.exponent
 	emit_decrease()
-	calculate(self)
+	emit_increase()
+	emit_change()
 
 
 func change_base(new_base: float) -> void:
@@ -330,9 +331,9 @@ func power(n: float) -> Big:
 	# a bit slower, still supports floats
 	var newExponent:int = int(temp)
 	var residue:float = temp - newExponent
-	var newMantissa = pow(10, n * log10(mantissa) + residue)
-	if newMantissa != INF and newMantissa != -INF:
-		mantissa = newMantissa
+	var _newMantissa = pow(10, n * log10(mantissa) + residue)
+	if _newMantissa != INF and _newMantissa != -INF:
+		mantissa = _newMantissa
 		exponent = newExponent
 		calculate(self)
 		emit_increase()

@@ -31,7 +31,8 @@ func fullscreen_changed() -> void:
 
 
 func joypad_allowed_changed() -> void:
-	joypad_allowed_details.visible = Settings.joypad_allowed.get_value()
+	joypad_allowed.button_pressed = Settings.joypad_allowed.get_value()
+	joypad_allowed_details.visible = joypad_allowed.button_pressed
 
 
 func joypad_detected_changed() -> void:

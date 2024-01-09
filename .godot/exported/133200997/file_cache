@@ -1,0 +1,34 @@
+res://Art/Animations/autobuyer.tres::f8f0a5f8ffa6181f795570cf850126e4::1704164150::res://.godot/exported/133200997/export-f66c6e54c52d3bd26167b8ac6944cacd-autobuyer.res
+res://Hud/Scenes/Thingy/thingy_container.tscn::18314f9a5ce62b6984ae6a6d2a083e22::1704779235::res://.godot/exported/133200997/export-3e184e5daa21db83c478e4ecc5cb3aac-thingy_container.scn
+res://Hud/Scenes/Thingy/thingy_vico.tscn::52f19ab6f8c6a6be54ee7c0d2758ffa4::1704779236::res://.godot/exported/133200997/export-c636ec4765708aa26eeebcb366004ffb-thingy_vico.scn
+res://Hud/Scenes/Thingy/thingy_widget.tscn::ad740615eb62b4c97c0df6030d1885e7::1704779235::res://.godot/exported/133200997/export-56d14b8ee6676c68da858a4a23545393-thingy_widget.scn
+res://Hud/Scenes/Upgrades/upgrade_button.tscn::e8db914a94d7f7a9483dd32c5ef22507::1704779235::res://.godot/exported/133200997/export-c3e54d9c1b0a83867549c8b2f2ded73e-upgrade_button.scn
+res://Hud/Scenes/Upgrades/upgrade_container.tscn::cc82c3decd07d2ee3222a8992a8efe3c::1704779235::res://.godot/exported/133200997/export-a036d91f9d3a0e62f7d948a5e5a9929d-upgrade_container.scn
+res://Hud/Scenes/bar.tscn::e8355c1f4f64ae17a87ae3e58574380b::1704779236::res://.godot/exported/133200997/export-400b909153ed84bb6fc396029ce31c21-bar.scn
+res://Hud/Scenes/flash.tscn::a927c6b4fb3e389c3245588d5b63334b::1704646470::res://.godot/exported/133200997/export-2246a3109577dbb061accb36a679b278-flash.scn
+res://Hud/Scenes/Header.tscn::743c86107a047102f38a9dd84042299d::1704646494::res://.godot/exported/133200997/export-8429be2e21ddf36e7f8a89102874f880-Header.scn
+res://Hud/Scenes/icon_button.tscn::117c2712ebd9187f435d4f38b1f5b802::1704646409::res://.godot/exported/133200997/export-604bbf10ea2cddeb4a540245e27caa74-icon_button.scn
+res://Hud/Scenes/MenuButton.tscn::066fb0bbe6aeabf4a9886d3dfbf9026f::1704671404::res://.godot/exported/133200997/export-00713b340038694d62fbb62e9b0268e5-MenuButton.scn
+res://Hud/Scenes/MenuScene.tscn::b1cdb2cd8fe1593c5057fe8861f62b98::1704779236::res://.godot/exported/133200997/export-757992361a66c807e18dd2422d59d98b-MenuScene.scn
+res://Hud/Scenes/purchase_button.tscn::5cc2ef2fcc01d2f3ef91dfeb794e96ea::1704779235::res://.godot/exported/133200997/export-00f78a2b11a2e2d4f055ced13f2ebe85-purchase_button.scn
+res://Hud/Scenes/reset_menu.tscn::638d352434dc1ef0491829678bccce29::1704779236::res://.godot/exported/133200997/export-729e8f1face8e806221ea5f76c8e9987-reset_menu.scn
+res://Hud/Scenes/RichLabel.tscn::ed9744a6954bf3ab764e3e08168e4126::1704646409::res://.godot/exported/133200997/export-6c680414f758c513857cc9f453d89881-RichLabel.scn
+res://Hud/Scenes/SettingsScene.tscn::e69dabd7f05f151755606d7a4cde35c7::1704773434::res://.godot/exported/133200997/export-78905826898e16655c3591c06ced02a7-SettingsScene.scn
+res://Hud/Themes/Backdrop.tres::554f707fedc53333754570d6123181ba::1694472834::res://.godot/exported/133200997/export-682040e5a7831b0deb9873d27c4981bd-Backdrop.res
+res://Hud/Themes/Background.tres::01265b0710cdd2981382fed12223c857::1704738525::res://.godot/exported/133200997/export-6461fb2944ace8bb2607b242426567f0-Background.res
+res://Hud/Themes/Invis.tres::39066484f8669112d3459b6aec012870::1704754816::res://.godot/exported/133200997/export-2c13949c872e400660bfbda8db23d445-Invis.res
+res://Hud/Themes/ProgressBar.tres::d969a80dd084ea0bb05f9801c0ce69ea::1704163332::res://.godot/exported/133200997/export-1dac7097524de24656265223f0a829fd-ProgressBar.res
+res://Hud/Themes/RoundedBackground.tres::5e66dc45593ed590e4ed169cc9f78b72::1703809027::res://.godot/exported/133200997/export-021be5f1a0f3d4653d85e672641a3a5f-RoundedBackground.res
+res://Hud/Themes/RoundedBackgroundNoShadow.tres::b4a09373bc4eb0bd25c727accb4492a4::1700410699::res://.godot/exported/133200997/export-9e8c5b566726f9ecdcc63eab9ef74860-RoundedBackgroundNoShadow.res
+res://Hud/Themes/RoundedTop.tres::9b655dfc9a1796be7427fb84b0e71d4e::1699657612::res://.godot/exported/133200997/export-be192127e20b013f9a05b18231f6bf8e-RoundedTop.res
+res://Hud/Themes/RoundedTopWithShadow.tres::154b59ee8c19b770835b18a62acf2176::1703809027::res://.godot/exported/133200997/export-1070f4ab0ce397db8ff59deb1565c448-RoundedTopWithShadow.res
+res://Hud/Themes/ShadowText.tres::fa67874645e08289e9b1c9ca0450b519::1704754816::res://.godot/exported/133200997/export-966ca4ac74bec71b5d0b4cd03477d47b-ShadowText.res
+res://Hud/Themes/SolidBackground.tres::089612f2f9e0f0f18ae1d7372fdb7206::1700430324::res://.godot/exported/133200997/export-41e39318f8c50158120a46412f15f879-SolidBackground.res
+res://Hud/Themes/Standard Rounded.tres::80c070046796dd8bf50eb78d38a76cfa::1704766962::res://.godot/exported/133200997/export-1feed7ca137d3f1e81b93a6cf63b6499-Standard Rounded.res
+res://Hud/Themes/Standard.tres::12732332fd1cd2f82244cab9ebdf258f::1704766922::res://.godot/exported/133200997/export-db3e246837a234ec79c11f63d3d62e26-Standard.res
+res://Hud/Themes/Subtle Background Rounded.tres::b7cff248d8158002475eca47919bb03e::1704759201::res://.godot/exported/133200997/export-b30ae05823bf3886879d02a7925938c7-Subtle Background Rounded.res
+res://Hud/Themes/Subtle Background.tres::c0b265b4119fa17e968663813f7f7513::1704766479::res://.godot/exported/133200997/export-a67b139caf712cf0d57360fb19488809-Subtle Background.res
+res://Hud/Themes/TextButton.tres::291c8907511614d6cb92fb3c2cc86c33::1703809027::res://.godot/exported/133200997/export-5cab22f25924533024ef5a95d4e08ca1-TextButton.res
+res://Hud/Themes/TextButtonAlternate.tres::58c8b191922a44db872c743d020469c5::1703809027::res://.godot/exported/133200997/export-c9ac42eee569a8a6c2bfa65115afa95b-TextButtonAlternate.res
+res://Hud/Themes/Title.tres::b4e3afa04b0404fd335c98bf3368acd4::1704754816::res://.godot/exported/133200997/export-85c9127ae61a1bac3e73b02d9c6589e4-Title.res
+res://Main.tscn::ebbec70eb7d6757f80643b9e9ddfd578::1704779235::res://.godot/exported/133200997/export-bcb0d2eb5949c52b6a65bfe9de3e985b-Main.scn

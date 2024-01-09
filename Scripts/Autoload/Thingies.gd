@@ -6,21 +6,20 @@ signal initialized
 signal container_loaded
 signal thingy_created
 
-var thingies := {}
+@export var thingies := {}
+@export var cost: Cost
+
 var container: ThingyContainer:
 	set(val):
 		container = val
 		container_loaded.emit()
-var cost: Cost
 
 var next_thingy_color := Color(1, 0.243, 0.208)
 
 var xp_output_range := FloatPair.new(1.0, 1.0)
 var xp_increase_range := FloatPair.new(1.15, 1.15)
 var xp_multiplier := LoudFloat.new(1.0)
-var crits_apply_to_xp := LoudBool.new(false)
-var crits_apply_to_coin := LoudBool.new(false)
-var crits_apply_to_duration := LoudBool.new(false)
+var duration_applies_to_xp_output := LoudBool.new(false)
 
 var output_range := FloatPair.new(1.0, 1.0)
 var output_increase_range := FloatPair.new(1.15, 1.15)
@@ -29,6 +28,9 @@ var crit_chance := LoudFloat.new(0.0)
 var crit_range := FloatPair.new(1.5, 1.5)
 var crit_crit_chance := LoudFloat.new(0.0)
 var crit_coin_output := FloatPair.new(0.0, 0.0)
+var crits_apply_to_xp := LoudBool.new(false)
+var crits_apply_to_coin := LoudBool.new(false)
+var crits_apply_to_duration := LoudBool.new(false)
 
 var duration_range := FloatPair.new(5.0, 5.0)
 var duration_increase_range := FloatPair.new(1.1, 1.1)
@@ -47,21 +49,29 @@ func _ready():
 	cost = Cost.new({Currency.Type.WILL: Value.new(1)})
 	cost.increase_multiplier = 3.0
 	initialized.emit()
-	return
-	crit_chance.set_to(5)
-	crit_range.total.set_to(2.5)
-	output_range.total.set_to(2)
-	duration_range.current.set_to(0.9)
-	duration_range.total.set_to(1.1)
+	gv.reset.connect(reset)
 
 
 
- # - Action
+#region Signals
+
+
+func thingy_wants_to_fucking_die(_index: int) -> void:
+	#print("erasing ", _index)
+	thingies.erase(_index)
+
+
+func reset(_tier: int) -> void:
+	cost.reset_now()
+
+
+#endregion
+
+#region Action
 
 
 func purchase_thingy() -> void:
-	cost.spend()
-	cost.increase()
+	cost.purchase()
 	new_thingy()
 
 
@@ -72,9 +82,11 @@ func new_thingy() -> void:
 	thingy_created.emit()
 
 
+#endregion
 
 
-# - Get
+
+#region Get
 
 
 func get_thingy(index: int) -> Thingy:
@@ -127,3 +139,6 @@ func get_color(index: int) -> Color:
 
 func get_latest_color() -> Color:
 	return get_latest_thingy().details.color
+
+
+#endregion

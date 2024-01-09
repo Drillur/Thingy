@@ -3,9 +3,9 @@ extends Resource
 
 
 
-const saved_vars := [
-	"output_multiplier",
-]
+signal kill_me
+
+@export var _class_name := "Thingy"
 
 enum Attribute {
 	NONE,
@@ -34,38 +34,43 @@ enum Attribute {
 	XP_OUTPUT_CURRENT,
 	XP_OUTPUT,
 	XP,
+	CRIT_CRIT,
 }
 
 signal timer_started
 
-var index: int
-var just_born := true
-var details = Details.new()
-var level := LoudInt.new(1)
-var timer := Timer.new()
+@export var level := LoudInt.new(1)
+@export var output_multiplier := Big.new(1.0)
+@export var xp := ValuePair.new(10.0).do_not_cap_current()
+@export var xp_modifier := LoudFloat.new(1.0)
+@export var duration_modifier := LoudFloat.new(1.0)
+@export var juice_output_modifier := LoudFloat.new(1.0)
+@export var juice_input_modifier := LoudFloat.new(1.0)
+@export var crit_multiplier := LoudFloat.new(1.0)
+@export var juiced_multiplier := LoudFloat.new(1.0)
 
-var output_multiplier := Big.new(1.0)
-var xp := ValuePair.new(10.0).do_not_cap_current()
-var xp_modifier := LoudFloat.new(1.0)
-var duration_modifier := LoudFloat.new(1.0)
-var juice_output_modifier := LoudFloat.new(1.0)
-var juice_input_modifier := LoudFloat.new(1.0)
+@export var output_currency := LoudInt.new(Currency.Type.WILL)
+
+var juiced := LoudBool.new(false)
+var crit_success := LoudBool.new(false)
 var inhand_will := Big.new(0)
 var inhand_coin := Big.new(0)
 var inhand_xp := Big.new(0)
 var inhand_juice := Big.new(0)
-var crit_success := LoudBool.new(false)
-var crit_multiplier := LoudFloat.new(1.0)
-var juiced := LoudBool.new(false)
-var juiced_multiplier := LoudFloat.new(1.0)
+var persist := Persist.new()
 
 
-var output_currency := LoudInt.new(Currency.Type.WILL)
+var index: int
+var just_born := true
+var details = Details.new()
+var timer := Timer.new()
 
 
 
 func _init(_index: int) -> void:
 	index = _index
+	persist.failed_persist_check.connect(reset)
+	kill_me.connect(th.thingy_wants_to_fucking_die)
 	details.color = th.next_thingy_color
 	xp.current.current.change_base(0.0)
 	xp.current.reset()
@@ -74,8 +79,6 @@ func _init(_index: int) -> void:
 	level.changed.connect(level_changed)
 	th.xp_multiplier.changed.connect(global_xp_multiplier_changed)
 	global_xp_multiplier_changed()
-	juiced.became_true.connect(juiced_became_true)
-	juiced.became_false.connect(juiced_became_false)
 	crit_multiplier.changed.connect(crit_success.set_true)
 	crit_multiplier.renewed.connect(crit_success.set_false)
 	output_currency.changed.connect(output_currency_changed)
@@ -84,18 +87,25 @@ func _init(_index: int) -> void:
 	inhand_coin.changed.connect(inhand_coin_changed)
 	inhand_juice.changed.connect(inhand_juice_changed)
 	juice_input_modifier.changed.connect(juice_input_modifier_changed)
+	juiced.became_true.connect(juiced_became_true)
 	juice_input_modifier_changed()
 	timer.timeout.connect(timer_timeout)
 	gv.add_child(timer)
 	timer.one_shot = true
-	start_timer()
-	
-	log_rates()
-
+	if gv.root_ready.is_false():
+		gv.root_ready.became_true.connect(start_timer)
+	else:
+		start_timer()
 
 
 
 #region Signals
+
+
+func reset() -> void:
+	timer.stop()
+	clear_rates()
+	kill_me.emit(index)
 
 
 func timer_timeout() -> void:
@@ -170,18 +180,7 @@ func juiced_became_true() -> void:
 			crit_multiplier.get_value() if crit_success.is_true() else 1.0
 		)
 	)
-	inhand_will.m(juiced_multiplier.get_value())
-	inhand_juice.m(juiced_multiplier.get_value())
-	inhand_xp.m(juiced_multiplier.get_value())
-	inhand_coin.m(juiced_multiplier.get_value())
 	timer.wait_time /= juiced_multiplier.get_value()
-
-
-func juiced_became_false() -> void:
-	inhand_will.reset()
-	inhand_juice.reset()
-	inhand_xp.reset()
-	inhand_coin.reset()
 
 
 func juice_input_modifier_changed() -> void:
@@ -197,8 +196,8 @@ func juice_input_modifier_changed() -> void:
 func start_timer() -> void:
 	timer.wait_time = get_random_duration()
 	output_currency.set_to(get_output_currency())
-	set_inhands()
 	juiced.set_to(should_juice())
+	set_inhands()
 	log_rates()
 	timer.wait_time = maxf(timer.wait_time, 0.05)
 	timer.start()
@@ -228,36 +227,61 @@ func get_output_currency() -> Currency.Type:
 
 
 func set_inhands() -> void:
-	var new_inhand_xp = th.xp_output_range.get_random_point()
-	var new_inhand_coin: Big
-	
 	if successful_crit_roll():
 		roll_for_lucky_crits()
 		if th.crits_apply_to_duration.is_true():
 			timer.wait_time /= crit_multiplier.get_value()
-		new_inhand_coin = Big.new(th.crit_coin_output.get_random_point())
-		if th.crits_apply_to_xp.is_true():
-			new_inhand_xp *= crit_multiplier.get_value()
-		if th.crits_apply_to_coin.is_true():
-			new_inhand_coin.m(crit_multiplier.get_value())
-		inhand_coin.set_to(new_inhand_coin)
-	
-	if wa.is_unlocked(Currency.Type.XP):
-		inhand_xp.set_to(new_inhand_xp)
-	
+	set_inhand_xp()
+	set_coin_inhand()
 	match output_currency.get_value():
 		Currency.Type.WILL:
-			inhand_will.set_to(
-				get_random_output().m(
-					crit_multiplier.get_value() if crit_success.is_true() else 1.0
-				)
-			)
+			set_inhand_will()
 		Currency.Type.JUICE:
-			inhand_juice.set_to(
-				get_random_juice_output() * (
-					crit_multiplier.get_value() if crit_success.is_true() else 1.0
-				)
-			)
+			set_inhand_juice()
+
+
+func set_inhand_will() -> void:
+	inhand_will.set_to(
+		get_random_output().m(
+			crit_multiplier.get_value() if crit_success.is_true() else 1.0
+		).m(
+			juiced_multiplier.get_value() if juiced.is_true() else 1.0
+		)
+	)
+
+
+func set_inhand_juice() -> void:
+	inhand_juice.set_to(
+		get_random_juice_output() * (
+			crit_multiplier.get_value() if crit_success.is_true() else 1.0
+		) * (
+			juiced_multiplier.get_value() if juiced.is_true() else 1.0
+		)
+	)
+
+
+func set_inhand_xp() -> void:
+	if not wa.is_unlocked(Currency.Type.XP):
+		return
+	var new_inhand = th.xp_output_range.get_random_point()
+	if juiced.is_true():
+		new_inhand *= juiced_multiplier.get_value()
+	if crit_success.is_true() and th.crits_apply_to_xp.is_true():
+		new_inhand *= crit_multiplier.get_value()
+	if th.duration_applies_to_xp_output.is_true():
+		new_inhand *= max(1, timer.wait_time)
+	inhand_xp.set_to(new_inhand)
+
+
+func set_coin_inhand() -> void:
+	if crit_success.is_false():
+		return
+	var new_inhand = th.crit_coin_output.get_random_point()
+	if juiced.is_true():
+		new_inhand *= juiced_multiplier.get_value()
+	if th.crits_apply_to_coin.is_true():
+		new_inhand *= crit_multiplier.get_value()
+	inhand_coin.set_to(new_inhand)
 
 
 func log_rates() -> void:
@@ -273,6 +297,12 @@ func log_rates() -> void:
 		)
 
 
+func clear_rates() -> void:
+	wa.get_currency(Currency.Type.WILL).gain_rate.remove_change("added", self)
+	wa.get_currency(Currency.Type.XP).gain_rate.remove_change("added", self)
+	wa.get_currency(Currency.Type.COIN).gain_rate.remove_change("added", self)
+
+
 func should_juice() -> bool:
 	var juice_drank = get_random_juice_input()
 	if wa.get_amount(Currency.Type.JUICE).greater_equal(juice_drank):
@@ -282,18 +312,6 @@ func should_juice() -> bool:
 
 
 #region Action
-
-
-func reset() -> void:
-	timer.stop()
-	level.reset()
-	output_multiplier.reset()
-	xp_modifier.reset()
-	xp.reset()
-	inhand_will.reset()
-	inhand_coin.reset()
-	inhand_xp.reset()
-	crit_multiplier.reset()
 
 
 func successful_crit_roll() -> bool:

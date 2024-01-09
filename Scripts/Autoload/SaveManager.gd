@@ -2,16 +2,6 @@ extends Node
 
 
 
-var saved_vars := [
-	"save_name",
-	"save_file_color",
-	"save_version",
-]
-
-signal save_finished
-signal load_finished
-signal load_started
-
 enum SaveMethod {
 	TO_FILE,
 	TO_CLIPBOARD,
@@ -26,7 +16,7 @@ enum LoadMethod {
 }
 
 const SAVE_BASE_PATH := "user://"
-const SAVE_EXTENSION := ".lored"
+const SAVE_EXTENSION := ".thingy"
 
 const RANDOM_PATH_POOL := [
 	"PaperPilot",
@@ -76,11 +66,10 @@ const RANDOM_PATH_POOL := [
 var default_save_method := SaveMethod.TO_FILE
 var default_load_method := LoadMethod.FROM_FILE
 
-var save_name: String = "Save"
-var color := LoudColor.new(Color(1, 0, 0.282))
-
-var save_version := {
-	"major": 3,
+@export var save_name: String = "Save"
+@export var color := LoudColor.new(Color(1, 0, 0.282))
+@export var save_version := {
+	"major": 1,
 	"minor": 0,
 	"revision": 0,
 }
@@ -88,14 +77,31 @@ var save_version := {
 var loaded_data: Dictionary
 var last_save_clock := Time.get_unix_time_from_system()
 var patched := false
+var saving := LoudBool.new(false)
 var loading := LoudBool.new(false)
 
 var test_data: String
+var singletons_with_exports := {}
+
+
+
+func _ready() -> void:
+	setup_singletons_with_exports()
+
+
+func setup_singletons_with_exports() -> void:
+	for node in get_tree().root.get_children():
+		if get_tree().current_scene and node.name == get_tree().current_scene.name:
+			continue
+		if script_has_exported_variable(node.get_script()):
+			singletons_with_exports[node.name] = node
 
 
 
 func save_game(method := default_save_method) -> void:
-	var packed_vars = pack_all_saved_vars()
+	saving.set_to(true)
+	
+	var packed_vars = pack_singleton_export_properties()
 	var save_text = JSON.stringify(packed_vars)
 	
 	match method:
@@ -110,23 +116,18 @@ func save_game(method := default_save_method) -> void:
 		SaveMethod.TEST:
 			test_data = save_text
 			print("- * - GAME SAVED - * -")
-			#print(save_text)
+			print(save_text)
 	
 	last_save_clock = Time.get_unix_time_from_system()
-	
-	save_finished.emit()
+	saving.reset()
 
 
 
 func load_game(method := default_load_method) -> void:
 	loading.set_to(true)
-	gv.close_all()
-	emit_signal("load_started")
 	loaded_data = get_save_data(method)
 	unpack_data(loaded_data)
-	gv.open_all()
-	load_finished.emit()
-	loading.set_to(false)
+	loading.reset()
 	update_save_version()
 
 
@@ -135,50 +136,38 @@ func delete_save(path := save_name):
 
 
 func duplicate_save(path := save_name) -> void:
-	var new_path = get_unique_path(path + " (Copy)")
+	var new_path = get_unique_filename(path + " (Copy)")
 	DirAccess.copy_absolute(path, new_path)
 
 
 func rename_path(path: String, new_path: String):
-	DirAccess.rename_absolute(get_save_path(path), get_unique_path(new_path))
+	DirAccess.rename_absolute(get_save_path(path), get_unique_filename(new_path))
 
 
 
 # - Actions
 
 
-func pack_all_saved_vars() -> Dictionary:
+func pack_singleton_export_properties() -> Dictionary:
 	var data := {}
-	data["Save"] = pack_saved_vars(self)
-	data["Overseer"] = pack_saved_vars(gv)
-	data["Wallet"] = pack_saved_vars(wa)
+	for singleton in singletons_with_exports:
+		data[singleton] = pack_exported_properties(singletons_with_exports[singleton])
 	return data
 
 
-func unpack_data(data: Dictionary) -> void:
-	unpack_vars(self, data["Save"])
-	unpack_vars(gv, data["Overseer"])
-	unpack_vars(wa, data["Wallet"])
 
-
-
-func pack_saved_vars(object) -> Dictionary:
+func pack_exported_properties(object) -> Dictionary:
 	var data := {}
-	for variable_name in object.get("saved_vars"):
+	for variable_name in get_exported_script_property_names(object.get_script()):
 		var variable = object.get(variable_name)
 		if variable is Dictionary:
 			data[variable_name] = pack_dictionary(variable)
 		elif variable is Array:
 			data[variable_name] = pack_array(variable)
 		elif variable is Object:
-			data[variable_name] = pack_saved_vars(variable)
+			data[variable_name] = pack_exported_properties(variable)
 		elif variable is Color:
-			data[variable_name] = {
-				"r": variable.r,
-				"g": variable.g,
-				"b": variable.b,
-				"a": variable.a,
-			}
+			data[variable_name] = pack_color(variable)
 		else:
 			data[variable_name] = variable
 	return data
@@ -191,14 +180,9 @@ func pack_dictionary(dictionary: Dictionary) -> Dictionary:
 		if value is Dictionary:
 			data[key] = pack_dictionary(value)
 		elif value is Object:
-			data[key] = pack_saved_vars(value)
+			data[key] = pack_exported_properties(value)
 		elif value is Color:
-			data[key] = {
-				"r": value.r,
-				"g": value.g,
-				"b": value.b,
-				"a": value.a,
-			}
+			data[key] = pack_color(value)
 		else:
 			data[key] = dictionary[key]
 	return data
@@ -220,9 +204,25 @@ func pack_array(array: Array) -> Dictionary:
 	return data
 
 
+func pack_color(value: Color) -> Dictionary:
+	return {
+		"r": value.r,
+		"g": value.g,
+		"b": value.b,
+		"a": value.a,
+	}
+
+
+
+func unpack_data(data: Dictionary) -> void:
+	for singleton in singletons_with_exports:
+		if not singleton in data.keys():
+			continue
+		unpack_vars(singletons_with_exports[singleton], data[singleton])
+
 
 func unpack_vars(object, packed_vars: Dictionary) -> void:
-	for variable_name in object.get("saved_vars"):
+	for variable_name in get_exported_script_property_names(object.get_script()):
 		if not variable_name in packed_vars.keys():
 			continue
 		var variable = object.get(variable_name)
@@ -235,40 +235,48 @@ func unpack_vars(object, packed_vars: Dictionary) -> void:
 		elif variable is Object:
 			unpack_vars(object.get(variable_name), packed_variable)
 			if variable is Big:
-				emit_signals_on_bigs(variable)
+				variable.emit_change()
+				variable.emit_increase()
+				variable.emit_decrease()
 		elif variable is Color:
-			object.set(variable_name, Color(
-				packed_variable.r,
-				packed_variable.g,
-				packed_variable.b,
-				packed_variable.a,
-			))
+			unpack_color(object.get(variable_name), packed_variable)
 		else:
 			object.set(variable_name, packed_variable)
 
 
 func unpack_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) -> Dictionary:
+	if dictionary.is_empty():
+		return unpack_dictionary_to_empty_dictionary(dictionary, packed_dictionary)
 	for key in dictionary:
 		if not key in packed_dictionary.keys():
 			continue
 		var value = dictionary[key]
 		var packed_value = packed_dictionary[key]
-		
 		if value is Dictionary:
 			dictionary[key] = unpack_dictionary(value, packed_value)
 		elif value is Object:
 			unpack_vars(dictionary[key], packed_value)
 			if value is Big:
-				emit_signals_on_bigs(value)
+				value.emit_change()
+				value.emit_increase()
+				value.emit_decrease()
 		elif value is Color:
-			dictionary[key] = Color(
-				packed_value.r,
-				packed_value.g,
-				packed_value.b,
-				packed_value.a,
-			)
+			unpack_color(dictionary[key], packed_value)
 		else:
 			dictionary[key] = packed_value
+	return dictionary
+
+
+func unpack_dictionary_to_empty_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) -> Dictionary:
+	for key in packed_dictionary.keys():
+		var new_key = key
+		if key is String and int(key) == round(int(key)):
+			new_key = int(key)
+		match packed_dictionary[key]["_class_name"]:
+			"Thingy":
+				th.new_thingy()
+				dictionary[new_key] = th.get_latest_thingy()
+				unpack_vars(dictionary[new_key], packed_dictionary[key])
 	return dictionary
 
 
@@ -287,12 +295,13 @@ func unpack_array(packed_array: Dictionary) -> Array:
 	return array
 
 
-
-func emit_signals_on_bigs(big: Big) -> void:
-	await load_finished
-	big.emit_change()
-	big.emit_increase()
-	big.emit_decrease()
+func unpack_color(_color: Color, packed_color: Dictionary) -> void:
+	_color = Color(
+		packed_color["r"],
+		packed_color["g"],
+		packed_color["b"],
+		packed_color["a"],
+	)
 
 
 
@@ -304,16 +313,15 @@ func update_save_version() -> void:
 
 
 
-# - Get
+#region Get
+
 
 func get_save_data(method := default_load_method, filename := save_name) -> Dictionary:
 	var save_text: String = get_save_text(method, filename)
 	var json = JSON.new()
 	json.parse(save_text)
-#	if method == LoadMethod.TEST:
-#		print(json.data)
-	
-	#ID[itemsJson.] = itemsJson.data[key]["Tags"]
+	if method == LoadMethod.TEST:
+		print(json.data)
 	return json.data
 
 
@@ -338,27 +346,36 @@ func save_exists(filename := save_name) -> bool:
 func is_compatible_save(data: Dictionary) -> bool:
 	if data == {}:
 		return false
-	if not "Save" in data.keys():
-		return false
-	if not "Overseer" in data.keys():
-		return false
-	if not "Wallet" in data.keys():
-		return false
-	if not "LOREDs" in data.keys():
+	if not "SaveManager" in data.keys():
 		return false
 	return true
 
 
-func can_load_game(method := default_load_method, path = save_name) -> bool:
-	if not save_exists(path):
+func can_load_game(method := default_load_method, filename = save_name) -> bool:
+	if not save_exists(filename):
 		return false
 	var json = JSON.new()
-	var error = json.parse(get_save_text(method, path))
+	var error = json.parse(get_save_text(method, filename))
 	if error != OK:
 		print("Loading error. ", error)
 		return false
 	var data := get_save_data()
 	return is_compatible_save(data)
+
+
+func get_exported_script_property_names(script: Script) -> Array[String]:
+	var variable_names: Array[String]
+	for property in script.get_script_property_list():
+		if property.usage == 4102:
+			variable_names.append(property.name)
+	return variable_names
+
+
+func script_has_exported_variable(script: Script) -> bool:
+	for property in script.get_script_property_list():
+		if property.usage == 4102:
+			return true
+	return false
 
 
 func is_version_changed_since_save() -> bool:
@@ -375,23 +392,24 @@ func is_version_changed_since_save() -> bool:
 	return save_version.revision < version.revision
 
 
-func get_save_path(path := save_name) -> String:
-	return SAVE_BASE_PATH + path + SAVE_EXTENSION
+func get_save_path(filename := save_name) -> String:
+	return SAVE_BASE_PATH + filename + SAVE_EXTENSION
 
 
-func get_unique_path(path: String) -> String:
+func get_unique_filename(filename: String) -> String:
 	randomize()
-	var new_path := path
-	while save_exists(new_path):
-		new_path += str(Time.get_unix_time_from_system() + randi())
-	return new_path
+	var new_filename := filename
+	while save_exists(new_filename):
+		new_filename += str(Time.get_unix_time_from_system() + randi())
+	return new_filename
 
 
-func get_random_path() -> String:
-	return get_unique_path(RANDOM_PATH_POOL[randi() % RANDOM_PATH_POOL.size()])
+func get_random_filename() -> String:
+	return get_unique_filename(RANDOM_PATH_POOL[randi() % RANDOM_PATH_POOL.size()])
 
 
 func get_time_since_last_save() -> float:
 	return gv.current_clock - last_save_clock
 
 
+#endregion

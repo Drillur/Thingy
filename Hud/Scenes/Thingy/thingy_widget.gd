@@ -25,39 +25,46 @@ extends MarginContainer
 @onready var juice_input = %"Juice Input"
 @onready var juice_input_increase = %"Juice Input Increase"
 
-var thingy: Thingy
+var thingy: Thingy:
+	set(val):
+		thingy = val
+		if not wa.get_unlocked(Currency.Type.XP).changed.is_connected(xp_unlocked):
+			wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked)
+			wa.get_unlocked(Currency.Type.JUICE).changed.connect(juice_unlocked)
+			th.xp_output_range.changed.connect(xp_output_range_changed)
+			th.duration_applies_to_xp_output.changed.connect(xp_output_range_changed)
+			th.xp_increase_range.changed.connect(xp_increase_range_changed)
+			th.output_increase_range.changed.connect(output_changed)
+			th.output_range.changed.connect(output_changed)
+			th.output_increase_range.changed.connect(output_increase_range_changed)
+			th.crit_chance.changed.connect(crit_chance_changed)
+			th.crit_crit_chance.changed.connect(crit_crit_chance_changed)
+			th.crit_range.changed.connect(crit_range_changed)
+			up.get_upgrade(Upgrade.Type.CRITS_AFFECT_COIN_GAIN).purchased.changed.connect(crit_coin_output_changed)
+			th.crit_coin_output.changed.connect(crit_coin_output_changed)
+			th.duration_range.changed.connect(duration_changed)
+			th.duration_increase_range.changed.connect(duration_changed)
+			th.duration_increase_range.changed.connect(duration_increase_changed)
+			th.juice_output_range.changed.connect(juice_output_changed)
+			th.juice_input_range.changed.connect(juice_input_changed)
+			th.juice_output_increase_range.changed.connect(juice_output_increase_changed)
+			th.juice_input_increase_range.changed.connect(juice_input_increase_changed)
+			xp_unlocked()
+			juice_unlocked()
 
 
 
 func _ready() -> void:
 	hide()
-	wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked)
-	wa.get_unlocked(Currency.Type.JUICE).changed.connect(juice_unlocked)
-	th.xp_output_range.changed.connect(xp_output_range_changed)
-	th.xp_increase_range.changed.connect(xp_increase_range_changed)
-	th.output_increase_range.changed.connect(output_changed)
-	th.output_range.changed.connect(output_changed)
-	th.output_increase_range.changed.connect(output_increase_range_changed)
-	th.crit_chance.changed.connect(crit_chance_changed)
-	th.crit_crit_chance.changed.connect(crit_crit_chance_changed)
-	th.crit_range.changed.connect(crit_range_changed)
-	up.get_upgrade(Upgrade.Type.CRITS_AFFECT_COIN_GAIN).purchased.changed.connect(crit_coin_output_changed)
-	th.crit_coin_output.changed.connect(crit_coin_output_changed)
-	th.duration_increase_range.changed.connect(duration_changed)
-	th.duration_range.changed.connect(duration_changed)
-	th.duration_increase_range.changed.connect(duration_increase_changed)
-	th.juice_output_range.changed.connect(juice_output_changed)
-	th.juice_input_range.changed.connect(juice_input_changed)
-	th.juice_output_increase_range.changed.connect(juice_output_increase_changed)
-	th.juice_input_increase_range.changed.connect(juice_input_increase_changed)
 	await th.container_loaded
 	th.container.selected_index.changed.connect(selected_index_changed)
-	xp_unlocked()
-	juice_unlocked()
 
 
 
 func selected_index_changed() -> void:
+	if th.get_selected_index() == -1:
+		hide()
+		return
 	show()
 	if thingy:
 		disconnect_calls()
@@ -76,11 +83,11 @@ func connect_calls() -> void:
 	thingy.level.changed.connect(level_changed)
 	thingy.xp.changed.connect(xp_changed)
 	thingy.level.changed.connect(output_changed)
-	thingy.level.changed.connect(duration_changed)
+	thingy.duration_modifier.changed.connect(duration_changed)
 	thingy.juice_output_modifier.changed.connect(juice_output_changed)
 	thingy.juice_input_modifier.changed.connect(juice_input_changed)
 	level_changed(false)
-	xp_changed(false)
+	xp_changed()
 	xp_output_range_changed(false)
 	xp_increase_range_changed(false)
 	output_changed(false)
@@ -102,7 +109,7 @@ func disconnect_calls() -> void:
 	thingy.level.changed.disconnect(level_changed)
 	thingy.xp.changed.disconnect(xp_changed)
 	thingy.level.changed.disconnect(output_changed)
-	thingy.level.changed.disconnect(duration_changed)
+	thingy.duration_modifier.changed.disconnect(duration_changed)
 	thingy.juice_output_modifier.changed.disconnect(juice_output_changed)
 	thingy.juice_input_modifier.changed.disconnect(juice_input_changed)
 
@@ -146,7 +153,7 @@ func level_changed(flash := true) -> void:
 		gv.flash(level, thingy.details.color)
 
 
-func xp_changed(flash := true) -> void:
+func xp_changed() -> void:
 	xp_label.text = wa.get_details(Currency.Type.XP).color_text % (
 		"%s/%s" % [
 			thingy.xp.get_current_text(),
@@ -159,14 +166,25 @@ func xp_output_range_changed(flash := true) -> void:
 	var text = wa.get_details(Currency.Type.XP).icon_and_name + ": [b]"
 	text += wa.get_details(Currency.Type.XP).color_text
 	if th.xp_output_range.is_full():
-		text = text % th.xp_output_range.get_total_text()
+		if th.duration_applies_to_xp_output.is_true():
+			text = text % Big.get_float_text(max(1, thingy.get_minimum_duration()) * th.xp_output_range.get_total())
+		else:
+			text = text % th.xp_output_range.get_total_text()
 	else:
-		text = text % (
-			"%s-%s" % [
-				th.xp_output_range.get_current_text(),
-				th.xp_output_range.get_total_text()
-			]
-		)
+		if th.duration_applies_to_xp_output.is_true():
+			text = text % (
+				"%s-%s" % [
+					Big.get_float_text(max(1, thingy.get_minimum_duration()) * th.xp_output_range.get_current()),
+					Big.get_float_text(max(1, thingy.get_maximum_duration()) * th.xp_output_range.get_total()),
+				]
+			)
+		else:
+			text = text % (
+				"%s-%s" % [
+					th.xp_output_range.get_current_text(),
+					th.xp_output_range.get_total_text()
+				]
+			)
 	xp_output_range.text = text
 	if flash:
 		gv.flash(xp_output_range, thingy.details.color)
@@ -353,6 +371,8 @@ func duration_changed(flash := true) -> void:
 		]
 	if flash:
 		gv.flash(duration, thingy.details.color)
+	if th.duration_applies_to_xp_output.is_true():
+		xp_output_range_changed(flash)
 
 
 func duration_increase_changed(flash := true) -> void:

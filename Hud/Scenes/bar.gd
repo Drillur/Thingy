@@ -96,7 +96,8 @@ func remove_value() -> void:
 
 func update_progress() -> void:
 	# value_pair only
-	progress = value.get_current_percent()
+	if value:
+		progress = value.get_current_percent()
 
 
 

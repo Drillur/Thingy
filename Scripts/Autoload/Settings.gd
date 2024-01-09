@@ -2,15 +2,10 @@ extends Node
 
 
 
-const saved_vars := [
-	"fullscreen",
-	"joypad_allowed",
-]
-
 var color := Color(0, 1, 0.812)
 
-var fullscreen := LoudBool.new(false)
-var joypad_allowed := LoudBool.new(true)
+@export var fullscreen := LoudBool.new(false)
+@export var joypad_allowed := LoudBool.new(true)
 
 
 
@@ -18,6 +13,7 @@ func _ready() -> void:
 	for variable in gv.get_script_variables(get_script()):
 		if has_method(variable + "_changed"):
 			get(variable).changed.connect(get(variable + "_changed"))
+			print(variable + "_changed")
 
 
 
@@ -32,6 +28,8 @@ func joypad_allowed_changed() -> void:
 
 
 func fullscreen_changed() -> void:
+	if gv.root_ready.is_false():
+		await gv.root_ready.became_true
 	if fullscreen.is_true():
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:

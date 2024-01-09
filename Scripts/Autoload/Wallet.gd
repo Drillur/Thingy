@@ -3,6 +3,7 @@ extends Node
 
 
 var currencies := {}
+@export var currencies_by_name := {}
 var soul_gain := Big.new(0)
 
 
@@ -10,8 +11,12 @@ var soul_gain := Big.new(0)
 func _ready() -> void:
 	for cur in Currency.Type.values():
 		currencies[cur] = Currency.new(cur)
+		currencies_by_name[currencies[cur].key] = currencies[cur]
 	get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
 
+
+
+#region Signals
 
 
 func will_changed() -> void:
@@ -24,8 +29,16 @@ func will_changed() -> void:
 	soul_gain.set_to(new_amount)
 
 
+#endregion
+
 
 # - Action
+
+
+func collect_reset_currency(_tier: int) -> void:
+	match _tier:
+		1:
+			add(Currency.Type.SOUL, soul_gain)
 
 
 func add(cur: Currency.Type, amount) -> void:

@@ -1,0 +1,85 @@
+[gd_scene load_steps=8 format=3 uid="uid://tfrl5j7jiiwd"]
+
+[ext_resource type="Texture2D" uid="uid://beuki11l6kwux" path="res://Art/Icons/Hud/Info.png" id="1_oh2yh"]
+[ext_resource type="Script" path="res://Hud/Scenes/reset_menu.gd" id="1_v23x2"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="2_s25fo"]
+[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="2_sp3ei"]
+[ext_resource type="PackedScene" uid="uid://bfi0uovwegdxj" path="res://Hud/Scenes/MenuButton.tscn" id="3_b3bx7"]
+[ext_resource type="Texture2D" uid="uid://bihfgl6qch4gh" path="res://Art/Icons/Hud/Skull.png" id="4_quk5e"]
+[ext_resource type="Theme" uid="uid://cjvpbaiddna0a" path="res://Hud/Themes/Standard Rounded.tres" id="5_qrmvg"]
+
+[node name="ResetMenu" type="MarginContainer"]
+offset_right = 168.0
+offset_bottom = 217.0
+script = ExtResource("1_v23x2")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SoulComponents" type="HBoxContainer" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="Soul Label" type="RichTextLabel" parent="VBoxContainer2/SoulComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("2_sp3ei")
+bbcode_enabled = true
+text = "+123e123 X Soul"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Soul Flair" type="RichTextLabel" parent="VBoxContainer2/SoulComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("2_sp3ei")
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+
+[node name="Free Button" parent="VBoxContainer2" instance=ExtResource("3_b3bx7")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("4_quk5e")
+text = "Free Souls"
+center_content = true
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer2"]
+layout_mode = 2
+
+[node name="Background" type="Panel" parent="VBoxContainer2/MarginContainer"]
+layout_mode = 2
+theme = ExtResource("5_qrmvg")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="HBoxContainer" type="VBoxContainer" parent="VBoxContainer2/MarginContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="info icon" type="TextureRect" parent="VBoxContainer2/MarginContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("1_oh2yh")
+stretch_mode = 5
+
+[node name="info" parent="VBoxContainer2/MarginContainer/MarginContainer/HBoxContainer" instance=ExtResource("2_s25fo")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "[i]Free the souls of your [img=<15>]res://Art/Icons/Hud/activeBuffs.png[/img] Thingies which you have lovingly cultivated. This will also obliterate all of your [img=<15>]res://Art/Icons/Hud/upgrades.png[/img] Upgrades and currencies (except Soul)."
+
+[connection signal="pressed" from="VBoxContainer2/Free Button" to="." method="_on_free_button_pressed"]

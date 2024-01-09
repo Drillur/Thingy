@@ -61,6 +61,7 @@ func _process(_delta):
 
 
 func connect_calls() -> void:
+	thingy.kill_me.connect(thingy_is_sick_of_living)
 	thingy.level.increased.connect(level_increased)
 	thingy.inhand_will.changed.connect(output_changed)
 	thingy.inhand_juice.changed.connect(output_changed)
@@ -72,9 +73,11 @@ func connect_calls() -> void:
 	timer_wait_time_changed()
 	level_changed()
 	crit_success_changed()
+	show()
 
 
 func disconnect_calls() -> void:
+	thingy.kill_me.disconnect(thingy_is_sick_of_living)
 	thingy.level.increased.disconnect(level_increased)
 	thingy.inhand_will.changed.disconnect(output_changed)
 	thingy.inhand_juice.changed.disconnect(output_changed)
@@ -89,6 +92,8 @@ func disconnect_calls() -> void:
 
 
 func selected_index_changed() -> void:
+	if th.get_selected_index() == -1:
+		return
 	var index: int = th.container.selected_index.get_value()
 	match get_index():
 		0:
@@ -123,6 +128,11 @@ func selected_index_changed() -> void:
 				assign_thingy(th.get_thingy(index - 3))
 			else:
 				clear_thingy()
+
+
+func thingy_is_sick_of_living(_index: int) -> void:
+	# signal 'kill_me' passes its index ^
+	clear_thingy()
 
 
 func output_changed() -> void:
@@ -200,7 +210,6 @@ func assign_thingy(_thingy: Thingy) -> void:
 	progress_bar.attach_timer(thingy.timer)
 	index_label.text = "[i]#" + str(thingy.index + 1)
 	set_process(true)
-	show()
 	if _thingy.just_born:
 		gv.flash(self, color)
 		_thingy.just_born = false

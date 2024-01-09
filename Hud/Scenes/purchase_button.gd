@@ -79,6 +79,8 @@ func setup(_cost: Cost) -> void:
 		content_parent.add_child(label)
 	
 	cost.affordable.connect_and_call("changed", affordable_changed)
+	cost.reset.connect(update)
+	SaveManager.loading.became_false.connect(update)
 	
 	if cost.affordable.is_true():
 		update_progress_bar()
@@ -147,7 +149,12 @@ func _on_button_gui_input(event: InputEvent):
 
 
 func right_click() -> void:
-	right_clicked.emit() 
+	right_clicked.emit()
+
+
+func update() -> void:
+	update_progress_bar()
+	set_eta_text()
 
 
 func update_progress_bar() -> void:
@@ -203,7 +210,8 @@ func _on_focus_entered():
 
 
 func _on_button_mouse_entered():
-	button.grab_focus()
+	if button.focus_mode == Control.FOCUS_ALL:
+		button.grab_focus()
 
 
 

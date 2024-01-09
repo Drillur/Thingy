@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dky60pdpk0ffa"]
+[gd_scene load_steps=9 format=3 uid="uid://dky60pdpk0ffa"]
 
 [ext_resource type="Script" path="res://Hud/Scenes/purchase_button.gd" id="1_c15yb"]
 [ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Hud/Themes/Subtle Background.tres" id="2_c4q5t"]
@@ -7,6 +7,15 @@
 [ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="4_dhfok"]
 [ext_resource type="Theme" uid="uid://cw23v8nlfy06y" path="res://Hud/Themes/Title.tres" id="5_aof47"]
 [ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Hud/Themes/Invis.tres" id="7_d7nvp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aykbp"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+shadow_color = Color(0, 0, 0, 0.34902)
+shadow_size = 5
 
 [node name="Purchase Button" type="MarginContainer"]
 offset_right = 44.0
@@ -20,6 +29,7 @@ script = ExtResource("1_c15yb")
 [node name="Background" type="Panel" parent="."]
 layout_mode = 2
 theme = ExtResource("2_c4q5t")
+theme_override_styles/panel = SubResource("StyleBoxFlat_aykbp")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2

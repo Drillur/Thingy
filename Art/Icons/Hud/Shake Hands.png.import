@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://y8gofi3ahidh"
-path="res://.godot/imported/autobuy.png-72136d857e01a1e07b22925bf3c5f095.ctex"
+uid="uid://blebtgsicw00t"
+path="res://.godot/imported/Shake Hands.png-4a23175030e5a69ad38884b78a49878f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/Icons/Hud/autobuy.png"
-dest_files=["res://.godot/imported/autobuy.png-72136d857e01a1e07b22925bf3c5f095.ctex"]
+source_file="res://Art/Icons/Hud/Shake Hands.png"
+dest_files=["res://.godot/imported/Shake Hands.png-4a23175030e5a69ad38884b78a49878f.ctex"]
 
 [params]
 

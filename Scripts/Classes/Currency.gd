@@ -15,9 +15,9 @@ var type: Type
 var key: String
 var details := Details.new()
 
-var amount: Value
-
-var unlocked := LoudBool.new(false)
+@export var amount: Value
+@export var unlocked := LoudBool.new(false)
+var persist := Persist.new()
 
 var net_rate := Big.new(0)
 var gain_rate := Value.new(0)
@@ -32,6 +32,7 @@ func _init(_type: Type) -> void:
 	loss_rate.changed.connect(sync_rate)
 	details.name = key.capitalize()
 	set_starting_amount()
+	persist.failed_persist_check.connect(reset)
 	match type:
 		Type.WILL:
 			details.color = Color(1, 0.114, 0.278)
@@ -50,6 +51,7 @@ func _init(_type: Type) -> void:
 		Type.SOUL:
 			details.color = Color(0.918, 0.2, 0.553)
 			details.icon = bag.get_resource("Ghost")
+			persist.through_tier(1)
 
 
 
@@ -61,6 +63,15 @@ func set_starting_amount() -> void:
 		_:
 			amount = Value.new(0)
 
+
+#region Signals
+
+
+func reset() -> void:
+	amount.reset()
+
+
+#endregion
 
 
 

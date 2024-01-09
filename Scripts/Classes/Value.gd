@@ -3,16 +3,13 @@ extends Resource
 
 
 
-var saved_vars := [
-	"current",
-]
-
 signal increased
 signal decreased
 signal pending_changed
 
-var current: Big
-var pending := Big.new(0.0)
+@export var _class_name := "Value"
+@export var current: Big
+@export var pending := Big.new(0.0)
 
 var added := Big.new(0)
 var subtracted := Big.new(0)
@@ -116,7 +113,7 @@ func decrease_divided(amount) -> void:
 	sync()
 
 
-var log := {
+var book := {
 	"added": {},
 	"subtracted": {},
 	"multiplied": {},
@@ -126,11 +123,11 @@ var log := {
 
 
 func add_change(category: String, source, amount) -> void:
-	if log[category].has(source):
+	if book[category].has(source):
 		if gv.dev_mode:
 			print_debug("This source already logged a change for this Value! Fix your code.")
 		return
-	log[category][source] = Big.new(amount)
+	book[category][source] = Big.new(amount)
 	match category:
 		"added":
 			increase_added(amount)
@@ -145,15 +142,15 @@ func add_change(category: String, source, amount) -> void:
 
 
 func edit_change(category: String, source, amount) -> void:
-	if log[category].has(source):
+	if book[category].has(source):
 		remove_change(category, source, false)
 	add_change(category, source, amount)
 
 
 func remove_change(category: String, source, sync_afterwards := true) -> void:
-	if not source in log[category].keys():
+	if not source in book[category].keys():
 		return
-	var amount: Big = log[category][source]
+	var amount: Big = book[category][source]
 	match category:
 		"added":
 			added.s(amount)
@@ -165,7 +162,7 @@ func remove_change(category: String, source, sync_afterwards := true) -> void:
 			divided.d(amount)
 		"pending":
 			pending.s(amount)
-	log[category].erase(source)
+	book[category].erase(source)
 	if sync_afterwards:
 		sync()
 
@@ -176,6 +173,7 @@ func reset():
 	subtracted.reset()
 	multiplied.reset()
 	divided.reset()
+	pending.reset()
 	current.reset()
 
 

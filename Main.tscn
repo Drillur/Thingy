@@ -1,8 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://cmo5x3dcvsaet"]
+[gd_scene load_steps=20 format=3 uid="uid://cmo5x3dcvsaet"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_q04pk"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="3_0lxd2"]
 [ext_resource type="PackedScene" uid="uid://bn52kwycifxlc" path="res://Hud/Scenes/Thingy/thingy_container.tscn" id="3_i7kju"]
 [ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="3_i8skv"]
+[ext_resource type="Texture2D" uid="uid://cya8ro2s324t3" path="res://Art/Icons/Hud/Save.png" id="3_u8jkq"]
 [ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Scenes/Header.tscn" id="4_bh3ko"]
 [ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://Hud/Themes/Subtle Background Rounded.tres" id="5_dm0ov"]
 [ext_resource type="PackedScene" uid="uid://cugpk4lkaganr" path="res://Hud/Scenes/MenuScene.tscn" id="5_i0mom"]
@@ -10,11 +12,13 @@
 [ext_resource type="PackedScene" uid="uid://bfi0uovwegdxj" path="res://Hud/Scenes/MenuButton.tscn" id="5_mtslg"]
 [ext_resource type="PackedScene" uid="uid://cqkk62rlbp3l" path="res://Hud/Scenes/SettingsScene.tscn" id="6_81evl"]
 [ext_resource type="Texture2D" uid="uid://408er70eh4ns" path="res://Art/Icons/Hud/upgrades.png" id="6_jmjrv"]
+[ext_resource type="PackedScene" uid="uid://tfrl5j7jiiwd" path="res://Hud/Scenes/reset_menu.tscn" id="8_jwrlk"]
 [ext_resource type="PackedScene" uid="uid://dq3cwy5fqfot5" path="res://Hud/Scenes/Upgrades/upgrade_container.tscn" id="9_o0od1"]
 [ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/purchase_button.tscn" id="9_x5lqm"]
 [ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Scenes/Upgrades/upgrade_button.tscn" id="10_4ysqw"]
 [ext_resource type="Texture2D" uid="uid://bvb4ehu30w7iu" path="res://Art/Icons/Hud/Settings.png" id="12_dnau6"]
 [ext_resource type="Texture2D" uid="uid://bihfgl6qch4gh" path="res://Art/Icons/Hud/Skull.png" id="15_im36d"]
+[ext_resource type="Texture2D" uid="uid://dqb65ponp02yw" path="res://Art/Icons/Hud/Sort.png" id="16_mjpp8"]
 
 [node name="Main" type="CanvasLayer"]
 script = ExtResource("1_q04pk")
@@ -36,6 +40,7 @@ metadata/_edit_lock_ = true
 layout_mode = 2
 theme_override_constants/separation = 48
 alignment = 1
+metadata/_edit_lock_ = true
 
 [node name="MarginBotLeft" type="MarginContainer" parent="Content/HBoxContainer"]
 layout_mode = 2
@@ -89,6 +94,11 @@ layout_mode = 2
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(450, 400)
+layout_mode = 2
+
+[node name="ResetMenu" parent="Content/HBoxContainer/MarginBotLeft/Sidebar/VBoxContainer/MarginContainer/TabContainer" instance=ExtResource("8_jwrlk")]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 
 [node name="ThingyContainer" parent="Content/HBoxContainer" instance=ExtResource("3_i7kju")]
@@ -180,49 +190,56 @@ layout_mode = 2
 icon = ExtResource("6_jmjrv")
 text = ""
 
-[node name="DevButton" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
+[node name="Reset Button" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
 unique_name_in_owner = true
 layout_mode = 2
 icon = ExtResource("15_im36d")
+text = ""
+
+[node name="DevButton" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("16_mjpp8")
 text = ""
 color = Color(1, 0, 0, 1)
 
 [node name="DevButton2" parent="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons" instance=ExtResource("5_mtslg")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 icon = ExtResource("15_im36d")
 text = ""
 color = Color(1, 0, 0, 1)
 
-[node name="TopPanel" type="MarginContainer" parent="Content/HBoxContainer2"]
+[node name="CurrencyPanel" type="MarginContainer" parent="Content/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Background" type="Panel" parent="Content/HBoxContainer2/TopPanel"]
+[node name="Background" type="Panel" parent="Content/HBoxContainer2/CurrencyPanel"]
 layout_mode = 2
 theme = ExtResource("5_dm0ov")
 
-[node name="MarginContainer" type="MarginContainer" parent="Content/HBoxContainer2/TopPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="Content/HBoxContainer2/CurrencyPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="CoinComponents" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+[node name="CoinComponents" type="HBoxContainer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
 alignment = 1
 
-[node name="Coin Label" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
+[node name="Coin Label" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/CoinComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -233,7 +250,7 @@ text = "123e123"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Coin Rate" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
+[node name="Coin Rate" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/CoinComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -245,7 +262,7 @@ text = "4/s"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Coin Flair" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/CoinComponents"]
+[node name="Coin Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/CoinComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -256,14 +273,14 @@ text = "Coin"
 fit_content = true
 autowrap_mode = 0
 
-[node name="WillComponents" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+[node name="WillComponents" type="HBoxContainer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
 alignment = 1
 
-[node name="Will Label" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/WillComponents"]
+[node name="Will Label" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/WillComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -274,7 +291,7 @@ text = "234"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Will Rate" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/WillComponents"]
+[node name="Will Rate" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/WillComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -286,7 +303,7 @@ text = "4/s"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Will Flair" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/WillComponents"]
+[node name="Will Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/WillComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -297,14 +314,14 @@ text = "Experience"
 fit_content = true
 autowrap_mode = 0
 
-[node name="XPComponents" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+[node name="XPComponents" type="HBoxContainer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
 alignment = 1
 
-[node name="XP Label" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/XPComponents"]
+[node name="XP Label" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/XPComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -315,7 +332,7 @@ text = "234"
 fit_content = true
 autowrap_mode = 0
 
-[node name="XP Rate" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/XPComponents"]
+[node name="XP Rate" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/XPComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -327,7 +344,7 @@ text = "4/s"
 fit_content = true
 autowrap_mode = 0
 
-[node name="XP Flair" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/XPComponents"]
+[node name="XP Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/XPComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -337,14 +354,14 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="JuiceComponents" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+[node name="JuiceComponents" type="HBoxContainer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
 alignment = 1
 
-[node name="Juice Label" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/JuiceComponents"]
+[node name="Juice Label" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -355,7 +372,7 @@ text = "234"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Juice Rate" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/JuiceComponents"]
+[node name="Juice Rate" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -367,7 +384,7 @@ text = "4/s"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Juice Flair" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/JuiceComponents"]
+[node name="Juice Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -377,14 +394,14 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="SoulComponents" type="HBoxContainer" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+[node name="SoulComponents" type="HBoxContainer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
 alignment = 1
 
-[node name="Soul Label" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents"]
+[node name="Soul Label" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/SoulComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -395,19 +412,7 @@ text = "234"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Soul Rate" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "4/s"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Soul Flair" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents"]
+[node name="Soul Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/SoulComponents"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -417,7 +422,7 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="DEV" type="RichTextLabel" parent="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer"]
+[node name="DEV" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -426,6 +431,57 @@ mouse_filter = 2
 theme = ExtResource("3_i8skv")
 bbcode_enabled = true
 fit_content = true
+autowrap_mode = 0
+
+[node name="FPS" type="RichTextLabel" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "FPS: 20"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Timer" type="Timer" parent="Content/FPS"]
+autostart = true
+
+[node name="Save Notification" type="MarginContainer" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="Save notification Background" type="Panel" parent="Content/Save Notification"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("5_dm0ov")
+
+[node name="MarginContainer" type="MarginContainer" parent="Content/Save Notification"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Content/Save Notification/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Save notification icon" type="TextureRect" parent="Content/Save Notification/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("3_u8jkq")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Save Notification Label" parent="Content/Save Notification/MarginContainer/HBoxContainer" instance=ExtResource("3_0lxd2")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[i]Game saved!"
 autowrap_mode = 0
 
 [node name="BottomPanel" type="MarginContainer" parent="."]
@@ -454,34 +510,15 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="FPS" type="RichTextLabel" parent="."]
-unique_name_in_owner = true
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -42.0
-offset_bottom = 15.0
-grow_horizontal = 0
-size_flags_horizontal = 0
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "FPS: 20"
-fit_content = true
-autowrap_mode = 0
-
-[node name="Timer" type="Timer" parent="FPS"]
-autostart = true
-
 [connection signal="pressed" from="Content/HBoxContainer/ThingyContainer/Purchase Thingy" to="." method="_on_purchase_thingy_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Menu" to="." method="_on_tab_menu_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Settings" to="." method="_on_tab_settings_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Upgrade" to="." method="_on_tab_upgrade_pressed"]
+[connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Reset Button" to="." method="_on_reset_button_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/DevButton" to="." method="_on_dev_button_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/DevButton2" to="." method="_on_dev_button_2_pressed"]
-[connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/CoinComponents" to="." method="_on_coin_components_resized"]
-[connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/WillComponents" to="." method="_on_will_components_resized"]
-[connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/XPComponents" to="." method="_on_xp_components_resized"]
-[connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/JuiceComponents" to="." method="_on_juice_components_resized"]
-[connection signal="resized" from="Content/HBoxContainer2/TopPanel/MarginContainer/HBoxContainer/SoulComponents" to="." method="_on_soul_components_resized"]
+[connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/CoinComponents" to="." method="_on_coin_components_resized"]
+[connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/WillComponents" to="." method="_on_will_components_resized"]
+[connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/XPComponents" to="." method="_on_xp_components_resized"]
+[connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents" to="." method="_on_juice_components_resized"]
+[connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/SoulComponents" to="." method="_on_soul_components_resized"]
