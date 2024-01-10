@@ -21,6 +21,7 @@
 [ext_resource type="Texture2D" uid="uid://dqb65ponp02yw" path="res://Art/Icons/Hud/Sort.png" id="16_mjpp8"]
 
 [node name="Main" type="CanvasLayer"]
+follow_viewport_scale = 0.905
 script = ExtResource("1_q04pk")
 
 [node name="Content" type="MarginContainer" parent="."]
@@ -372,18 +373,6 @@ text = "234"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Juice Rate" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("3_i8skv")
-bbcode_enabled = true
-text = "4/s"
-fit_content = true
-autowrap_mode = 0
-
 [node name="Juice Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -412,6 +401,18 @@ text = "234"
 fit_content = true
 autowrap_mode = 0
 
+[node name="Soul Rate" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/SoulComponents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("3_i8skv")
+bbcode_enabled = true
+text = "4/s"
+fit_content = true
+autowrap_mode = 0
+
 [node name="Soul Flair" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/SoulComponents"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -433,7 +434,7 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="FPS" type="RichTextLabel" parent="Content"]
+[node name="FPS" type="RichTextLabel" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -445,7 +446,7 @@ text = "FPS: 20"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Timer" type="Timer" parent="Content/FPS"]
+[node name="Timer" type="Timer" parent="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/FPS"]
 autostart = true
 
 [node name="Save Notification" type="MarginContainer" parent="Content"]
@@ -509,6 +510,10 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
+
+[node name="Label" type="Label" parent="."]
+offset_right = 64.0
+offset_bottom = 122.0
 
 [connection signal="pressed" from="Content/HBoxContainer/ThingyContainer/Purchase Thingy" to="." method="_on_purchase_thingy_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Menu" to="." method="_on_tab_menu_pressed"]

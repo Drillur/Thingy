@@ -2,28 +2,32 @@ extends MarginContainer
 
 
 
+const INDEX_1 := 2
+
 #region Nodes
 
 @onready var joypad_allowed = %JoypadAllowed
-@onready var joypad_allowed_details = %JoypadAllowedDetails
 @onready var joypad_detected = %JoypadDetected
 @onready var fullscreen = %Fullscreen
+@onready var eta_mode = %"ETA Mode"
 
 #endregion
 
 
 
 func _ready() -> void:
-	Settings.joypad_allowed.changed.connect(joypad_allowed_changed)
 	Settings.fullscreen.changed.connect(fullscreen_changed)
-	gv.joypad_detected.changed.connect(joypad_detected_changed)
-	gv.joypad_detected.changed.connect(update_focus_modes)
+	Settings.rate_mode.changed.connect(rate_mode_changed)
+	Settings.joypad.left.changed.connect(joypad_allowed_changed)
+	Settings.joypad.right.changed.connect(joypad_detected_changed)
+	Settings.joypad.right.changed.connect(update_focus_modes)
 	joypad_allowed_changed()
 	joypad_detected_changed()
 	update_focus_modes()
 	
 	fullscreen.pressed.connect(Settings.fullscreen.invert)
-	joypad_allowed.pressed.connect(Settings.joypad_allowed.invert)
+	joypad_allowed.pressed.connect(Settings.joypad.left.invert)
+	eta_mode.item_selected.connect(Settings.rate_mode.set_to)
 
 
 func fullscreen_changed() -> void:
@@ -31,19 +35,56 @@ func fullscreen_changed() -> void:
 
 
 func joypad_allowed_changed() -> void:
-	joypad_allowed.button_pressed = Settings.joypad_allowed.get_value()
-	joypad_allowed_details.visible = joypad_allowed.button_pressed
+	joypad_allowed.button_pressed = Settings.joypad.get_left()
+	joypad_detected.visible = joypad_allowed.button_pressed
 
 
 func joypad_detected_changed() -> void:
-	joypad_detected.button_pressed = gv.joypad_detected.get_value()
+	joypad_detected.text = "Detected: %s" % (
+		"Yes" if Settings.joypad.get_right() else "No"
+	)
+
+
+func rate_mode_changed() -> void:
+	eta_mode.selected = Settings.rate_mode.get_value()
 
 
 func update_focus_modes() -> void:
 	var i: int
-	if gv.joypad_detected.is_false():
-		i = Control.FOCUS_NONE
-	else:
+	if Settings.joypad.are_true():
 		i = Control.FOCUS_ALL
+	else:
+		i = Control.FOCUS_NONE
 	fullscreen.focus_mode = i
 	joypad_allowed.focus_mode = i
+	eta_mode.focus_mode = i
+
+
+func _on_scale_item_selected(index):
+	match index:
+		INDEX_1 - 2:
+			ProjectSettings.set_setting("display/window/stretch/scale", 0.9)
+		INDEX_1 - 1:
+			ProjectSettings.set_setting("display/window/stretch/scale", 0.95)
+		INDEX_1 + 0:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.0)
+		INDEX_1 + 1:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.05)
+		INDEX_1 + 2:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.1)
+		INDEX_1 + 3:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.15)
+		INDEX_1 + 4:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.2)
+		INDEX_1 + 5:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.25)
+		INDEX_1 + 6:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.3)
+		INDEX_1 + 7:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.35)
+		INDEX_1 + 8:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.4)
+		INDEX_1 + 9:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.45)
+		INDEX_1 + 10:
+			ProjectSettings.set_setting("display/window/stretch/scale", 1.5)

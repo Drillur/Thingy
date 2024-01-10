@@ -16,6 +16,8 @@ var subtracted := Big.new(0)
 var multiplied := Big.new(1)
 var divided := Big.new(1)
 
+var add_pending_to_current_on_game_load := true
+
 
 func _init(base_value = 0.0) -> void:
 	current = Big.new(base_value)
@@ -23,6 +25,20 @@ func _init(base_value = 0.0) -> void:
 	current.increased.connect(emit_increase)
 	current.decreased.connect(emit_decrease)
 	pending.changed.connect(emit_pending_changed)
+	if gv.save_manager_ready.is_false():
+		gv.save_manager_ready.became_true.connect(connect_game_loaded)
+	else:
+		connect_game_loaded()
+
+
+func connect_game_loaded() -> void:
+	SaveManager.loading.became_false.connect(game_loaded)
+
+
+func game_loaded() -> void:
+	if add_pending_to_current_on_game_load:
+		current.a(pending)
+	pending.reset()
 
 
 func emit_increase() -> void:
@@ -70,6 +86,10 @@ func sync() -> void:
 
 func get_value() -> Big:
 	return current
+
+
+func get_pending_value() -> Big:
+	return pending
 
 
 
@@ -144,6 +164,10 @@ func add_change(category: String, source, amount) -> void:
 func edit_change(category: String, source, amount) -> void:
 	if book[category].has(source):
 		remove_change(category, source, false)
+	if not amount is Big:
+		amount = Big.new(amount)
+		if amount.equal(0):
+			return
 	add_change(category, source, amount)
 
 
@@ -169,6 +193,7 @@ func remove_change(category: String, source, sync_afterwards := true) -> void:
 
 
 func reset():
+	book.clear()
 	added.reset()
 	subtracted.reset()
 	multiplied.reset()

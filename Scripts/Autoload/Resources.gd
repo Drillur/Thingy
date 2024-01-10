@@ -43,10 +43,7 @@ func dir_contents(path):
 					var _path: String = path + "/" + file_name
 					_path = _path.trim_suffix(".remap")
 					_path = _path.trim_suffix(".import")
-					if resources.has(_name):
-						if gv.dev_mode:
-							printerr(_name, " already in resource_preloader! Change resource name!")
-					else:
+					if not resources.has(_name):
 						resources[_name] = load(_path)
 			file_name = dir.get_next()
 

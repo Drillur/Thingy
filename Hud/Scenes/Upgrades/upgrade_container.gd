@@ -23,11 +23,12 @@ func _ready() -> void:
 			node.get_index() + 1
 		).details.color
 	get_viewport().gui_focus_changed.connect(focus_changed)
-	gv.joypad_detected.changed.connect(joypad_detected_changed)
+	Settings.joypad.right.changed.connect(joypad_detected_changed)
 	joypad_detected_changed()
 	up.get_upgrade_tree(up.UpgradeTree.Type.VOYAGER).unlocked.changed.connect(voyager_unlocked_changed)
 	_on_tab_container_tab_changed(0)
 	SaveManager.loading.became_false.connect(_on_tab_container_tab_changed)
+	gv.reset.connect(reset)
 
 
 
@@ -37,17 +38,15 @@ func _ready() -> void:
 func _input(_event):
 	if Input.is_action_just_pressed("upgrades0"):
 		tab_container.current_tab = 0
-	elif (
-		Input.is_action_just_pressed("upgrades1")
-		and up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER)
-	):
-		tab_container.current_tab = 1
+	elif Input.is_action_just_pressed("upgrades1"):
+		if up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER):
+			tab_container.current_tab = 1
 
 
 func _physics_process(_delta):
 	if not is_visible_in_tree():
 		return
-	if gv.joypad_detected.is_true():
+	if Settings.joypad.right.is_true():
 		if Input.is_action_pressed("joy_scroll_down"):
 			current_scroll_container.scroll_vertical += int(Input.get_action_strength("joy_scroll_down") * SCROLL_SPEED)
 		elif Input.is_action_pressed("joy_scroll_up"):
@@ -67,7 +66,7 @@ func _on_visibility_changed():
 
 
 func joypad_detected_changed() -> void:
-	joypad_controls.visible = gv.joypad_detected.get_value()
+	joypad_controls.visible = Settings.joypad.get_right()
 
 
 func focus_changed(node: Node) -> void:
@@ -98,6 +97,12 @@ func voyager_unlocked_changed() -> void:
 	tab_container.tabs_visible = up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER)
 
 
+func reset(_tier: int) -> void:
+	for scroll_container in tab_container.get_children():
+		if up.get_upgrade_tree(scroll_container.get_index() + 1).persist.should_fail_at_tier(_tier):
+			scroll_container.scroll_vertical = 0
+
+
 #endregion
 
 
@@ -109,7 +114,8 @@ func determine_focus() -> void:
 	get_focus_in_children(current_tab_vbox)
 	focus_set = false
 	if focus:
-		focus.grab_focus()
+		if focus.focus_mode == Control.FOCUS_ALL:
+			focus.grab_focus()
 
 
 func get_focus_in_children(parent: Node) -> void:

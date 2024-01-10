@@ -38,6 +38,12 @@ enum Type {
 	UNLOCK_LUCKY_CRIT,
 	CRIT02,
 	SMART_JUICE,
+	JUICER,
+	LUCKY_CRIT2,
+	CRITS_AFFECT_COIN_GAIN2,
+	CRIT_RANGE02,
+	WILL_FROM_JUICE,
+	THINGY_AUTOBUYER,
 }
 
 @export var times_purchased := LoudInt.new(0)
@@ -52,6 +58,8 @@ var unlocked := LoudBool.new(true)
 var persist := Persist.new()
 var times_applied := 0
 
+
+var vico: UpgradeButton
 var required_upgrade: Upgrade.Type:
 	set(val):
 		required_upgrade = val
@@ -70,6 +78,7 @@ var thingy_attributes_to_edit: Array
 var modifier: LoudFloat
 var modifier_add := 0.0
 var modifier_multiply := 1.0
+var discord_state := ""
 
 var unlocked_tree: up.UpgradeTree.Type
 
@@ -84,6 +93,7 @@ func _init(_type: Type) -> void:
 	var mod: float
 	match type:
 		Type.UNLOCK_UPGRADES:
+			discord_state = "Discovering Upgrades to their Thingy"
 			cost = Cost.new({Currency.Type.WILL: Value.new(10)})
 			details.color = up.upgrade_color
 			details.icon = bag.get_resource("upgrades")
@@ -93,7 +103,7 @@ func _init(_type: Type) -> void:
 			details.name = "Urgency"
 			details.description = "Duration [b]-%s[/b]."
 			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({Currency.Type.WILL: Value.new(10)})
+			cost = Cost.new({Currency.Type.WILL: Value.new(20)})
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE
 			category = "subtracted"
 			mod = 1.0
@@ -104,7 +114,7 @@ func _init(_type: Type) -> void:
 			).icon_and_name + " output [b]+%s[/b]."
 			details.color = wa.get_color(Currency.Type.WILL)
 			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({Currency.Type.WILL: Value.new(20)})
+			cost = Cost.new({Currency.Type.WILL: Value.new(30)})
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
 			category = "added"
 			mod = 1.0
@@ -120,13 +130,14 @@ func _init(_type: Type) -> void:
 			mod = 0.75
 		Type.UNLOCK_XP:
 			details.name = "Adventurer"
-			details.description = "Unlocks %s." % wa.get_details(
+			details.description = "Unlocks %s and Thingy levels." % wa.get_details(
 				Currency.Type.XP
 			).icon_and_colored_name
 			details.color = wa.get_color(Currency.Type.XP)
 			details.icon = bag.get_resource("Star")
 			cost = Cost.new({Currency.Type.WILL: Value.new(50)})
 		Type.UNLOCK_RPG_TREE:
+			discord_state = "About to reset their Thingy"
 			required_upgrade = Type.UNLOCK_XP
 			unlocked_tree = up.UpgradeTree.Type.VOYAGER
 			details.name = "Voyager"
@@ -137,14 +148,16 @@ func _init(_type: Type) -> void:
 			})
 			persist.through_tier(1)
 		Type.UNLOCK_CRIT:
+			discord_state = "Their Thingy can score Critical Hits!"
 			details.name = "Low Roller"
 			details.description = "Crit chance [b]+%s%%[/b]."
 			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({Currency.Type.WILL: Value.new(45)})
+			cost = Cost.new({Currency.Type.XP: Value.new(100)})
 			thingy_attribute = Thingy.Attribute.CRIT
 			category = "added"
 			mod = 5.0
 		Type.CRITS_GIVE_GOLD:
+			discord_state = "Earning money from their Thingy"
 			required_upgrade = Type.UNLOCK_CRIT
 			details.name = "Cat Burglar"
 			details.description = "All crits produce up to %s " + wa.get_details(
@@ -152,7 +165,7 @@ func _init(_type: Type) -> void:
 			).icon_and_colored_name + "."
 			details.color = wa.get_color(Currency.Type.COIN)
 			details.icon = bag.get_resource("Coin Hand")
-			cost = Cost.new({Currency.Type.WILL: Value.new(100)})
+			cost = Cost.new({Currency.Type.WILL: Value.new(300)})
 			cost.increase_multiplier = 10.0
 			times_purchased.set_limit(3)
 			mod = 1.0
@@ -194,7 +207,7 @@ func _init(_type: Type) -> void:
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE_CURRENT
 			category = "multiplied"
 		Type.TOTAL_XP_GAIN01:
-			required_upgrade = Type.UNLOCK_XP
+			required_upgrade = Type.CRIT01
 			details.name = "One-on-One"
 			details.description = "Maximum " + (
 				wa.get_details(Currency.Type.XP).icon_and_name
@@ -246,16 +259,16 @@ func _init(_type: Type) -> void:
 			).icon_and_name + " output [b]x%s[/b]."
 			details.icon = bag.get_resource("Boxing")
 			cost = Cost.new({
-				Currency.Type.XP: Value.new(30),
-				Currency.Type.WILL: Value.new(350)
+				Currency.Type.XP: Value.new(25),
+				Currency.Type.WILL: Value.new(125)
 			})
-			cost.increase_multiplier = 4.0
+			cost.increase_multiplier = 5.0
 			times_purchased.set_limit(5)
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
 			category = "multiplied"
 			mod = 1.5
 		Type.XP_GAIN01:
-			required_upgrade = Type.UNLOCK_XP
+			required_upgrade = Type.CRIT01
 			details.name = "How to Google"
 			details.description = wa.get_details(Currency.Type.XP).icon_and_name
 			details.description += " output [b]+%s[/b]."
@@ -286,6 +299,7 @@ func _init(_type: Type) -> void:
 			category = "multiplied"
 			mod = 0.75
 		Type.DURATION01:
+			discord_state = "Faster! Faster!"
 			required_upgrade = Type.CRITS_AFFECT_XP_GAIN
 			details.name = "Angst"
 			details.description = "Duration [b]x%s[/b]."
@@ -315,9 +329,9 @@ func _init(_type: Type) -> void:
 			category = "subtracted"
 			mod = 0.02
 		Type.CRITS_AFFECT_XP_GAIN:
-			required_upgrade = Type.UNLOCK_CRIT
+			required_upgrade = Type.CRIT01
 			details.name = "Rogue and Scholar"
-			details.description = "Crits apply to %s output." % (
+			details.description = "Crits multiply %s output." % (
 				wa.get_details(Currency.Type.XP).icon_and_name
 			)
 			details.icon = bag.get_resource("Star")
@@ -328,7 +342,7 @@ func _init(_type: Type) -> void:
 		Type.CRITS_AFFECT_COIN_GAIN:
 			required_upgrade = Type.CRIT01
 			details.name = "Through and Through"
-			details.description = "Crits apply to %s output." % (
+			details.description = "Crits multiply %s output." % (
 				wa.get_details(Currency.Type.COIN).icon_and_name
 			)
 			details.icon = bag.get_resource("Coin")
@@ -421,12 +435,13 @@ func _init(_type: Type) -> void:
 		Type.CRITS_APPLY_TO_DURATION:
 			required_upgrade = Type.CRITS_AFFECT_COIN_GAIN
 			details.name = "Theif's Gait"
-			details.description = "Crits apply to duration."
+			details.description = "Crits divide duration."
 			details.icon = bag.get_resource("Speed")
 			cost = Cost.new({
 				Currency.Type.COIN: Value.new(100),
 			})
 		Type.UNLOCK_JUICE:
+			discord_state = "Their Thingy is really Juicy."
 			details.name = "Unlock Juice"
 			details.description = "Thingies may produce and consume %s to become [i][wave amp=20 freq=2]juiced![/wave][/i], halving duration and doubling primary output. If none is available to drink, they will produce it." % (
 				wa.get_details(Currency.Type.JUICE).icon_and_name
@@ -437,6 +452,7 @@ func _init(_type: Type) -> void:
 				Currency.Type.SOUL: Value.new("1"),
 			})
 		Type.SMART_JUICE:
+			discord_state = "This is one highly intelligent Thingy!"
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
 			details.name = "Intellijuice"
 			details.description = "Thingies will all work together to ensure that there is sufficient %s for any task." % (
@@ -471,6 +487,18 @@ func _init(_type: Type) -> void:
 			cost = Cost.new({
 				Currency.Type.SOUL: Value.new(5),
 			})
+		Type.WILL_FROM_JUICE:
+			required_upgrade = Type.SMART_JUICE
+			details.name = "Orange Juice"
+			details.description = "You gain 100%% of your current %s " % (
+				wa.get_details(Currency.Type.JUICE).icon_and_name
+			) + " as %s per second." % (
+				wa.get_details(Currency.Type.WILL).icon_and_name
+			)
+			details.icon = bag.get_resource("Heart")
+			cost = Cost.new({
+				Currency.Type.SOUL: Value.new(25),
+			})
 		Type.UNLOCK_LUCKY_CRIT:
 			details.name = "Lucky Crit"
 			details.description = "Successful crits and lucky crits have a chance to roll for another crit, called a [i][wave amp=20 freq=2]lucky crit![/wave][/i] Crit multiplier will stack. Lucky crit chance [b]+%s%%[/b]."
@@ -494,24 +522,116 @@ func _init(_type: Type) -> void:
 			mod = 1.0
 			thingy_attribute = Thingy.Attribute.CRIT
 			category = "added"
+		Type.JUICER:
+			required_upgrade = Type.UNLOCK_JUICE
+			details.name = "I'm da Juica, Baby!"
+			details.description = "Max %s output " % (
+				wa.get_details(Currency.Type.JUICE).icon_and_name
+			) + "[b]+%s[/b]."
+			details.icon = bag.get_resource("Juice")
+			cost = Cost.new({
+				Currency.Type.XP: Value.new("2e3"),
+				Currency.Type.COIN: Value.new("60"),
+			})
+			cost.increase_multiplier = 2.0
+			times_purchased.set_limit(5)
+			mod = 0.1
+			thingy_attribute = Thingy.Attribute.JUICE_OUTPUT_RANGE_TOTAL
+			category = "added"
+		Type.LUCKY_CRIT2:
+			required_upgrade = Type.UNLOCK_LUCKY_CRIT
+			details.name = "Isn't gambling illegal?"
+			details.description = "Lucky crit chance [b]+%s%%[/b]."
+			details.icon = bag.get_resource("Dice")
+			cost = Cost.new({Currency.Type.WILL: Value.new("5e6")})
+			cost.increase_multiplier = 2.0
+			times_purchased.set_limit(5)
+			mod = 1.0
+			thingy_attribute = Thingy.Attribute.CRIT_CRIT
+			category = "added"
+		Type.CRITS_AFFECT_COIN_GAIN2:
+			required_upgrade = Type.UNLOCK_LUCKY_CRIT
+			details.name = "Wealth of Luck"
+			details.description = "Crits multiply %s output a second time." % (
+				wa.get_details(Currency.Type.COIN).icon_and_name
+			)
+			details.icon = bag.get_resource("Coin Hand")
+			cost = Cost.new({
+				Currency.Type.COIN: Value.new(1666),
+			})
+		Type.CRIT_RANGE02:
+			required_upgrade = Type.UNLOCK_LUCKY_CRIT
+			details.name = "[i]Freak Out![/i]"
+			details.description = "Maximum crit multiplier [b]+%s[/b]."
+			details.icon = bag.get_resource("Dice")
+			cost = Cost.new({
+				Currency.Type.SOUL: Value.new(3),
+			})
+			cost.increase_multiplier = 2.0
+			times_purchased.set_limit(5)
+			thingy_attribute = Thingy.Attribute.CRIT_RANGE_TOTAL
+			category = "added"
+			mod = 0.1
+		Type.THINGY_AUTOBUYER:
+			required_upgrade = Type.UNLOCK_LUCKY_CRIT
+			details.name = "Idle Hands"
+			details.description = "Automatically purchases Thingies."
+			details.icon = bag.get_resource("Refresh")
+			cost = Cost.new({
+				Currency.Type.SOUL: Value.new(10),
+			})
+	
+	#if "JUICE" in Thingy.Attribute.keys()[thingy_attribute]:
+		#details.color = wa.get_color(Currency.Type.JUICE)
+		#details.color = wa.get_color(Currency.Type.XP)
 	
 	match thingy_attribute:
+		Thingy.Attribute.JUICE_OUTPUT_RANGE:
+			thingy_attributes_to_edit.append(th.juice_output_range.current)
+			thingy_attributes_to_edit.append(th.juice_output_range.total)
+		Thingy.Attribute.JUICE_OUTPUT_RANGE_CURRENT:
+			thingy_attributes_to_edit.append(th.juice_output_range.current)
+		Thingy.Attribute.JUICE_OUTPUT_RANGE_TOTAL:
+			thingy_attributes_to_edit.append(th.juice_output_range.total)
+		Thingy.Attribute.JUICE_INPUT_RANGE:
+			thingy_attributes_to_edit.append(th.juice_input_range.current)
+			thingy_attributes_to_edit.append(th.juice_input_range.total)
+		Thingy.Attribute.JUICE_INPUT_RANGE_CURRENT:
+			thingy_attributes_to_edit.append(th.juice_input_range.current)
+		Thingy.Attribute.JUICE_INPUT_RANGE_TOTAL:
+			thingy_attributes_to_edit.append(th.juice_input_range.total)
+		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE:
+			thingy_attributes_to_edit.append(th.juice_output_increase_range.current)
+			thingy_attributes_to_edit.append(th.juice_output_increase_range.total)
+		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE_CURRENT:
+			thingy_attributes_to_edit.append(th.juice_output_increase_range.current)
+		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE_TOTAL:
+			thingy_attributes_to_edit.append(th.juice_output_increase_range.total)
+		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE:
+			thingy_attributes_to_edit.append(th.juice_input_increase_range.current)
+			thingy_attributes_to_edit.append(th.juice_input_increase_range.total)
+		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE_CURRENT:
+			thingy_attributes_to_edit.append(th.juice_input_increase_range.current)
+		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE_TOTAL:
+			thingy_attributes_to_edit.append(th.juice_input_increase_range.total)
+		Thingy.Attribute.JUICE_MULTIPLIER_RANGE:
+			thingy_attributes_to_edit.append(th.juice_multiplier_range.current)
+			thingy_attributes_to_edit.append(th.juice_multiplier_range.total)
+		Thingy.Attribute.JUICE_MULTIPLIER_RANGE_CURRENT:
+			thingy_attributes_to_edit.append(th.juice_multiplier_range.current)
+		Thingy.Attribute.JUICE_MULTIPLIER_RANGE_TOTAL:
+			thingy_attributes_to_edit.append(th.juice_multiplier_range.total)
 		Thingy.Attribute.XP:
 			thingy_attributes_to_edit.append(th.xp_multiplier)
-			details.color = wa.get_color(Currency.Type.XP)
 		Thingy.Attribute.XP_OUTPUT_TOTAL:
 			thingy_attributes_to_edit.append(th.xp_output_range.total)
-			details.color = wa.get_color(Currency.Type.XP)
 		Thingy.Attribute.XP_OUTPUT_CURRENT:
 			thingy_attributes_to_edit.append(th.xp_output_range.current)
-			details.color = wa.get_color(Currency.Type.XP)
 		Thingy.Attribute.XP_OUTPUT:
 			thingy_attributes_to_edit.append(th.xp_output_range.current)
 			thingy_attributes_to_edit.append(th.xp_output_range.total)
-			details.color = wa.get_color(Currency.Type.XP)
 		Thingy.Attribute.CURRENT_XP_INCREASE_RANGE:
 			thingy_attributes_to_edit.append(th.xp_increase_range.current)
-			details.color = wa.get_color(Currency.Type.XP)
 		Thingy.Attribute.DURATION_RANGE:
 			thingy_attributes_to_edit.append(th.duration_range.current)
 			thingy_attributes_to_edit.append(th.duration_range.total)
@@ -554,13 +674,10 @@ func _init(_type: Type) -> void:
 		Thingy.Attribute.CRIT_COIN_OUTPUT:
 			thingy_attributes_to_edit.append(th.crit_coin_output.current)
 			thingy_attributes_to_edit.append(th.crit_coin_output.total)
-			details.color = wa.get_color(Currency.Type.COIN)
 		Thingy.Attribute.CRIT_COIN_OUTPUT_CURRENT:
 			thingy_attributes_to_edit.append(th.crit_coin_output.current)
-			details.color = wa.get_color(Currency.Type.COIN)
 		Thingy.Attribute.CRIT_COIN_OUTPUT_TOTAL:
 			thingy_attributes_to_edit.append(th.crit_coin_output.total)
-			details.color = wa.get_color(Currency.Type.COIN)
 		Thingy.Attribute.COST:
 			await th.initialized
 			for cur in th.cost.amount:
@@ -609,6 +726,9 @@ func times_purchased_changed() -> void:
 		times_applied = 0
 		if modifier:
 			modifier.reset()
+	else:
+		if discord_state != "":
+			gv.update_discord_state(discord_state)
 
 
 func times_purchased_increased() -> void:
@@ -652,10 +772,18 @@ func remove() -> void:
 	if unlocked_tree != up.UpgradeTree.Type.NONE:
 		up.upgrade_trees[unlocked_tree].unlocked.set_to(false)
 	match type:
+		Type.THINGY_AUTOBUYER:
+			th.autobuyer.left.set_to(false)
+		Type.SMART_JUICE:
+			th.smart_juice.set_to(false)
+		Type.WILL_FROM_JUICE:
+			wa.will_from_juice.set_to(false)
 		Type.CRITS_AFFECT_XP_GAIN:
 			th.crits_apply_to_xp.set_to(false)
 		Type.CRITS_AFFECT_COIN_GAIN:
 			th.crits_apply_to_coin.set_to(false)
+		Type.CRITS_AFFECT_COIN_GAIN2:
+			th.crits_apply_to_coin_twice.set_to(false)
 		Type.UNLOCK_XP:
 			wa.lock(Currency.Type.XP)
 		Type.CRITS_APPLY_TO_DURATION:
@@ -676,10 +804,18 @@ func apply() -> void:
 	if unlocked_tree != up.UpgradeTree.Type.NONE:
 		up.upgrade_trees[unlocked_tree].unlocked.set_to(true)
 	match type:
+		Type.THINGY_AUTOBUYER:
+			th.autobuyer.left.set_to(true)
+		Type.SMART_JUICE:
+			th.smart_juice.set_to(true)
+		Type.WILL_FROM_JUICE:
+			wa.will_from_juice.set_to(true)
 		Type.CRITS_AFFECT_XP_GAIN:
 			th.crits_apply_to_xp.set_to(true)
 		Type.CRITS_AFFECT_COIN_GAIN:
 			th.crits_apply_to_coin.set_to(true)
+		Type.CRITS_AFFECT_COIN_GAIN2:
+			th.crits_apply_to_coin_twice.set_to(true)
 		Type.UNLOCK_XP:
 			wa.unlock(Currency.Type.XP)
 		Type.CRITS_APPLY_TO_DURATION:
@@ -748,19 +884,23 @@ func get_description() -> String:
 							)
 						]
 				else:
-					match thingy_attribute:
-						Thingy.Attribute.CRIT:
-							text = details.description % "%s -> %s%"
+					if thingy_attribute in [
+						Thingy.Attribute.CRIT,
+						Thingy.Attribute.CRIT_CRIT,
+					]:
+						text = details.description % "%s -> %s%"
 			return text % [
 				modifier.get_text(),
 				Big.get_float_text(
 					(modifier.get_value() + modifier_add) * modifier_multiply
 				)
 			]
-		if thingy_attribute in [
-			Thingy.Attribute.DURATION_RANGE,
-			Thingy.Attribute.DURATION_RANGE_CURRENT
-		]:
+		if (
+			thingy_attribute in [
+				Thingy.Attribute.DURATION_RANGE,
+				Thingy.Attribute.DURATION_RANGE_CURRENT
+			] and category in ["subtracted", "added"]
+		):
 			return details.description % tp.quick_parse(modifier.get_value(), false)
 		return details.description % modifier.get_text()
 	return details.description

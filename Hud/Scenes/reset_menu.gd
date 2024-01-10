@@ -18,7 +18,7 @@ func _ready() -> void:
 	free_button.color = wa.get_color(Currency.Type.SOUL)
 	info_icon.modulate = wa.get_color(Currency.Type.SOUL)
 	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).icon_and_name
-	wa.soul_gain.changed.connect(soul_changed)
+	wa.get_pending_amount(Currency.Type.SOUL).changed.connect(soul_changed)
 	soul_changed()
 
 
@@ -28,7 +28,7 @@ func _ready() -> void:
 func soul_changed() -> void:
 	soul_label.text = "[i]" + (
 		wa.get_details(Currency.Type.SOUL).color_text % (
-			"+" + wa.soul_gain.text
+			"+" + wa.get_pending_amount(Currency.Type.SOUL).text
 		)
 	)
 

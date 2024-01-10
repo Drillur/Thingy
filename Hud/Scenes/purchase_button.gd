@@ -8,6 +8,7 @@ extends MarginContainer
 @onready var check = %Check
 @onready var check_bg = %"title bg"
 @onready var bar = %Bar as Bar
+@onready var pending_bar = %PendingBar
 @onready var cost_components = %CostComponents
 @onready var texture_rect = %"Texture Rect"
 @onready var title = %Title
@@ -27,6 +28,8 @@ signal right_clicked
 
 var content := {}
 
+var loud_color: LoudColor
+
 var color: Color:
 	set(val):
 		if color == val:
@@ -39,14 +42,16 @@ var color: Color:
 			check_bg.self_modulate = color
 			bar.color = color
 			bar.color.a = 0.25
+			pending_bar.color = color
+			pending_bar.color.a = 0.2
+			
 
 var cost: Cost
 
 
 
 func _ready() -> void:
-	Settings.joypad_allowed.changed.connect(joypad_allowed_changed)
-	gv.joypad_detected.changed.connect(joypad_allowed_changed)
+	Settings.joypad.right.changed.connect(joypad_allowed_changed)
 	joypad_allowed_changed()
 	if remove_cost_components:
 		cost_components.queue_free()
@@ -73,6 +78,7 @@ func setup(_cost: Cost) -> void:
 	cost_components.custom_minimum_size.x = 170
 	for cur in cost.amount:
 		var label = bag.get_resource("RichLabel").instantiate()
+		#label.theme = bag.get_resource("ShadowText")
 		label.disable_autowrap()
 		content[cur] = label
 		label.watch_cost(cur, cost)
@@ -83,7 +89,7 @@ func setup(_cost: Cost) -> void:
 	SaveManager.loading.became_false.connect(update)
 	
 	if cost.affordable.is_true():
-		update_progress_bar()
+		update()
 		bar.hide_edge()
 	else:
 		connect_calls()
@@ -97,6 +103,8 @@ func connect_calls() -> void:
 		currency.amount.changed.connect(set_eta_text)
 		currency.net_rate.changed.connect(set_eta_text)
 		currency.amount.changed.connect(update_progress_bar)
+		currency.amount.changed.connect(update_pending_progress_bar)
+		currency.amount.pending_changed.connect(update_pending_progress_bar)
 
 
 func disconnect_calls() -> void:
@@ -108,10 +116,22 @@ func disconnect_calls() -> void:
 		currency.amount.changed.disconnect(set_eta_text)
 		currency.net_rate.changed.disconnect(set_eta_text)
 		currency.amount.changed.disconnect(update_progress_bar)
+		currency.amount.changed.disconnect(update_pending_progress_bar)
+		currency.amount.pending_changed.disconnect(update_pending_progress_bar)
+
+
+func assign_loud_color(_loud_color: LoudColor) -> void:
+	loud_color = _loud_color
+	loud_color.changed.connect(loud_color_changed)
+	loud_color_changed()
 
 
 
 # - Signals
+
+
+func loud_color_changed() -> void:
+	color = loud_color.get_value()
 
 
 func _on_button_pressed():
@@ -129,11 +149,11 @@ func _on_button_pressed():
 
 func pressed_emitted() -> void:
 	gv.flash(self, color)
-	update_progress_bar()
+	update()
 
 
 func joypad_allowed_changed() -> void:
-	if Settings.joypad_allowed.is_true() and gv.joypad_detected.is_true():
+	if Settings.joypad.are_true():
 		focus_mode = Control.FOCUS_ALL
 		button.focus_mode = Control.FOCUS_ALL
 	else:
@@ -154,6 +174,7 @@ func right_click() -> void:
 
 func update() -> void:
 	update_progress_bar()
+	update_pending_progress_bar()
 	set_eta_text()
 
 
@@ -162,12 +183,23 @@ func update_progress_bar() -> void:
 		bar.set_deferred("progress", cost.get_progress_percent())
 
 
+func update_pending_progress_bar() -> void:
+	if cost:
+		var pending_progress_percent = cost.get_pending_progress_percent()
+		pending_bar.set_deferred("progress", pending_progress_percent)
+		if is_equal_approx(pending_progress_percent, 1.0):
+			pending_bar.hide_edge()
+		else:
+			pending_bar.show_edge()
+
+
 func set_eta_text() -> void:
-	var _eta = cost.get_eta()
-	if _eta.equal(0):
-		check.text = ""
-		return
-	check.text = tp.full_parse_big(_eta)
+	if cost:
+		var _eta = cost.get_eta()
+		if _eta.equal(0):
+			check.text = ""
+			return
+		check.text = tp.full_parse_big(_eta)
 
 
 func flash(): # manual flash
@@ -192,8 +224,7 @@ func affordable_changed() -> void:
 	else:
 		bar.show_edge()
 		connect_calls()
-		set_eta_text()
-		update_progress_bar()
+		update()
 
 
 func _on_button_button_down():
@@ -205,7 +236,7 @@ func _on_button_button_up():
 
 
 func _on_focus_entered():
-	if Settings.joypad_allowed.is_true():
+	if Settings.joypad.get_left():
 		button.grab_focus()
 
 

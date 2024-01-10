@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/Scenes/bar.tscn" id="2_nad20"]
 [ext_resource type="Theme" uid="uid://d0f4im7h1ne7c" path="res://Hud/Themes/ShadowText.tres" id="3_e4ujg"]
 [ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="3_q0aqb"]
-[ext_resource type="PackedScene" uid="uid://cb3ej8nlybhvm" path="res://Hud/Scenes/icon_button.tscn" id="5_7yjky"]
+[ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Hud/Themes/Invis.tres" id="5_a1a0r"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5bk8n"]
 draw_center = false
@@ -168,10 +168,11 @@ text = "[i]#1"
 fit_content = true
 autowrap_mode = 0
 
-[node name="DEV" parent="." instance=ExtResource("5_7yjky")]
-visible = false
+[node name="Button" type="Button" parent="."]
+unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme = ExtResource("5_a1a0r")
 
-[connection signal="pressed" from="DEV" to="." method="_on_dev_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

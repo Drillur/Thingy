@@ -40,7 +40,8 @@ var thingy: Thingy:
 			th.crit_chance.changed.connect(crit_chance_changed)
 			th.crit_crit_chance.changed.connect(crit_crit_chance_changed)
 			th.crit_range.changed.connect(crit_range_changed)
-			up.get_upgrade(Upgrade.Type.CRITS_AFFECT_COIN_GAIN).purchased.changed.connect(crit_coin_output_changed)
+			th.crits_apply_to_coin.changed.connect(crit_coin_output_changed)
+			th.crits_apply_to_coin_twice.changed.connect(crit_coin_output_changed)
 			th.crit_coin_output.changed.connect(crit_coin_output_changed)
 			th.duration_range.changed.connect(duration_changed)
 			th.duration_increase_range.changed.connect(duration_changed)
@@ -124,6 +125,8 @@ func xp_unlocked(flash := true) -> void:
 	xp_increase_range.get_parent().visible = xp_components.visible
 	output_increase_range.get_parent().visible = xp_components.visible
 	duration_increase.get_parent().visible = xp_components.visible
+	juice_output_increase.get_parent().visible = xp_components.visible and input_components.visible
+	juice_input_increase.get_parent().visible = xp_components.visible and input_components.visible
 	if flash:
 		gv.flash(level, wa.get_color(Currency.Type.XP))
 		gv.flash(xp_label, wa.get_color(Currency.Type.XP))
@@ -137,9 +140,9 @@ func xp_unlocked(flash := true) -> void:
 func juice_unlocked(flash := true) -> void:
 	input_components.visible = wa.is_unlocked(Currency.Type.JUICE)
 	juice_input.visible = input_components.visible
-	juice_input_increase.get_parent().visible = input_components.visible
 	juice_output.visible = input_components.visible
-	juice_output_increase.get_parent().visible = input_components.visible
+	juice_output_increase.get_parent().visible = input_components.visible and xp_components.visible
+	juice_input_increase.get_parent().visible = input_components.visible and xp_components.visible
 	if flash:
 		gv.flash(juice_output, wa.get_color(Currency.Type.JUICE))
 		gv.flash(juice_output_increase, wa.get_color(Currency.Type.JUICE))
@@ -343,19 +346,23 @@ func crit_coin_output_changed(flash := true) -> void:
 	crit_coin.visible = th.crit_coin_output.total.greater(0)
 	var text = wa.get_details(Currency.Type.COIN).icon_and_name + ": [b]"
 	text += wa.get_details(Currency.Type.COIN).color_text
-	if th.crit_coin_output.is_full() and not up.is_purchased(Upgrade.Type.CRITS_AFFECT_COIN_GAIN):
+	if th.crit_coin_output.is_full() and th.crits_apply_to_coin.is_false():
 		text = text % th.crit_coin_output.get_total_text()
 	else:
-		if up.is_purchased(Upgrade.Type.CRITS_AFFECT_COIN_GAIN):
-			text = text % "%s-%s" % [
-				Big.get_float_text(th.crit_coin_output.get_current() * th.crit_range.get_current()),
-				Big.get_float_text(th.crit_coin_output.get_total() * th.crit_range.get_total())
-			]
-		else:
-			text = text % "%s-%s" % [
-				th.crit_coin_output.get_current_text(),
-				th.crit_coin_output.get_total_text()
-			]
+		#text = text % "%s-%s" % [
+			#th.crit_coin_output.get_current_text(),
+			#th.crit_coin_output.get_total_text(),
+		#]
+		text = text % "%s-%s" % [
+			Big.get_float_text(th.crit_coin_output.get_current() * (
+				(th.crit_range.get_current() if th.crits_apply_to_coin.is_true() else 1.0) *
+				(th.crit_range.get_current() if th.crits_apply_to_coin_twice.is_true() else 1.0)
+			)),
+			Big.get_float_text(th.crit_coin_output.get_total() * (
+				(th.crit_range.get_total() if th.crits_apply_to_coin.is_true() else 1.0) *
+				(th.crit_range.get_total() if th.crits_apply_to_coin_twice.is_true() else 1.0)
+			))
+		]
 	crit_coin.text = text
 	if flash:
 		gv.flash(crit_coin, thingy.details.color)

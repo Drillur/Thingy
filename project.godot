@@ -16,8 +16,8 @@ run/main_scene="res://Main.tscn"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Thingy"
 config/features=PackedStringArray("4.2", "GL Compatibility")
-config/icon="res://Art/Icons/Icon.svg"
-config/windows_native_icon="res://Art/Icons/Hud/activeBuffs.ico"
+config/icon="res://Art/Icons/Icon.png"
+config/windows_native_icon="res://Art/Icons/Icon.ico"
 
 [autoload]
 
@@ -29,6 +29,7 @@ wa="*res://Scripts/Autoload/Wallet.gd"
 up="*res://Scripts/Autoload/Upgrades.gd"
 th="*res://Scripts/Autoload/Thingies.gd"
 SaveManager="*res://Scripts/Autoload/SaveManager.gd"
+DiscordSDKLoader="*res://addons/discord-sdk-gd/nodes/discord_autoload.gd"
 
 [debug]
 
@@ -38,8 +39,13 @@ gdscript/warnings/integer_division=0
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
+window/size/viewport_width=1408
+window/size/viewport_height=792
+window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/discord-sdk-gd/plugin.cfg")
 
 [file_customization]
 

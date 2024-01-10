@@ -76,21 +76,21 @@ theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 columns = 3
 
-[node name="current duration range 01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+[node name="crit 01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
-upgrade_type = 11
+upgrade_type = 8
 
 [node name="crits give gold" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 9
 
-[node name="crit 01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
-layout_mode = 2
-upgrade_type = 8
-
 [node name="output 02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 15
+
+[node name="current duration range 01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 11
 
 [node name="total output range 01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
@@ -159,6 +159,25 @@ alignment = 1
 [node name="unlock voyager" parent="TabContainer/Q/MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 5
+
+[node name="GridContainer4" type="GridContainer" parent="TabContainer/Q/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
+
+[node name="juicer" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 34
+
+[node name="lucky crit2" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 35
+
+[node name="crits affect coin 2" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 36
 
 [node name="W" type="ScrollContainer" parent="TabContainer"]
 visible = false
@@ -232,9 +251,37 @@ upgrade_type = 23
 layout_mode = 2
 upgrade_type = 32
 
+[node name="GridContainer6" type="GridContainer" parent="TabContainer/W/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="crit 03" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 37
+
+[node name="will from juice2" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 38
+wrap_description = true
+
 [node name="smart juice" parent="TabContainer/W/MarginContainer/VBoxContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 33
+wrap_description = true
+
+[node name="GridContainer7" type="GridContainer" parent="TabContainer/W/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="will from juice" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer7" instance=ExtResource("2_yq021")]
+layout_mode = 2
+upgrade_type = 38
 wrap_description = true
 
 [node name="JoypadControls" type="MarginContainer" parent="."]

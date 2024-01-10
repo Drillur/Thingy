@@ -33,8 +33,7 @@ func _ready():
 	quick_scroll_timer.one_shot = true
 	quick_scroll_timer.wait_time = 0.05
 	selected_index.changed.connect(selected_index_changed)
-	Settings.joypad_allowed.changed.connect(joypad_allowed_changed)
-	gv.joypad_detected.changed.connect(joypad_allowed_changed)
+	Settings.joypad.changed.connect(joypad_allowed_changed)
 	joypad_allowed_changed()
 	hide_all_thingies()
 	gv.reset.connect(reset)
@@ -68,10 +67,7 @@ func load_finished() -> void:
 
 
 func joypad_allowed_changed() -> void:
-	if Settings.joypad_allowed.is_false():
-		navigation_buttons.show()
-	elif gv.joypad_detected.is_true():
-		navigation_buttons.hide()
+	navigation_buttons.visible = Settings.joypad.right.is_false()
 	navigation_joypad.visible = not navigation_buttons.visible
 
 

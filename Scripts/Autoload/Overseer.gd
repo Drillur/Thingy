@@ -1,24 +1,22 @@
 extends Node
 
 
-const dev_mode := false
+const dev_mode := true
 
 var root: CanvasLayer
 var root_ready := LoudBool.new(false)
-var joypad_detected := LoudBool.new(false)
+var save_manager_ready := LoudBool.new(false)
 var game_has_focus := LoudBool.new(true)
 
 
 
 func _ready() -> void:
-	SaveManager.color.set_to(get_random_nondark_color())
-	Settings.joypad_allowed.changed.connect(joypad_allowed_changed)
 	game_has_focus.became_false.connect(game_lost_focus)
 	game_has_focus.became_true.connect(game_gained_focus)
 	session_tracker()
 	setup_reset()
-	if Settings.joypad_allowed.is_true():
-		get_viewport().gui_focus_changed.connect(focus_changed)
+	setup_discord()
+	get_viewport().gui_focus_changed.connect(focus_changed)
 
 
 func _notification(what):
@@ -29,17 +27,6 @@ func _notification(what):
 			game_has_focus.set_to(true)
 
 
-func joypad_allowed_changed() -> void:
-	set_process_input(Settings.joypad_allowed.get_value())
-	if Settings.joypad_allowed.is_false():
-		joypad_detected.set_to(false)
-
-
-func _input(_event):
-	if _event is InputEventJoypadButton:
-		joypad_detected.set_to(true)
-	if joypad_detected.is_true():
-		set_process_input(false)
 
 
 func flash(parent: Node, color = Color(1, 0, 0)) -> void:
@@ -71,21 +58,21 @@ func get_script_variables(script: Script) -> Array:
 
 
 func get_random_color() -> Color:
-	var r = randf_range(0, 1)
-	var g = randf_range(0, 1)
-	var b = randf_range(0, 1)
-	return Color(r, g, b, 1.0)
+	return Color(
+		randf_range(0, 1),
+		randf_range(0, 1),
+		randf_range(0, 1),
+		1.0
+	)
 
 
 func get_random_nondark_color() -> Color:
-	var r = randf_range(0, 1)
-	var g = randf_range(0, 1)
-	var b = randf_range(0, 1)
-	while r + g + b < 1.0:
-		r *= 1.1
-		g *= 1.1
-		b *= 1.1
-	return Color(r, g, b, 1.0)
+	var color: Color = get_random_color()
+	while color.r + color.g + color.b < 1.0:
+		color.r *= 1.1
+		color.g *= 1.1
+		color.b *= 1.1
+	return color
 
 
 #endregion
@@ -103,6 +90,8 @@ func focus_changed(node) -> void:
 
 
 func find_nearest_focus(node: Control) -> void:
+	if root_ready.is_false():
+		return
 	var nearest_next = get_nearest_next_focus(node.find_next_valid_focus(), 1)
 	var nearest_prev = get_nearest_next_focus(node.find_next_valid_focus(), 1)
 	if nearest_next[1] == nearest_prev[1] or nearest_next[1] > nearest_prev[1]:
@@ -187,6 +176,57 @@ func setup_reset() -> void:
 func reset_now(tier: int) -> void:
 	wa.collect_reset_currency(tier)
 	reset.emit(tier)
+
+
+#endregion
+
+
+#region Discord
+
+
+func setup_discord() -> void:
+	
+	DiscordSDK.app_id = 1194327849545519205
+	
+	# this is boolean if everything worked
+	#print("Discord working: " + str(DiscordSDK.get_is_discord_working()))
+	
+	# Set the first custom text row of the activity here
+	DiscordSDK.details = "They're really getting into it..."
+	
+	# Set the second custom text row of the activity here
+	DiscordSDK.state = "Waking their Thingy up"
+	
+	# Image key for small image from "Art Assets" from the Discord Developer website
+	#DiscordSDK.large_image = "Thingy"
+	
+	# Tooltip text for the large image
+	#DiscordSDK.large_image_text = "Buhhhh"
+	
+	# Image key for large image from "Art Assets" from the Discord Developer website
+	#DiscordSDK.small_image = "boss"
+	
+	# Tooltip text for the small image
+	#DiscordSDK.small_image_text = "Fighting the end boss! D:"
+	
+	# "02:41 elapsed" timestamp for the activity
+	DiscordSDK.start_timestamp = int(Time.get_unix_time_from_system())
+	
+	# "59:59 remaining" timestamp for the activity
+	#DiscordSDK.end_timestamp = int(Time.get_unix_time_from_system()) + 3600
+	
+	# Always refresh after changing the values!
+	DiscordSDK.refresh()
+
+
+func update_discord_details(text: String) -> void:
+	DiscordSDK.details = text
+	DiscordSDK.refresh()
+
+
+func update_discord_state(text: String) -> void:
+	DiscordSDK.state = text
+	DiscordSDK.refresh()
 
 
 #endregion

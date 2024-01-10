@@ -123,7 +123,7 @@ autowrap_mode = 0
 [node name="Crit Coin" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer" instance=ExtResource("4_wqyrf")]
 unique_name_in_owner = true
 layout_mode = 2
-text = "[img=<15>]res://Art/Icons/Hud/Coin.png[/img] Coin: [b]0-2[/b] [font_size=10](on crit)"
+text = "[img=<15>]res://Art/Icons/Hud/Coin.png[/img] Coin: [b]0-2[/b]"
 autowrap_mode = 0
 
 [node name="Input Components" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]

@@ -14,7 +14,8 @@ var container: ThingyContainer:
 		container = val
 		container_loaded.emit()
 
-var next_thingy_color := Color(1, 0.243, 0.208)
+@export var next_thingy_color := LoudColor.new(1, 0.243, 0.208)
+var autobuyer := LoudBoolPair.new(false, true, "unlocked", "enabled")
 
 var xp_output_range := FloatPair.new(1.0, 1.0)
 var xp_increase_range := FloatPair.new(1.15, 1.15)
@@ -30,6 +31,7 @@ var crit_crit_chance := LoudFloat.new(0.0)
 var crit_coin_output := FloatPair.new(0.0, 0.0)
 var crits_apply_to_xp := LoudBool.new(false)
 var crits_apply_to_coin := LoudBool.new(false)
+var crits_apply_to_coin_twice := LoudBool.new(false)
 var crits_apply_to_duration := LoudBool.new(false)
 
 var duration_range := FloatPair.new(5.0, 5.0)
@@ -62,6 +64,7 @@ func thingy_wants_to_fucking_die(_index: int) -> void:
 
 func reset(_tier: int) -> void:
 	cost.reset_now()
+	max_juice_use.reset()
 
 
 #endregion
@@ -77,7 +80,7 @@ func purchase_thingy() -> void:
 func new_thingy() -> void:
 	var new_index = thingies.size()
 	thingies[new_index] = Thingy.new(new_index)
-	next_thingy_color = gv.get_random_nondark_color()
+	next_thingy_color.set_to(gv.get_random_nondark_color())
 	thingy_created.emit()
 
 

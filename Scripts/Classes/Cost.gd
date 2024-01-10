@@ -10,7 +10,6 @@ var amount := {}
 var times_increased := 0
 var affordable := LoudBool.new(false)
 var increase_multiplier: float
-var longest_eta_currency_type := -1
 
 
 
@@ -96,7 +95,6 @@ func reset_now() -> void:
 	times_increased = 0
 	times_purchased.reset()
 	set_amounts()
-	longest_eta_currency_type = -1
 	reset.emit()
 
 
@@ -108,8 +106,13 @@ func get_amount_value(cur: Currency.Type) -> Big:
 
 
 func get_eta() -> Big:
-	longest_eta_currency_type = amount.keys()[0]
 	
+	for cur in amount:
+		var currency = wa.get_currency(cur)
+		if not currency.is_net_rate_positive():
+			return Big.new(0)
+	
+	var longest_eta_currency_type = amount.keys()[0]
 	var eta: Big = wa.get_currency(longest_eta_currency_type).get_eta(amount.values()[0].get_value())
 	for i in amount.size():
 		var cur = wa.get_currency(amount.keys()[i]) as Currency
@@ -127,19 +130,20 @@ func get_eta() -> Big:
 
 
 func get_progress_percent() -> float:
-	#if (
-		#currencies_are_unlocked
-		#and not lv.any_loreds_in_list_are_inactive(produced_by)
-		#and not longest_eta_currency_type == -1
-	#):
-		#var count = wa.get_count(longest_eta_currency_type)
-		#var _amount = amount[longest_eta_currency_type].get_value()
-		#return count.percent(_amount)
-	
 	var total_percent = amount.size()
 	var percent := 0.0
 	for cur in amount:
 		var currency = wa.get_currency(cur)
 		var _amount = amount[cur].get_value()
 		percent += currency.get_amount().percent(_amount)
+	return percent / total_percent
+
+
+func get_pending_progress_percent() -> float:
+	var total_percent = amount.size()
+	var percent := 0.0
+	for cur in amount:
+		var currency = wa.get_currency(cur)
+		var _amount = amount[cur].get_value()
+		percent += currency.get_effective_amount().percent(_amount)
 	return percent / total_percent

@@ -22,9 +22,9 @@ var setup_done := false
 
 
 func _ready() -> void:
-	Settings.joypad_allowed.changed.connect(update_focus)
-	gv.joypad_detected.changed.connect(update_focus)
+	Settings.joypad.right.changed.connect(update_focus)
 	upgrade = up.get_upgrade(upgrade_type)
+	upgrade.vico = self
 	upgrade.unlocked.changed.connect(unlocked_changed)
 	upgrade.unlocked.changed.connect(update_focus)
 	upgrade.purchased.changed.connect(upgrade_purchased_changed)
@@ -70,6 +70,7 @@ func setup() -> void:
 		pb.description.hide()
 	if upgrade.get_purchase_limit() > 1:
 		pb.times_purchased.show()
+	set_cost_visibility()
 	if setup_done:
 		return
 	setup_done = true
@@ -78,7 +79,6 @@ func setup() -> void:
 	if upgrade.details.description != "":
 		upgrade.times_purchased.changed.connect(set_description_text)
 		set_description_text()
-	set_cost_visibility()
 	if upgrade.get_purchase_limit() > 1:
 		pb.times_purchased.show()
 		upgrade.times_purchased.changed.connect(times_purchased_changed)
@@ -88,6 +88,8 @@ func setup() -> void:
 func _on_purchase_button_pressed():
 	if upgrade.can_purchase():
 		upgrade.purchase()
+	elif upgrade.unlocked.is_false():
+		up.flash_vico(upgrade.required_upgrade)
 
 
 func upgrade_purchased_changed() -> void:
@@ -133,7 +135,9 @@ func unlocked_changed() -> void:
 
 
 func update_focus() -> void:
-	if gv.joypad_detected.is_true():
+	if gv.root_ready.is_false():
+		return
+	if Settings.joypad.are_true():
 		if upgrade.unlocked.is_false() or upgrade.purchased.is_true():
 			focus_mode = FOCUS_NONE
 			pb.focus_mode = FOCUS_NONE

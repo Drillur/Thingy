@@ -27,6 +27,9 @@ func _ready() -> void:
 	
 	if SaveManager.can_load_game():
 		SaveManager.load_game()
+		Settings.joypad.set_right(false)
+	else:
+		SaveManager.color.set_to(gv.get_random_nondark_color())
 	
 	gv.root = self
 	gv.root_ready.set_to(true)
@@ -41,8 +44,8 @@ func thingy_created() -> void:
 
 
 func _input(event):
-	if event is InputEventJoypadButton:
-		if gv.joypad_detected.is_false() or gv.game_has_focus.is_false():
+	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+		if Settings.joypad.are_either_false() or gv.game_has_focus.is_false():
 			return
 	
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -64,9 +67,9 @@ func _input(event):
 	):
 		hotkey_upgrades_tab()
 	elif Input.is_action_just_pressed("ui_up"):
-		scroll_thingies_up()
+		scroll_thingies_up(event is InputEventJoypadButton)
 	elif Input.is_action_just_pressed("ui_down"):
-		scroll_thingies_down()
+		scroll_thingies_down(event is InputEventJoypadButton)
 	elif Input.is_action_just_pressed("joy_to_top"):
 		th.container.snap_to_index(th.get_top_index())
 	elif Input.is_action_just_pressed("joy_to_bot"):
@@ -76,6 +79,8 @@ func _input(event):
 	elif Input.is_action_just_pressed("save"):
 		SaveManager.save_game()
 	elif event is InputEventMouseButton:
+		if Settings.joypad.right.is_true():
+			Settings.joypad.right.set_to(false)
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			if sidebar.visible:
 				if (
@@ -89,10 +94,10 @@ func _input(event):
 					current_tab.set_to(-1)
 		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_DOWN):
 			if not gv.node_has_point(sidebar, sidebar.get_global_mouse_position()):
-				scroll_thingies_down()
+				scroll_thingies_down(false)
 		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_WHEEL_UP):
 			if not gv.node_has_point(sidebar, sidebar.get_global_mouse_position()):
-				scroll_thingies_up()
+				scroll_thingies_up(false)
 
 
 func open_or_close_tab(tab: Tab) -> void:
@@ -108,10 +113,18 @@ func hotkey_upgrades_tab() -> void:
 		current_tab.set_to(Tab.UPGRADE)
 
 
-func scroll_thingies_up() -> void:
-	if current_tab.less(0):
-		if th.has_thingy(th.get_selected_index() + 1):
-			th.container.snap_to_index(th.get_selected_index() + 1)
+func scroll_thingies_up(_joypad: bool) -> void:
+	if current_tab.greater_equal(0) and _joypad:
+		return
+	if th.has_thingy(th.get_selected_index() + 1):
+		th.container.snap_to_index(th.get_selected_index() + 1)
+
+
+func scroll_thingies_down(_joypad: bool) -> void:
+	if current_tab.greater_equal(0) and _joypad:
+		return
+	if th.has_thingy(th.get_selected_index() - 1):
+		th.container.snap_to_index(th.get_selected_index() - 1)
 
 
 func save_notification_soon() -> void:
@@ -126,12 +139,6 @@ func save_notification_now() -> void:
 	gv.flash(save_notification, SaveManager.color.get_value())
 	await get_tree().create_timer(2).timeout
 	save_notification.hide()
-
-
-func scroll_thingies_down() -> void:
-	if current_tab.less(0):
-		if th.has_thingy(th.get_selected_index() - 1):
-			th.container.snap_to_index(th.get_selected_index() - 1)
 
 
 func save_color_changed() -> void:
@@ -159,12 +166,12 @@ func save_color_changed() -> void:
 @onready var xp_rate = %"XP Rate"
 @onready var juice_components = %JuiceComponents
 @onready var juice_label = %"Juice Label"
-@onready var juice_rate = %"Juice Rate"
 @onready var juice_flair = %"Juice Flair"
 @onready var will_components = %WillComponents
 @onready var soul_components = %SoulComponents
 @onready var soul_label = %"Soul Label"
 @onready var soul_flair = %"Soul Flair"
+@onready var soul_rate = %"Soul Rate"
 
 @onready var dev = %DEV
 
@@ -172,14 +179,14 @@ func save_color_changed() -> void:
 func setup_currency_panel() -> void:
 	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name
 	will_rate.modulate = wa.get_color(Currency.Type.WILL)
-	wa.get_currency(Currency.Type.WILL).amount.pending_changed.connect(will_changed)
+	wa.get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
 	wa.get_currency(Currency.Type.WILL).net_rate.changed.connect(will_rate_changed)
 	will_changed()
 	will_rate_changed()
 	
 	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).icon_and_name
 	coin_rate.modulate = wa.get_color(Currency.Type.COIN)
-	wa.get_currency(Currency.Type.COIN).amount.pending_changed.connect(coin_changed)
+	wa.get_currency(Currency.Type.COIN).amount.changed.connect(coin_changed)
 	wa.get_currency(Currency.Type.COIN).net_rate.changed.connect(coin_rate_changed)
 	wa.get_currency(Currency.Type.COIN).unlocked.changed.connect(coin_unlocked_changed)
 	coin_changed()
@@ -188,7 +195,7 @@ func setup_currency_panel() -> void:
 	
 	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).icon_and_name
 	xp_rate.modulate = wa.get_color(Currency.Type.XP)
-	wa.get_currency(Currency.Type.XP).amount.pending_changed.connect(xp_changed)
+	wa.get_currency(Currency.Type.XP).amount.changed.connect(xp_changed)
 	wa.get_currency(Currency.Type.XP).net_rate.changed.connect(xp_rate_changed)
 	wa.get_currency(Currency.Type.XP).unlocked.changed.connect(xp_unlocked_changed)
 	xp_changed()
@@ -196,19 +203,20 @@ func setup_currency_panel() -> void:
 	xp_unlocked_changed()
 	
 	juice_flair.text = "[i]" + wa.get_details(Currency.Type.JUICE).icon_and_name
-	juice_rate.modulate = wa.get_color(Currency.Type.JUICE)
 	wa.get_currency(Currency.Type.JUICE).amount.changed.connect(juice_changed)
-	wa.get_currency(Currency.Type.JUICE).amount.pending_changed.connect(juice_changed)
-	th.max_juice_use.changed.connect(juice_rate_changed)
+	th.max_juice_use.changed.connect(juice_changed)
 	wa.get_currency(Currency.Type.JUICE).unlocked.changed.connect(juice_unlocked_changed)
 	juice_changed()
-	juice_rate_changed()
 	juice_unlocked_changed()
 	
 	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).icon_and_name
-	wa.soul_gain.changed.connect(soul_changed)
-	soul_changed()
+	soul_rate.modulate = wa.get_color(Currency.Type.SOUL)
+	wa.get_currency(Currency.Type.SOUL).amount.changed.connect(soul_changed)
+	wa.get_currency(Currency.Type.SOUL).amount.pending_changed.connect(soul_changed)
+	wa.get_currency(Currency.Type.SOUL).net_rate.changed.connect(soul_rate_changed)
 	wa.get_currency(Currency.Type.SOUL).unlocked.changed.connect(soul_unlocked_changed)
+	soul_changed()
+	soul_rate_changed()
 	soul_unlocked_changed()
 	
 	currency_panel.hide()
@@ -221,7 +229,7 @@ func coin_unlocked_changed() -> void:
 func coin_changed() -> void:
 	coin_label.text = "[i]" + (
 		wa.get_details(Currency.Type.COIN).color_text % (
-			"+" + wa.get_currency(Currency.Type.COIN).amount.get_pending_text()
+			wa.get_currency(Currency.Type.COIN).amount.get_text()
 		)
 	)
 
@@ -233,7 +241,7 @@ func coin_rate_changed() -> void:
 func will_changed() -> void:
 	will_label.text = "[i]" + (
 		wa.get_details(Currency.Type.WILL).color_text % (
-			"+" + wa.get_currency(Currency.Type.WILL).amount.get_pending_text()
+			wa.get_currency(Currency.Type.WILL).amount.get_text()
 		)
 	)
 
@@ -249,7 +257,7 @@ func xp_unlocked_changed() -> void:
 func xp_changed() -> void:
 	xp_label.text = "[i]" + (
 		wa.get_details(Currency.Type.XP).color_text % (
-			"+" + wa.get_currency(Currency.Type.XP).amount.get_pending_text()
+			wa.get_currency(Currency.Type.XP).amount.get_text()
 		)
 	)
 
@@ -263,16 +271,12 @@ func juice_unlocked_changed() -> void:
 
 
 func juice_changed() -> void:
-	juice_label.text = "[i]" + (
-		wa.get_details(Currency.Type.JUICE).color_text % (
-			wa.get_amount_text(Currency.Type.JUICE) + "+" +
-			wa.get_pending_amount(Currency.Type.JUICE).text
-		)
+	juice_label.text = wa.get_details(Currency.Type.JUICE).color_text % (
+		"[i]%s (Goal: %s)[/i]" % [
+			wa.get_amount_text(Currency.Type.JUICE),
+			th.max_juice_use.get_text(),
+		]
 	)
-
-
-func juice_rate_changed() -> void:
-	juice_rate.text = "[i](%s)" % th.max_juice_use.get_text()
 
 
 func soul_unlocked_changed() -> void:
@@ -283,9 +287,16 @@ func soul_unlocked_changed() -> void:
 func soul_changed() -> void:
 	soul_label.text = "[i]" + (
 		wa.get_details(Currency.Type.SOUL).color_text % (
-			"+" + wa.soul_gain.text
+			"%s+%s" % [
+				wa.get_amount_text(Currency.Type.SOUL),
+				wa.get_pending_amount(Currency.Type.SOUL).text
+			]
 		)
 	)
+
+
+func soul_rate_changed() -> void:
+	soul_rate.text = "[i](%s/s)" % wa.get_net_rate(Currency.Type.SOUL).get_text()
 
 
 func _on_coin_components_resized():
@@ -343,18 +354,15 @@ func setup_navigation_panel() -> void:
 	update_unlock_upgrades_button_visibility()
 	tab_settings.color = Settings.color
 	tab_menu.color = SaveManager.color.get_value()
-	Settings.joypad_allowed.changed.connect(update_navigation_button_focus_modes)
-	gv.joypad_detected.changed.connect(update_navigation_button_focus_modes)
+	Settings.joypad.right.changed.connect(update_navigation_button_focus_modes)
 	update_navigation_button_focus_modes()
 	reset_button.color = wa.get_color(Currency.Type.SOUL)
-	
-	
+	purchase_thingy.assign_loud_color(th.next_thingy_color)
 	purchase_thingy.setup(th.cost)
-	purchase_thingy.color = th.next_thingy_color
 
 
 func update_navigation_button_focus_modes() -> void:
-	if Settings.joypad_allowed.is_true() and gv.joypad_detected.is_true():
+	if Settings.joypad.are_true():
 		for node in navigation_buttons.get_children():
 			node.focus_mode = Control.FOCUS_ALL
 			node.button.focus_mode = Control.FOCUS_ALL
@@ -394,7 +402,6 @@ func _on_reset_button_pressed():
 
 func _on_purchase_thingy_pressed():
 	th.purchase_thingy()
-	purchase_thingy.color = th.next_thingy_color
 
 
 func update_navigation_panel_visibility() -> void:
@@ -491,18 +498,21 @@ func upgrade_tab_changed(index: int = upgrade_container.tab_container.current_ta
 
 
 func setup_dev() -> void:
+	fps.get_node("Timer").timeout.connect(fps_timer_timeout)
+	fps_timer_timeout()
 	if gv.dev_mode:
-		fps.get_node("Timer").timeout.connect(fps_timer_timeout)
 		wa.get_currency(Currency.Type.WILL).amount.changed.connect(dev_text)
 	else:
-		fps.queue_free()
+		#fps.queue_free()
 		dev.queue_free()
 		dev_button.queue_free()
 		dev_button_2.queue_free()
 
 
 func fps_timer_timeout() -> void:
-	fps.text = "FPS: " + str(Engine.get_frames_per_second())
+	fps.text = "[b]" + str(Engine.get_frames_per_second()).pad_zeros(3) + (
+		"[/b] [img=<15>]%s[/img] [i]fps" % bag.get_resource("Speed").get_path()
+	)
 
 
 func _on_dev_button_pressed():

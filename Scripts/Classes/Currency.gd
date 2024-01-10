@@ -17,6 +17,7 @@ var details := Details.new()
 
 @export var amount: Value
 @export var unlocked := LoudBool.new(false)
+
 var persist := Persist.new()
 
 var net_rate := Big.new(0)
@@ -52,6 +53,7 @@ func _init(_type: Type) -> void:
 			details.color = Color(0.918, 0.2, 0.553)
 			details.icon = bag.get_resource("Ghost")
 			persist.through_tier(1)
+			amount.add_pending_to_current_on_game_load = false
 
 
 
@@ -69,6 +71,9 @@ func set_starting_amount() -> void:
 
 func reset() -> void:
 	amount.reset()
+	gain_rate.reset()
+	loss_rate.reset()
+	sync_rate()
 
 
 #endregion
@@ -105,8 +110,7 @@ func sync_rate() -> void:
 func get_eta(threshold: Big) -> Big:
 	if (
 		get_amount().greater_equal(threshold)
-		or net_rate.equal(0)
-		or net_rate.positive.is_false()
+		or not is_net_rate_positive()
 	):
 		return Big.new(0)
 	
@@ -114,8 +118,23 @@ func get_eta(threshold: Big) -> Big:
 	return deficit.d(net_rate)
 
 
+func is_net_rate_positive() -> bool:
+	return (
+		net_rate.greater(0)
+		and net_rate.positive.is_true()
+	)
+
+
 func get_amount() -> Big:
 	return amount.get_value()
+
+
+func get_pending_amount() -> Big:
+	return amount.get_pending_value()
+
+
+func get_effective_amount() -> Big:
+	return Big.new(get_amount()).a(get_pending_amount())
 
 
 #endregion

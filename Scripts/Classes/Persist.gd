@@ -21,7 +21,7 @@ func _init() -> void:
 
 
 func check_if_can_persist_through_tier(_tier: int) -> void:
-	if get_highest_tier_can_persist_through() < _tier:
+	if should_fail_at_tier(_tier):
 		failed_persist_check.emit()
 	
 
@@ -64,6 +64,10 @@ func get_highest_tier_can_persist_through() -> int:
 	if persist_through_tier1.is_true():
 		return 1
 	return 0
+
+
+func should_fail_at_tier(_tier: int) -> bool:
+	return get_highest_tier_can_persist_through() < _tier
 
 
 #endregion

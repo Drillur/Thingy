@@ -3,54 +3,17 @@ extends Resource
 
 
 
-var saved_vars := [
-	"mantissa",
-	"exponent",
-]
-
 const MANTISSA_PRECISSION = 0.0000001
 const MIN_INTEGER: int = -9223372036854775807
 const MAX_INTEGER: int = 9223372036854775806
 
+signal renewed
 signal increased
 signal decreased
 
-signal change_cooldown_finished
-signal increase_cooldown_finished
-signal decrease_cooldown_finished
-
-var increase_on_cooldown := false:
-	set(val):
-		increase_on_cooldown = val
-		if val:
-			if gv.root_ready.is_false():
-				await gv.root_ready.became_true
-			await gv.get_tree().physics_frame
-			increase_on_cooldown = false
-			emit_signal("increase_cooldown_finished")
-var increase_queued := false
-
-var decrease_on_cooldown := false:
-	set(val):
-		decrease_on_cooldown = val
-		if val:
-			if gv.root_ready.is_false():
-				await gv.root_ready.became_true
-			await gv.get_tree().physics_frame
-			decrease_on_cooldown = false
-			emit_signal("decrease_cooldown_finished")
-var decrease_queued := false
-
-var change_on_cooldown := false:
-	set(val):
-		change_on_cooldown = val
-		if val:
-			if gv.root_ready.is_false():
-				await gv.root_ready.became_true
-			await gv.get_tree().physics_frame
-			change_on_cooldown = false
-			emit_signal("change_cooldown_finished")
-var change_queued := false
+var changed_cooldown := PhysicsCooldown.new(changed)
+var increase_cooldown := PhysicsCooldown.new(increased)
+var decrease_cooldown := PhysicsCooldown.new(decreased)
 
 var positive := LoudBool.new(true)
 
@@ -111,6 +74,7 @@ func reset() -> void:
 	emit_decrease()
 	emit_increase()
 	emit_change()
+	renewed.emit()
 
 
 func change_base(new_base: float) -> void:
@@ -120,36 +84,15 @@ func change_base(new_base: float) -> void:
 
 
 func emit_change() -> void:
-	if change_queued:
-		return
-	if change_on_cooldown:
-		change_queued = true
-		await change_cooldown_finished
-		change_queued = false
-	emit_changed()
-	change_on_cooldown = true
+	changed_cooldown.emit_sig()
 
 
 func emit_increase() -> void:
-	if increase_queued:
-		return
-	if increase_on_cooldown:
-		increase_queued = true
-		await increase_cooldown_finished
-		increase_queued = false
-	increased.emit()
-	increase_on_cooldown = true
+	increase_cooldown.emit_sig()
 
 
 func emit_decrease() -> void:
-	if decrease_queued:
-		return
-	if decrease_on_cooldown:
-		decrease_queued = true
-		await decrease_cooldown_finished
-		decrease_queued = false
-	decreased.emit()
-	decrease_on_cooldown = true
+	decrease_cooldown.emit_sig()
 
 
 

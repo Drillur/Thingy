@@ -14,6 +14,7 @@ extends MarginContainer
 @onready var level_label = %"Level Label"
 @onready var border = %Border
 @onready var crit_success = %CritSuccess
+@onready var button = %Button
 
 var thingy: Thingy
 
@@ -22,6 +23,7 @@ var color: Color:
 		color = val
 		progress_bar.modulate = val
 		index_label.modulate = val
+		button.modulate = val
 		if get_index() == 3:
 			border.modulate = val
 
@@ -43,9 +45,6 @@ func _ready() -> void:
 			pass
 		_:
 			selected.queue_free()
-	
-	if not gv.dev_mode:
-		$DEV.queue_free()
 
 
 
@@ -128,6 +127,11 @@ func selected_index_changed() -> void:
 				assign_thingy(th.get_thingy(index - 3))
 			else:
 				clear_thingy()
+
+
+func _on_button_pressed():
+	if thingy:
+		th.container.snap_to_index(thingy.index)
 
 
 func thingy_is_sick_of_living(_index: int) -> void:
@@ -231,10 +235,3 @@ func clear_thingy() -> void:
 func get_offset_index() -> int:
 	return get_index() - 3
 
-
-
-# - Dev
-
-
-func _on_dev_pressed():
-	clear_thingy()

@@ -2,21 +2,40 @@ extends Node
 
 
 
-var currencies := {}
+enum RateMode {
+	MINIMUM,
+	LIVE,
+}
+
 @export var currencies_by_name := {}
-var soul_gain := Big.new(0)
+
+var currencies := {}
+var will_from_juice := LoudBool.new(false)
 
 
 
 func _ready() -> void:
+	set_physics_process(false)
 	for cur in Currency.Type.values():
 		currencies[cur] = Currency.new(cur)
 		currencies_by_name[currencies[cur].key] = currencies[cur]
 	get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
+	get_currency(Currency.Type.WILL).amount.changed.connect(update_soul_gain_rate)
+	get_currency(Currency.Type.JUICE).amount.changed.connect(juice_changed)
+	gv.one_second.connect(update_soul_gain_rate)
+	will_from_juice.changed.connect(will_from_juice_changed)
 
 
 
 #region Signals
+
+
+func _physics_process(_delta):
+	add(Currency.Type.WILL, Big.new(get_amount(Currency.Type.JUICE)).d(60))
+
+
+func will_from_juice_changed() -> void:
+	set_physics_process(will_from_juice.get_value())
 
 
 func will_changed() -> void:
@@ -26,7 +45,25 @@ func will_changed() -> void:
 			pow(get_amount(Currency.Type.WILL).logN(15), 1.5) - 8
 		)
 	).roundDown()
-	soul_gain.set_to(new_amount)
+	wa.get_pending_amount(Currency.Type.SOUL).set_to(new_amount)
+
+
+func juice_changed() -> void:
+	if wa.will_from_juice.is_true():
+		var rate = Big.new(wa.get_amount(Currency.Type.JUICE)).d(60)
+		wa.get_currency(Currency.Type.WILL).gain_rate.edit_change(
+			"added", wa.get_currency(Currency.Type.JUICE), rate
+		)
+
+
+func update_soul_gain_rate() -> void:
+	wa.get_currency(Currency.Type.SOUL).gain_rate.edit_change(
+		"added", self, Big.new(wa.get_pending_amount(Currency.Type.SOUL)).d(
+			up.get_upgrade_tree(
+				up.UpgradeTree.Type.FIRESTARTER
+			).get_run_duration()
+		)
+	)
 
 
 #endregion
@@ -38,7 +75,7 @@ func will_changed() -> void:
 func collect_reset_currency(_tier: int) -> void:
 	match _tier:
 		1:
-			add(Currency.Type.SOUL, soul_gain)
+			add(Currency.Type.SOUL, wa.get_pending_amount(Currency.Type.SOUL))
 
 
 func add(cur: Currency.Type, amount) -> void:
@@ -74,7 +111,7 @@ func get_pending_amount(cur: Currency.Type) -> Big:
 
 
 func get_effective_amount(cur: Currency.Type) -> Big:
-	return Big.new(get_amount(cur)).a(get_pending_amount(cur))
+	return get_currency(cur).get_effective_amount()
 
 
 func get_net_rate(cur: Currency.Type) -> Big:

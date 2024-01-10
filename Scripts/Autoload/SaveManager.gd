@@ -63,16 +63,16 @@ const RANDOM_PATH_POOL := [
 	"retchleaf",
 ]
 
-var default_save_method := SaveMethod.TO_FILE
-var default_load_method := LoadMethod.FROM_FILE
-
 @export var save_name: String = "Save"
-@export var color := LoudColor.new(Color(1, 0, 0.282))
+@export var color := LoudColor.new(1, 0, 0.282)
 @export var save_version := {
 	"major": 1,
 	"minor": 0,
 	"revision": 0,
 }
+
+var default_save_method := SaveMethod.TO_FILE
+var default_load_method := LoadMethod.FROM_FILE
 
 var loaded_data: Dictionary
 var last_save_clock := Time.get_unix_time_from_system()
@@ -87,6 +87,7 @@ var singletons_with_exports := {}
 
 func _ready() -> void:
 	setup_singletons_with_exports()
+	gv.save_manager_ready.set_to(true)
 
 
 func setup_singletons_with_exports() -> void:
@@ -239,7 +240,15 @@ func unpack_vars(object, packed_vars: Dictionary) -> void:
 				variable.emit_increase()
 				variable.emit_decrease()
 		elif variable is Color:
-			unpack_color(object.get(variable_name), packed_variable)
+			object.set(
+				variable_name,
+				Color(
+					packed_variable["r"],
+					packed_variable["g"],
+					packed_variable["b"],
+					packed_variable["a"],
+				)
+			)
 		else:
 			object.set(variable_name, packed_variable)
 
@@ -261,7 +270,12 @@ func unpack_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) ->
 				value.emit_increase()
 				value.emit_decrease()
 		elif value is Color:
-			unpack_color(dictionary[key], packed_value)
+			dictionary[key] = Color(
+				packed_value["r"],
+				packed_value["g"],
+				packed_value["b"],
+				packed_value["a"],
+			)
 		else:
 			dictionary[key] = packed_value
 	return dictionary
@@ -293,16 +307,6 @@ func unpack_array(packed_array: Dictionary) -> Array:
 			array.append(data)
 	
 	return array
-
-
-func unpack_color(_color: Color, packed_color: Dictionary) -> void:
-	_color = Color(
-		packed_color["r"],
-		packed_color["g"],
-		packed_color["b"],
-		packed_color["a"],
-	)
-
 
 
 func update_save_version() -> void:
