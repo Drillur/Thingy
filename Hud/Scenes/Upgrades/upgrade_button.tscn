@@ -1,14 +1,30 @@
-[gd_scene load_steps=3 format=3 uid="uid://bbq5xo6rr5ldf"]
+[gd_scene load_steps=4 format=3 uid="uid://bbq5xo6rr5ldf"]
 
-[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/purchase_button.tscn" id="1_6pr3e"]
+[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/Upgrades/purchase_button.tscn" id="1_6pr3e"]
 [ext_resource type="Script" path="res://Hud/Scenes/Upgrades/upgrade_button.gd" id="1_s0467"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e38k4"]
+draw_center = false
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+shadow_color = Color(1, 0, 0, 0.34902)
+shadow_size = 5
 
 [node name="UpgradeButton" type="MarginContainer"]
 offset_right = 103.0
 offset_bottom = 99.0
-focus_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 mouse_filter = 2
 script = ExtResource("1_s0467")
+
+[node name="Enabled Border" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_e38k4")
 
 [node name="Purchase Button" parent="." instance=ExtResource("1_6pr3e")]
 layout_mode = 2

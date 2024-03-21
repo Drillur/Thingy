@@ -1,0 +1,60 @@
+[gd_scene load_steps=4 format=3 uid="uid://bic2t0qt743uw"]
+
+[ext_resource type="Theme" uid="uid://cw23v8nlfy06y" path="res://Hud/Themes/Title.tres" id="1_t8v5a"]
+[ext_resource type="Script" path="res://Hud/Scenes/Upgrades/cost_components.gd" id="1_xhb8e"]
+[ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/Scenes/bar.tscn" id="2_cg4qf"]
+
+[node name="CostComponents" type="VBoxContainer"]
+theme_override_constants/separation = 0
+script = ExtResource("1_xhb8e")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+
+[node name="title bg" type="Panel" parent="MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("1_t8v5a")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 9
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 9
+
+[node name="Check" type="CheckBox" parent="MarginContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+focus_mode = 0
+mouse_filter = 2
+theme = ExtResource("1_t8v5a")
+text = "44 seconds"
+
+[node name="MarginContainer3" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="PendingBar" parent="MarginContainer3" instance=ExtResource("2_cg4qf")]
+unique_name_in_owner = true
+layout_mode = 2
+kill_background = true
+
+[node name="Bar" parent="MarginContainer3" instance=ExtResource("2_cg4qf")]
+unique_name_in_owner = true
+layout_mode = 2
+kill_background = true
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer3"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Content Parent" type="VBoxContainer" parent="MarginContainer3/MarginContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4

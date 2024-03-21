@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Thingy"
-config/version="0.1.0"
+config/version="0.1.1"
 run/main_scene="res://Main.tscn"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Thingy"
@@ -23,12 +23,12 @@ config/windows_native_icon="res://Art/Icons/Icon.ico"
 
 bag="*res://Scripts/Autoload/Resources.gd"
 tp="*res://Scripts/Autoload/TimeParser.gd"
-Settings="*res://Scripts/Autoload/Settings.gd"
+SaveManager="*res://Scripts/Autoload/SaveManager.gd"
 gv="*res://Scripts/Autoload/Overseer.gd"
+Settings="*res://Scripts/Autoload/Settings.gd"
 wa="*res://Scripts/Autoload/Wallet.gd"
 up="*res://Scripts/Autoload/Upgrades.gd"
 th="*res://Scripts/Autoload/Thingies.gd"
-SaveManager="*res://Scripts/Autoload/SaveManager.gd"
 DiscordSDKLoader="*res://addons/discord-sdk-gd/nodes/discord_autoload.gd"
 
 [debug]

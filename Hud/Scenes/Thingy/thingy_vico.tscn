@@ -174,5 +174,6 @@ layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme = ExtResource("5_a1a0r")
+metadata/_edit_lock_ = true
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

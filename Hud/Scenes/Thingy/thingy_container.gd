@@ -41,7 +41,6 @@ func _ready():
 	await gv.root_ready.became_true
 	th.thingy_created.connect(thingy_created)
 	gv.root.current_tab.changed.connect(display_navigators)
-	#thingy_created()
 	update_navigator_colors()
 	display_navigators()
 
@@ -67,7 +66,7 @@ func load_finished() -> void:
 
 
 func joypad_allowed_changed() -> void:
-	navigation_buttons.visible = Settings.joypad.right.is_false()
+	navigation_buttons.visible = Settings.joypad_detected.is_false()
 	navigation_joypad.visible = not navigation_buttons.visible
 
 

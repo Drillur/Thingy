@@ -52,8 +52,6 @@ enum Attribute {
 	JUICE_MULTIPLIER_RANGE_TOTAL,
 }
 
-signal timer_started
-
 @export var level := LoudInt.new(1)
 @export var output_multiplier := Big.new(1.0)
 @export var xp := ValuePair.new(10.0).do_not_cap_current()
@@ -68,17 +66,13 @@ signal timer_started
 
 var juiced := LoudBool.new(false)
 var crit_success := LoudBool.new(false)
-var inhand_will := Big.new(0)
-var inhand_coin := Big.new(0)
-var inhand_xp := Big.new(0)
-var inhand_juice := Big.new(0)
+var inhand: Inhand
 var persist := Persist.new()
-
 
 var index: int
 var just_born := true
 var details = Details.new()
-var timer := Timer.new()
+var timer := LoudTimer.new(1.0, 1.0)
 
 
 
@@ -86,34 +80,41 @@ func _init(_index: int) -> void:
 	index = _index
 	persist.failed_persist_check.connect(reset)
 	kill_me.connect(th.thingy_wants_to_fucking_die)
-	details.color = color.get_value()
+	details.set_color(color.get_value())
 	xp.current.current.change_base(0.0)
 	xp.current.reset()
-	xp.filled.connect(xp_filled)
-	xp_modifier.changed.connect(xp_modifier_changed)
+	xp.full.became_true.connect(xp_filled)
+	xp.total.book.add_multiplier(xp_modifier)
+	xp.total.book.add_multiplier(th.xp_multiplier)
 	level.changed.connect(level_changed)
-	th.xp_multiplier.changed.connect(global_xp_multiplier_changed)
-	global_xp_multiplier_changed()
-	crit_multiplier.changed.connect(crit_success.set_true)
+	crit_multiplier.became_not_1.connect(crit_success.set_true)
 	crit_multiplier.renewed.connect(crit_success.set_false)
-	output_currency.changed.connect(output_currency_changed)
-	inhand_will.changed.connect(inhand_will_changed)
-	inhand_xp.changed.connect(inhand_xp_changed)
-	inhand_coin.changed.connect(inhand_coin_changed)
-	inhand_juice.changed.connect(inhand_juice_changed)
 	juice_input_modifier.changed.connect(juice_input_modifier_changed)
-	juiced.became_true.connect(juiced_became_true)
 	juice_input_modifier_changed()
+	juiced.became_true.connect(juiced_became_true)
 	timer.timeout.connect(timer_timeout)
 	Settings.rate_mode.changed.connect(rate_mode_changed)
 	rate_mode_changed()
+	timer.started.connect(log_rates)
+	timer.wait_time_range.current.book.add_multiplier(th.duration_range.current)
+	timer.wait_time_range.current.book.add_multiplier(duration_modifier)
+	timer.wait_time_range.total.book.add_multiplier(duration_modifier)
+	timer.wait_time_range.total.book.add_multiplier(th.duration_range.total)
+	timer.wait_time_range.current.book.add_multiplier(crit_multiplier)
+	timer.wait_time_range.total.book.add_multiplier(crit_multiplier)
 	
-	gv.add_child(timer)
-	timer.one_shot = true
 	if gv.root_ready.is_false():
-		gv.root_ready.became_true.connect(start_timer)
+		SaveManager.loading.became_false.connect(first_start)
+		if not SaveManager.can_load_game():
+			gv.root_ready.became_true.connect(first_start)
 	else:
 		start_timer()
+
+
+func first_start() -> void:
+	await th.get_tree().physics_frame
+	await th.get_tree().physics_frame
+	start_timer()
 
 
 
@@ -127,15 +128,11 @@ func reset() -> void:
 
 
 func timer_timeout() -> void:
-	wa.add(Currency.Type.WILL, inhand_will)
-	wa.add(Currency.Type.JUICE, inhand_juice)
-	wa.add(Currency.Type.XP, inhand_xp)
-	xp.add(inhand_xp)
-	if crit_success.is_true():
-		wa.add(Currency.Type.COIN, inhand_coin)
-		if get_crit_chance() < 100:
-			wa.get_currency(Currency.Type.COIN).gain_rate.remove_change("added", self)
-			inhand_coin.reset()
+	inhand.add_currencies()
+	if inhand.xp:
+		xp.add(inhand.xp.get_value())
+	inhand.clear()
+	inhand = null
 	crit_multiplier.reset()
 	juiced.reset()
 	start_timer()
@@ -154,92 +151,20 @@ func level_changed() -> void:
 	juice_output_modifier.multiply(th.juice_output_increase_range.get_random_point())
 
 
-func xp_modifier_changed() -> void:
-	xp.total.edit_change("multiplied", self, xp_modifier.get_value())
-
-
-func global_xp_multiplier_changed() -> void:
-	xp.total.edit_change(
-		"multiplied",
-		th.xp_multiplier,
-		th.xp_multiplier.get_value()
-	)
-
-
-func output_currency_changed() -> void:
-	match output_currency.get_value():
-		Currency.Type.WILL:
-			if inhand_juice.greater(0):
-				inhand_juice.reset()
-		Currency.Type.JUICE:
-			if inhand_will.greater(0):
-				inhand_will.reset()
-
-
-func inhand_will_changed() -> void:
-	wa.get_currency(Currency.Type.WILL).amount.edit_change("pending", self, inhand_will)
-
-
-func inhand_xp_changed() -> void:
-	wa.get_currency(Currency.Type.XP).amount.edit_change("pending", self, inhand_xp)
-
-
-func inhand_coin_changed() -> void:
-	wa.get_currency(Currency.Type.COIN).amount.edit_change("pending", self, inhand_coin)
-
-
-func inhand_juice_changed() -> void:
-	wa.get_currency(Currency.Type.JUICE).amount.edit_change("pending", self, inhand_juice)
-
-
 func juiced_became_true() -> void:
 	juiced_multiplier.set_to(
 		th.juice_multiplier_range.get_random_point() * (
 			crit_multiplier.get_value() if crit_success.is_true() else 1.0
 		)
 	)
-	timer.wait_time /= juiced_multiplier.get_value()
+	timer.divide_wait_time(juiced_multiplier, juiced_multiplier.get_value())
 
 
 func juice_input_modifier_changed() -> void:
-	th.max_juice_use.edit_change("added", self, get_maximum_juice_input() * 2)
+	th.max_juice_use.edit_added(self, get_maximum_juice_input() * 2)
 
 
 func rate_mode_changed() -> void:
-	if Settings.rate_mode.get_value() == wa.RateMode.MINIMUM:
-		if not th.output_range.changed.is_connected(log_rates):
-			th.output_range.changed.connect(log_rates)
-			th.duration_range.changed.connect(log_rates)
-			th.xp_output_range.changed.connect(log_rates)
-			th.juice_output_range.changed.connect(log_rates)
-			th.crit_coin_output.changed.connect(log_rates)
-			th.crit_chance.changed.connect(log_rates)
-			th.crits_apply_to_coin.became_true.connect(log_rates)
-			th.crits_apply_to_coin_twice.became_true.connect(log_rates)
-			output_multiplier.changed.connect(log_rates)
-			duration_modifier.changed.connect(log_rates)
-			juice_output_modifier.changed.connect(log_rates)
-			crit_multiplier.changed.connect(log_rates)
-	if Settings.rate_mode.get_value() != wa.RateMode.MINIMUM:
-		if th.output_range.changed.is_connected(log_rates):
-			th.output_range.changed.disconnect(log_rates)
-			th.duration_range.changed.disconnect(log_rates)
-			th.xp_output_range.changed.disconnect(log_rates)
-			th.juice_output_range.changed.disconnect(log_rates)
-			th.crit_coin_output.changed.disconnect(log_rates)
-			th.crit_chance.changed.disconnect(log_rates)
-			th.crits_apply_to_coin.became_true.disconnect(log_rates)
-			th.crits_apply_to_coin_twice.became_true.disconnect(log_rates)
-			output_multiplier.changed.disconnect(log_rates)
-			duration_modifier.changed.disconnect(log_rates)
-			juice_output_modifier.changed.disconnect(log_rates)
-			crit_multiplier.changed.disconnect(log_rates)
-	if Settings.rate_mode.get_value() == wa.RateMode.LIVE:
-		if not timer_started.is_connected(log_rates):
-			timer_started.connect(log_rates)
-	if Settings.rate_mode.get_value() != wa.RateMode.LIVE:
-		if timer_started.is_connected(log_rates):
-			timer_started.disconnect(log_rates)
 	remove_rates()
 	log_rates()
 
@@ -251,13 +176,10 @@ func rate_mode_changed() -> void:
 
 
 func start_timer() -> void:
-	timer.wait_time = get_random_duration()
 	output_currency.set_to(get_output_currency())
 	juiced.set_to(should_juice())
 	set_inhands()
-	timer.wait_time = maxf(timer.wait_time, 0.05)
 	timer.start()
-	timer_started.emit()
 
 
 func get_output_currency() -> Currency.Type:
@@ -285,8 +207,7 @@ func get_output_currency() -> Currency.Type:
 func set_inhands() -> void:
 	if successful_crit_roll():
 		roll_for_lucky_crits()
-		if th.crits_apply_to_duration.is_true():
-			timer.wait_time /= crit_multiplier.get_value()
+	inhand = Inhand.new()
 	set_inhand_xp()
 	set_coin_inhand()
 	match output_currency.get_value():
@@ -294,26 +215,27 @@ func set_inhands() -> void:
 			set_inhand_will()
 		Currency.Type.JUICE:
 			set_inhand_juice()
+	inhand.edit_pending()
 
 
 func set_inhand_will() -> void:
-	inhand_will.set_to(
+	inhand.add_output({Currency.Type.WILL:
 		get_random_output().m(
 			crit_multiplier.get_value() if crit_success.is_true() else 1.0
 		).m(
 			juiced_multiplier.get_value() if juiced.is_true() else 1.0
 		)
-	)
+	})
 
 
 func set_inhand_juice() -> void:
-	inhand_juice.set_to(
-		get_random_juice_output() * (
+	inhand.add_output({Currency.Type.JUICE:
+		get_random_output().m(
 			crit_multiplier.get_value() if crit_success.is_true() else 1.0
-		) * (
+		).m(
 			juiced_multiplier.get_value() if juiced.is_true() else 1.0
 		)
-	)
+	})
 
 
 func set_inhand_xp() -> void:
@@ -326,7 +248,7 @@ func set_inhand_xp() -> void:
 		new_inhand *= crit_multiplier.get_value()
 	if th.duration_applies_to_xp_output.is_true():
 		new_inhand *= max(1, timer.wait_time)
-	inhand_xp.set_to(new_inhand)
+	inhand.set_xp(LoudFloat.new(new_inhand))
 
 
 func set_coin_inhand() -> void:
@@ -339,48 +261,50 @@ func set_coin_inhand() -> void:
 		new_inhand *= crit_multiplier.get_value()
 	if th.crits_apply_to_coin_twice.is_true():
 		new_inhand *= crit_multiplier.get_value()
-	inhand_coin.set_to(new_inhand)
+	inhand.set_coin(Big.new(new_inhand))
 
 
 func log_rates() -> void:
 	match Settings.rate_mode.get_value():
 		wa.RateMode.LIVE:
-			wa.get_currency(Currency.Type.WILL).gain_rate.edit_change(
-				"added", self, Big.new(inhand_will).d(timer.wait_time)
-			)
-			wa.get_currency(Currency.Type.XP).gain_rate.edit_change(
-				"added", self, Big.new(inhand_xp).d(timer.wait_time)
-			)
-			wa.get_currency(Currency.Type.JUICE).gain_rate.edit_change(
-				"added", self, Big.new(inhand_juice).d(timer.wait_time)
+			if Currency.Type.WILL in inhand.output.keys():
+				wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(
+					self, Big.new(inhand.output[Currency.Type.WILL]).d(timer.wait_time)
+				)
+			elif Currency.Type.JUICE in inhand.output.keys():
+				wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
+					self, Big.new(inhand.output[Currency.Type.JUICE]).d(timer.wait_time)
+				)
+			wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
+				self, Big.new(inhand.xp).d(timer.wait_time)
 			)
 			if crit_success.is_true():
-				wa.get_currency(Currency.Type.COIN).gain_rate.edit_change(
-					"added", self, Big.new(inhand_coin).d(timer.wait_time)
+				wa.get_currency(Currency.Type.COIN).gain_rate.edit_added(
+					self, Big.new(inhand.coin).d(timer.wait_time)
 				)
 		wa.RateMode.MINIMUM:
-			wa.get_currency(Currency.Type.WILL).gain_rate.edit_change(
-				"added", self, get_minimum_output().d(get_minimum_duration())
+			wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(
+				self, get_minimum_output().d(get_minimum_duration())
 			)
-			wa.get_currency(Currency.Type.XP).gain_rate.edit_change(
-				"added", self, get_minimum_xp_output() / get_minimum_duration()
+			wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
+				self, get_minimum_xp_output() / get_minimum_duration()
 			)
-			wa.get_currency(Currency.Type.JUICE).gain_rate.edit_change(
-				"added", self, get_minimum_juice_output() / get_minimum_duration()
+			wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
+				self, get_minimum_juice_output() / get_minimum_duration()
 			)
 			var coin_rate = (
 				get_minimum_coin_output() * get_crit_chance_divider()
 			) / get_minimum_duration()
-			wa.get_currency(Currency.Type.COIN).gain_rate.edit_change(
-				"added", self, coin_rate
+			wa.get_currency(Currency.Type.COIN).gain_rate.edit_added(
+				self, coin_rate
 			)
 
 
 func remove_rates() -> void:
-	wa.get_currency(Currency.Type.WILL).gain_rate.remove_change("added", self)
-	wa.get_currency(Currency.Type.XP).gain_rate.remove_change("added", self)
-	wa.get_currency(Currency.Type.JUICE).gain_rate.remove_change("added", self)
-	wa.get_currency(Currency.Type.COIN).gain_rate.remove_change("added", self)
+	wa.get_currency(Currency.Type.WILL).gain_rate.remove_added(self)
+	wa.get_currency(Currency.Type.XP).gain_rate.remove_added(self)
+	wa.get_currency(Currency.Type.JUICE).gain_rate.remove_added(self)
+	wa.get_currency(Currency.Type.COIN).gain_rate.remove_added(self)
 
 
 func should_juice() -> bool:

@@ -47,8 +47,11 @@ var text_requires_update := true
 var base := {"mantissa": 1.0, "exponent": 0}
 
 
-func _init(mant = 1.0):
-	if mant is String:
+func _init(mant = 1.0, _exponent = -1):
+	if _exponent > -1:
+		mantissa = mant
+		exponent = _exponent
+	elif mant is String:
 		var scientific = mant.split("e")
 		mantissa = float(scientific[0])
 		if scientific.size() > 1:
@@ -61,8 +64,12 @@ func _init(mant = 1.0):
 	else:
 		mantissa = mant
 		exponent = 0
-	
-	calculate(self)
+	positive.changed.connect(
+		func():
+			text_requires_update = true
+			emit_change()
+	)
+	calculate(self, false)
 	base.mantissa = mantissa
 	base.exponent = exponent
 
@@ -71,28 +78,33 @@ func _init(mant = 1.0):
 func reset() -> void:
 	mantissa = base.mantissa
 	exponent = base.exponent
+	renewed.emit()
 	emit_decrease()
 	emit_increase()
 	emit_change()
-	renewed.emit()
 
 
 func change_base(new_base: float) -> void:
 	base.mantissa = new_base
 	base.exponent = 0
 	calculate(base)
+	set_to(base)
+
+
+func set_default_value(value: float) -> void:
+	change_base(value)
 
 
 func emit_change() -> void:
-	changed_cooldown.emit_sig()
+	changed_cooldown.emit()
 
 
 func emit_increase() -> void:
-	increase_cooldown.emit_sig()
+	increase_cooldown.emit()
 
 
 func emit_decrease() -> void:
-	decrease_cooldown.emit_sig()
+	decrease_cooldown.emit()
 
 
 
@@ -101,7 +113,10 @@ func type_check(n):
 		return {"mantissa":float(n), "exponent":int(0)}
 	elif n is String:
 		var split = n.split("e")
-		return {"mantissa":float(split[0]), "exponent":int(0 if split.size() == 1 else split[1])}
+		return {
+			"mantissa": float(split[0]),
+			"exponent": int(0 if split.size() == 1 else split[1])
+		}
 	return n
 
 
@@ -110,7 +125,7 @@ func a(n) -> Big:
 	if n.mantissa == 0.0 and n.exponent == 0:
 		return self
 	var exp_diff = n.exponent - exponent
-	if exp_diff < 248:
+	if exp_diff < 16:
 		var scaled_mantissa = n.mantissa * pow(10, exp_diff)
 		mantissa += scaled_mantissa
 	elif less(n):
@@ -121,12 +136,16 @@ func a(n) -> Big:
 	return self
 
 
+func add(n) -> Big:
+	return a(n)
+
+
 func s(n) -> Big:
 	n = type_check(n)
 	if n.mantissa == 0.0 and n.exponent == 0:
 		return self
 	var exp_diff = n.exponent - exponent
-	if exp_diff < 248:
+	if exp_diff < 16:
 		var scaled_mantissa = n.mantissa * pow(10, exp_diff)
 		mantissa -= scaled_mantissa
 	elif less(n):
@@ -135,6 +154,10 @@ func s(n) -> Big:
 	calculate(self)
 	emit_decrease()
 	return self
+
+
+func subtract(n) -> Big:
+	return s(n)
 
 
 func m(n) -> Big:
@@ -151,9 +174,13 @@ func m(n) -> Big:
 	calculate(self)
 	if n.mantissa > 1 or n.exponent > 0:
 		emit_increase()
-	elif n.exponent < 0:
+	elif n.mantissa < 1:
 		emit_decrease()
 	return self
+
+
+func multiply(n) -> Big:
+	return m(n)
 
 
 func d(n) -> Big:
@@ -171,8 +198,15 @@ func d(n) -> Big:
 	mantissa = new_mantissa
 	exponent = new_exponent
 	calculate(self)
-	emit_decrease()
+	if n.mantissa > 1 or n.exponent > 0:
+		emit_decrease()
+	else:
+		emit_increase()
 	return self
+
+
+func divide(n) -> Big:
+	return d(n)
 
 
 func set_to(n) -> Big:
@@ -274,7 +308,7 @@ func power(n: float) -> Big:
 	# a bit slower, still supports floats
 	var newExponent:int = int(temp)
 	var residue:float = temp - newExponent
-	var _newMantissa = pow(10, n * log10(mantissa) + residue)
+	var _newMantissa = pow(10, n * Big.log10(mantissa) + residue)
 	if _newMantissa != INF and _newMantissa != -INF:
 		mantissa = _newMantissa
 		exponent = newExponent
@@ -310,9 +344,9 @@ func modulo(n) -> Big:
 	return self
 
 
-func calculate(big):
+func calculate(big, _emit_change = true):
 	if big.mantissa >= 10.0 or big.mantissa < 1.0:
-		var diff = int(floor(log10(big.mantissa)))
+		var diff = int(floor(Big.log10(big.mantissa)))
 		if diff > -10 and diff < 248:
 			var div = pow(10, diff)
 			if div > MANTISSA_PRECISSION:
@@ -331,7 +365,7 @@ func calculate(big):
 	if big.mantissa < 0:
 		big.mantissa = 0.0
 		big.exponent = 0
-	if big is Big and big == self:
+	if _emit_change and big is Big and big == self:
 		emit_change()
 
 
@@ -401,12 +435,12 @@ func round_up_tens() -> Big:
 	return self
 
 
-func log10(x):
+static func log10(x):
 	return log(x) * 0.4342944819032518
 
 
 func absLog10():
-	return exponent + log10(abs(mantissa))
+	return exponent + Big.log10(abs(mantissa))
 
 
 func ln():
@@ -416,7 +450,7 @@ func ln():
 func logN(n):
 	if equal(0):
 		return 0.0
-	return (2.302585092994046 / log(n)) * (exponent + log10(mantissa))
+	return (2.302585092994046 / log(n)) * (exponent + Big.log10(mantissa))
 
 
 func pow10(value:int):
@@ -432,6 +466,8 @@ func toInt() -> int:
 	return int(round(mantissa * pow(10, exponent)))
 
 
+func get_value() -> Big:
+	return self
 
 
 static func get_float_text(value: float) -> String:
@@ -513,3 +549,27 @@ func format_exponent(value: int) -> String:
 		output += string[i]
 	
 	return output
+
+
+static func rand_range(_min: Big, _max: Big) -> Big:
+	var result := Big.new()
+	if _min.greater_equal(_max):
+		printerr("Big Error: _min value is larger than random float range Max!")
+		return _max
+
+	# 0 - 9,999,999 range? Do a standard randf_range
+	if _max.exponent - _min.exponent < 6:
+		result.exponent = _min.exponent
+		result.mantissa = randf_range(_min.mantissa, 10 ** (_max.exponent - _min.exponent) * _max.mantissa)
+	else:
+		result.exponent = randi_range(_min.exponent, _max.exponent)
+		if result.exponent == _min.exponent:
+			result.mantissa = randf_range(_min.mantissa, 10.0)
+		elif result.exponent == _max.exponent:
+			result.mantissa = randf_range(0.0, _max.mantissa)
+		else:
+			result.mantissa = randf_range(1.0, 10.0)
+			while is_zero_approx(result.mantissa):
+				result.mantissa = randf_range(1.0, 10.0)
+	result.calculate(result)
+	return result

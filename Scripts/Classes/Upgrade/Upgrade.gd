@@ -17,8 +17,6 @@ enum Type {
 	TOTAL_OUTPUT_RANGE01,
 	CURRENT_DURATION_RANGE01,
 	TOTAL_XP_GAIN01,
-	CURRENT_XP_INCREASE_RANGE01,
-	OUTPUT_INCREASE01,
 	OUTPUT02,
 	XP_GAIN01,
 	XP01,
@@ -27,33 +25,39 @@ enum Type {
 	CRITS_AFFECT_XP_GAIN,
 	CRIT_RANGE01,
 	CRITS_AFFECT_COIN_GAIN,
-	OUTPUT_INCREASE_RANGE_TOTAL01,
 	DURATION02,
-	DURATION03,
 	OUTPUT03,
 	COIN01,
 	CRITS_APPLY_TO_DURATION,
+	
+	
 	UNLOCK_JUICE,
-	DURATION_APPLIES_TO_XP_OUTPUT,
+	DURATION03,
+	OUTPUT_INCREASE01,
 	UNLOCK_LUCKY_CRIT,
+	DURATION_APPLIES_TO_XP_OUTPUT,
+	CURRENT_XP_INCREASE_RANGE01,
+	OUTPUT_INCREASE_RANGE_TOTAL01,
 	CRIT02,
+	CRIT_RANGE02,
+	WILL_FROM_JUICE,
 	SMART_JUICE,
+	THINGY_AUTOBUYER,
+	
 	JUICER,
 	LUCKY_CRIT2,
 	CRITS_AFFECT_COIN_GAIN2,
-	CRIT_RANGE02,
-	WILL_FROM_JUICE,
-	THINGY_AUTOBUYER,
 }
 
-@export var times_purchased := LoudInt.new(0)
+@export var times_purchased := LoudIntPair.new(0, 1)
 @export var purchased := LoudBool.new(false)
-@export var cost: Cost
+@export var price: Price
+@export var enabled := LoudBool.new(true)
 
 var type: Type
 var key: String
 var details := Details.new()
-var category: String
+var category: Book.Category
 var unlocked := LoudBool.new(true)
 var persist := Persist.new()
 var times_applied := 0
@@ -79,511 +83,519 @@ var modifier: LoudFloat
 var modifier_add := 0.0
 var modifier_multiply := 1.0
 var discord_state := ""
+var tree: UpgradeTree.Type
 
-var unlocked_tree: up.UpgradeTree.Type
+var unlocked_tree: UpgradeTree.Type
 
 
 
 func _init(_type: Type) -> void:
 	type = _type
 	key = Type.keys()[type]
-	details.name = key.capitalize()
-	times_purchased.set_limit(1)
+	if type < Type.UNLOCK_JUICE:
+		tree = UpgradeTree.Type.FIRESTARTER
+	else:
+		tree = UpgradeTree.Type.VOYAGER
+	details.set_name(key.capitalize())
 	persist.failed_persist_check.connect(reset)
 	var mod: float
 	match type:
 		Type.UNLOCK_UPGRADES:
 			discord_state = "Discovering Upgrades to their Thingy"
-			cost = Cost.new({Currency.Type.WILL: Value.new(10)})
-			details.color = up.upgrade_color
-			details.icon = bag.get_resource("upgrades")
-			unlocked_tree = up.UpgradeTree.Type.FIRESTARTER
+			price = Price.new({Currency.Type.WILL: 10})
+			details.set_color(up.upgrade_color)
+			details.set_icon(bag.get_resource("upgrades"))
+			unlocked_tree = UpgradeTree.Type.FIRESTARTER
 			persist.through_tier(4)
 		Type.HASTE01:
-			details.name = "Urgency"
-			details.description = "Duration [b]-%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({Currency.Type.WILL: Value.new(20)})
+			details.set_name("Urgency")
+			details.set_description("Duration [b]-%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({Currency.Type.WILL: 20})
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE
-			category = "subtracted"
+			category = Book.Category.SUBTRACTED
 			mod = 1.0
 		Type.OUTPUT01:
-			details.name = "Boxer"
-			details.description = wa.get_details(
+			details.set_name("Boxer")
+			details.set_description(wa.get_details(
 				Currency.Type.WILL
-			).icon_and_name + " output [b]+%s[/b]."
-			details.color = wa.get_color(Currency.Type.WILL)
-			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({Currency.Type.WILL: Value.new(30)})
+			).get_icon_and_name() + " output [b]+%s[/b].")
+			details.set_color(wa.get_color(Currency.Type.WILL))
+			details.set_icon(bag.get_resource("Boxing"))
+			price = Price.new({Currency.Type.WILL: 30})
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 1.0
 		Type.COST01:
-			details.name = "Greed"
-			details.description = "Cost [b]x%s[/b]."
-			details.icon = bag.get_resource("Coin")
-			cost = Cost.new({Currency.Type.WILL: Value.new(90)})
-			cost.increase_multiplier = 8.0
+			details.set_name("Greed")
+			details.set_description("Cost [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Coin"))
+			price = Price.new({Currency.Type.WILL: 90})
+			price.increase_modifier.set_to(8.0)
 			thingy_attribute = Thingy.Attribute.COST
-			times_purchased.set_limit(3)
-			category = "multiplied"
+			times_purchased.total.set_default_value(3)
+			category = Book.Category.MULTIPLIED
 			mod = 0.75
 		Type.UNLOCK_XP:
-			details.name = "Adventurer"
-			details.description = "Unlocks %s and Thingy levels." % wa.get_details(
+			details.set_name("Adventurer")
+			details.set_description("Unlocks %s and Thingy levels." % wa.get_details(
 				Currency.Type.XP
-			).icon_and_colored_name
-			details.color = wa.get_color(Currency.Type.XP)
-			details.icon = bag.get_resource("Star")
-			cost = Cost.new({Currency.Type.WILL: Value.new(50)})
+			).get_icon_and_colored_name())
+			details.set_color(wa.get_color(Currency.Type.XP))
+			details.set_icon(bag.get_resource("Star"))
+			price = Price.new({Currency.Type.WILL: 50})
 		Type.UNLOCK_RPG_TREE:
 			discord_state = "About to reset their Thingy"
 			required_upgrade = Type.UNLOCK_XP
-			unlocked_tree = up.UpgradeTree.Type.VOYAGER
-			details.name = "Voyager"
-			details.icon = up.get_upgrade_tree(unlocked_tree).details.icon
-			cost = Cost.new({
-				Currency.Type.WILL: Value.new(100000),
-				Currency.Type.COIN: Value.new(250),
+			unlocked_tree = UpgradeTree.Type.VOYAGER
+			details.set_name("Voyager")
+			details.set_icon(up.get_upgrade_tree(unlocked_tree).details.get_icon())
+			price = Price.new({
+				Currency.Type.WILL: 100000,
+				Currency.Type.COIN: 250,
 			})
 			persist.through_tier(1)
 		Type.UNLOCK_CRIT:
 			discord_state = "Their Thingy can score Critical Hits!"
-			details.name = "Low Roller"
-			details.description = "Crit chance [b]+%s%%[/b]."
-			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({Currency.Type.XP: Value.new(100)})
+			details.set_name("Low Roller")
+			details.set_description("Crit chance [b]+%s%%[/b].")
+			details.set_icon(bag.get_resource("Dice"))
+			price = Price.new({Currency.Type.XP: 100})
 			thingy_attribute = Thingy.Attribute.CRIT
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 5.0
 		Type.CRITS_GIVE_GOLD:
 			discord_state = "Earning money from their Thingy"
 			required_upgrade = Type.UNLOCK_CRIT
-			details.name = "Cat Burglar"
-			details.description = "All crits produce up to %s " + wa.get_details(
+			details.set_name("Cat Burglar")
+			details.set_description("All crits produce up to %s " + wa.get_details(
 				Currency.Type.COIN
-			).icon_and_colored_name + "."
-			details.color = wa.get_color(Currency.Type.COIN)
-			details.icon = bag.get_resource("Coin Hand")
-			cost = Cost.new({Currency.Type.WILL: Value.new(300)})
-			cost.increase_multiplier = 10.0
-			times_purchased.set_limit(3)
+			).get_icon_and_colored_name() + ".")
+			details.set_color(wa.get_color(Currency.Type.COIN))
+			details.set_icon(bag.get_resource("Coin Hand"))
+			price = Price.new({Currency.Type.WILL: 300})
+			price.increase_modifier.set_to(10.0)
+			times_purchased.total.set_default_value(3)
 			mod = 1.0
 			thingy_attribute = Thingy.Attribute.CRIT_COIN_OUTPUT_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 		Type.CRIT01:
 			required_upgrade = Type.UNLOCK_CRIT
-			details.name = "Die, Son!"
-			details.description = "Crit chance [b]+%s%%[/b]."
-			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({Currency.Type.COIN: Value.new(1)})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			details.set_name("Die, Son!")
+			details.set_description("Crit chance [b]+%s%%[/b].")
+			details.set_icon(bag.get_resource("Dice"))
+			price = Price.new({Currency.Type.COIN: 1})
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			mod = 1.0
 			thingy_attribute = Thingy.Attribute.CRIT
-			category = "added"
+			category = Book.Category.ADDED
 		Type.TOTAL_OUTPUT_RANGE01:
 			required_upgrade = Type.UNLOCK_CRIT
-			details.name = "Beg"
-			details.description = "Maximum " + wa.get_details(
+			details.set_name("Beg")
+			details.set_description("Maximum " + wa.get_details(
 				Currency.Type.WILL
-			).icon_and_name + " output [b]+%s[/b]."
-			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({Currency.Type.COIN: Value.new(5)})
-			cost.increase_multiplier = 3.0
-			times_purchased.set_limit(3)
+			).get_icon_and_name() + " output [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Boxing"))
+			price = Price.new({Currency.Type.COIN: 5})
+			price.increase_modifier.set_to(3.0)
+			times_purchased.total.set_default_value(3)
 			mod = 1.0
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 		Type.CURRENT_DURATION_RANGE01:
 			required_upgrade = Type.UNLOCK_CRIT
-			details.name = "Time Bandit"
-			details.description = "Minimum duration [b]x%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({Currency.Type.COIN: Value.new(3)})
-			cost.increase_multiplier = 2
-			times_purchased.set_limit(5)
+			details.set_name("Time Bandit")
+			details.set_description("Minimum duration [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({Currency.Type.COIN: 3})
+			price.increase_modifier.set_to(2)
+			times_purchased.total.set_default_value(5)
 			mod = 0.9
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE_CURRENT
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 		Type.TOTAL_XP_GAIN01:
 			required_upgrade = Type.CRIT01
-			details.name = "One-on-One"
-			details.description = "Maximum " + (
-				wa.get_details(Currency.Type.XP).icon_and_name
-			) + " output [b]+%s[/b]."
-			details.icon = bag.get_resource("Star")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(40),
-				Currency.Type.COIN: Value.new(1)
+			details.set_name("One-on-One")
+			details.set_description("Maximum " + (
+				wa.get_details(Currency.Type.XP).get_icon_and_name()
+			) + " output [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Star"))
+			price = Price.new({
+				Currency.Type.XP: 250,
+				Currency.Type.COIN: 5,
 			})
-			cost.increase_multiplier = 5
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(3)
+			times_purchased.total.set_default_value(5)
 			mod = 1
 			thingy_attribute = Thingy.Attribute.XP_OUTPUT_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 		Type.CURRENT_XP_INCREASE_RANGE01:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Inheritance"
-			details.description = "Minimum " + (
-				wa.get_details(Currency.Type.XP).icon_and_name
-			) + " increase [b]-%s[/b]."
-			details.icon = bag.get_resource("Arrow Up Fill")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(1)
+			details.set_name("Inheritance")
+			details.set_description("Minimum " + (
+				wa.get_details(Currency.Type.XP).get_icon_and_name()
+			) + " increase [b]-%s[/b].")
+			details.set_icon(bag.get_resource("Arrow Up Fill"))
+			price = Price.new({
+				Currency.Type.SOUL: 1,
 			})
-			cost.increase_multiplier = 3
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(3)
+			times_purchased.total.set_default_value(5)
 			mod = 0.03
 			thingy_attribute = Thingy.Attribute.CURRENT_XP_INCREASE_RANGE
-			category = "subtracted"
+			category = Book.Category.SUBTRACTED
 		Type.OUTPUT_INCREASE01:
-			details.name = "The Thinker"
-			details.description = wa.get_details(
+			details.set_name("The Thinker")
+			details.set_description(wa.get_details(
 				Currency.Type.WILL
-			).icon_and_name + " output increase [b]+%s[/b]."
-			details.icon = bag.get_resource("Brain")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(1)
+			).get_icon_and_name() + " output increase [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Brain"))
+			price = Price.new({
+				Currency.Type.SOUL: 1,
 			})
-			cost.increase_multiplier = 3.0
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(3.0)
+			times_purchased.total.set_default_value(3)
 			mod = 0.05
 			thingy_attribute = Thingy.Attribute.OUTPUT_INCREASE_RANGE
-			category = "added"
+			category = Book.Category.ADDED
 		Type.OUTPUT02:
 			required_upgrade = Type.UNLOCK_XP
-			details.name = "Randy Orton"
-			details.description = wa.get_details(
+			details.set_name("Randy Orton")
+			details.set_description(wa.get_details(
 				Currency.Type.WILL
-			).icon_and_name + " output [b]x%s[/b]."
-			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(25),
-				Currency.Type.WILL: Value.new(125)
+			).get_icon_and_name() + " output [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Boxing"))
+			price = Price.new({
+				Currency.Type.XP: 25,
+				Currency.Type.WILL: 125,
 			})
-			cost.increase_multiplier = 5.0
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(5.0)
+			times_purchased.total.set_default_value(5)
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 			mod = 1.5
 		Type.XP_GAIN01:
 			required_upgrade = Type.CRIT01
-			details.name = "How to Google"
-			details.description = wa.get_details(Currency.Type.XP).icon_and_name
-			details.description += " output [b]+%s[/b]."
-			details.icon = bag.get_resource("Star")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(100),
+			details.set_name("How to Google")
+			details.set_description(
+				wa.get_details(Currency.Type.XP).get_icon_and_name() + (
+					" output [b]+%s[/b]."
+				)
+			)
+			details.set_icon(bag.get_resource("Star"))
+			price = Price.new({
+				Currency.Type.XP: 300,
 			})
-			cost.increase_multiplier = 2.5
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(3)
 			thingy_attribute = Thingy.Attribute.XP_OUTPUT
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 1
 		Type.XP01:
 			required_upgrade = Type.CRITS_AFFECT_XP_GAIN
-			details.name = "Fast Pass"
-			details.description = "Total " + (
-				wa.get_details(Currency.Type.XP).icon_and_name
-			) + " required [b]x%s[/b]."
-			details.icon = bag.get_resource("Star")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(100),
-				Currency.Type.WILL: Value.new(2500),
-				Currency.Type.COIN: Value.new(1)
+			details.set_name("Fast Pass")
+			details.set_description("Total " + (
+				wa.get_details(Currency.Type.XP).get_icon_and_name()
+			) + " required [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Star"))
+			price = Price.new({
+				Currency.Type.XP: 100,
+				Currency.Type.WILL: 2500,
+				Currency.Type.COIN: 1,
 			})
-			cost.increase_multiplier = 4.0
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(4.0)
+			times_purchased.total.set_default_value(3)
 			thingy_attribute = Thingy.Attribute.XP
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 			mod = 0.75
 		Type.DURATION01:
 			discord_state = "Faster! Faster!"
 			required_upgrade = Type.CRITS_AFFECT_XP_GAIN
-			details.name = "Angst"
-			details.description = "Duration [b]x%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(120),
-				Currency.Type.WILL: Value.new(3500),
+			details.set_name("Angst")
+			details.set_description("Duration [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.XP: 120,
+				Currency.Type.WILL: 3500,
 			})
-			cost.increase_multiplier = 4.0
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(4.0)
+			times_purchased.total.set_default_value(3)
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 			mod = 0.75
 		Type.DURATION_INCREASE01:
 			required_upgrade = Type.CRIT01
-			details.name = "Consideration"
-			details.description = "Minimum duration increase [b]-%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(50),
-				Currency.Type.WILL: Value.new(4000),
-				Currency.Type.COIN: Value.new(15),
+			details.set_name("Consideration")
+			details.set_description("Minimum duration increase [b]-%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.XP: 50,
+				Currency.Type.WILL: 4000,
+				Currency.Type.COIN: 15,
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			thingy_attribute = Thingy.Attribute.DURATION_INCREASE_RANGE_CURRENT
-			category = "subtracted"
+			category = Book.Category.SUBTRACTED
 			mod = 0.02
 		Type.CRITS_AFFECT_XP_GAIN:
 			required_upgrade = Type.CRIT01
-			details.name = "Rogue and Scholar"
-			details.description = "Crits multiply %s output." % (
-				wa.get_details(Currency.Type.XP).icon_and_name
-			)
-			details.icon = bag.get_resource("Star")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new(250),
-				Currency.Type.WILL: Value.new(1000),
+			details.set_name("Rogue and Scholar")
+			details.set_description("Crits multiply %s output." % (
+				wa.get_details(Currency.Type.XP).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Star"))
+			price = Price.new({
+				Currency.Type.XP: 250,
+				Currency.Type.WILL: 1000,
 			})
 		Type.CRITS_AFFECT_COIN_GAIN:
 			required_upgrade = Type.CRIT01
-			details.name = "Through and Through"
-			details.description = "Crits multiply %s output." % (
-				wa.get_details(Currency.Type.COIN).icon_and_name
-			)
-			details.icon = bag.get_resource("Coin")
-			cost = Cost.new({
-				Currency.Type.COIN: Value.new(25),
+			details.set_name("Through and Through")
+			details.set_description("Crits multiply %s output." % (
+				wa.get_details(Currency.Type.COIN).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Coin"))
+			price = Price.new({
+				Currency.Type.COIN: 25,
 			})
 		Type.CRIT_RANGE01:
 			required_upgrade = Type.CRIT01
-			details.name = "Venemous"
-			details.description = "Maximum crit multiplier [b]+%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({
-				Currency.Type.COIN: Value.new(8),
-				Currency.Type.WILL: Value.new(3000),
+			details.set_name("Venemous")
+			details.set_description("Maximum crit multiplier [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.COIN: 8,
+				Currency.Type.WILL: 3000,
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			thingy_attribute = Thingy.Attribute.CRIT_RANGE_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 0.1
 		Type.OUTPUT_INCREASE_RANGE_TOTAL01:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Puncture"
-			details.description = "Maximum " + wa.get_details(
+			details.set_name("Puncture")
+			details.set_description("Maximum " + wa.get_details(
 				Currency.Type.WILL
-			).icon_and_name + " output increase [b]+%s[/b]."
-			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(3),
+			).get_icon_and_name() + " output increase [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Boxing"))
+			price = Price.new({
+				Currency.Type.SOUL: 3,
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(4)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(4)
 			thingy_attribute = Thingy.Attribute.OUTPUT_INCREASE_RANGE_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 0.05
 		Type.DURATION02:
 			required_upgrade = Type.CRIT01
-			details.name = "Mood Swing"
-			details.description = "Minimum duration [b]-%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({
-				Currency.Type.COIN: Value.new(20),
-				Currency.Type.WILL: Value.new(20000),
+			details.set_name("Mood Swing")
+			details.set_description("Minimum duration [b]-%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.COIN: 20,
+				Currency.Type.WILL: 20000,
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(3)
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE_CURRENT
-			category = "subtracted"
+			category = Book.Category.SUBTRACTED
 			mod = 1
 		Type.DURATION03:
-			details.name = "[i]Rapido![/i]"
-			details.description = "Duration [b]x%s[/b]."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(1),
+			details.set_name("[i]Rapido![/i]")
+			details.set_description("Duration [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.SOUL: 1,
 			})
-			cost.increase_multiplier = 10.0
-			times_purchased.set_limit(2)
+			price.increase_modifier.set_to(10.0)
+			times_purchased.total.set_default_value(2)
 			thingy_attribute = Thingy.Attribute.DURATION_RANGE
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 			mod = 0.5
 		Type.OUTPUT03:
 			required_upgrade = Type.TOTAL_OUTPUT_RANGE01
-			details.name = "Batter"
-			details.description = wa.get_details(
+			details.set_name("Batter")
+			details.set_description(wa.get_details(
 				Currency.Type.WILL
-			).icon_and_name + " output [b]x%s[/b]."
-			details.icon = bag.get_resource("Boxing")
-			cost = Cost.new({
-				Currency.Type.WILL: Value.new(10000),
+			).get_icon_and_name() + " output [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Boxing"))
+			price = Price.new({
+				Currency.Type.WILL: 10000,
 			})
-			cost.increase_multiplier = 4.0
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(4.0)
+			times_purchased.total.set_default_value(3)
 			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 			mod = 1.5
 		Type.COIN01:
 			required_upgrade = Type.CRITS_GIVE_GOLD
-			details.name = "Fiscal"
-			details.description = wa.get_details(
+			details.set_name("Fiscal")
+			details.set_description(wa.get_details(
 				Currency.Type.COIN
-			).icon_and_name + " output [b]+%s[/b]."
-			details.icon = bag.get_resource("Coin")
-			cost = Cost.new({
-				Currency.Type.WILL: Value.new(50000),
+			).get_icon_and_name() + " output [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Coin"))
+			price = Price.new({
+				Currency.Type.WILL: 50000,
 			})
 			thingy_attribute = Thingy.Attribute.CRIT_COIN_OUTPUT
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 1
 		Type.CRITS_APPLY_TO_DURATION:
 			required_upgrade = Type.CRITS_AFFECT_COIN_GAIN
-			details.name = "Theif's Gait"
-			details.description = "Crits divide duration."
-			details.icon = bag.get_resource("Speed")
-			cost = Cost.new({
-				Currency.Type.COIN: Value.new(100),
+			details.set_name("Theif's Gait")
+			details.set_description("Crits divide duration.")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.COIN: 100,
 			})
 		Type.UNLOCK_JUICE:
 			discord_state = "Their Thingy is really Juicy."
-			details.name = "Unlock Juice"
-			details.description = "Thingies may produce and consume %s to become [i][wave amp=20 freq=2]juiced![/wave][/i], halving duration and doubling primary output. If none is available to drink, they will produce it." % (
-				wa.get_details(Currency.Type.JUICE).icon_and_name
-			)
-			details.icon = bag.get_resource("Juice")
-			details.color = wa.get_color(Currency.Type.JUICE)
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new("1"),
+			details.set_name("Unlock Juice")
+			details.set_description("Thingies may produce and consume %s to become [i][wave amp=20 freq=2]juiced![/wave][/i], halving duration and doubling primary output. If none is available to drink, they will produce it." % (
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Juice"))
+			details.set_color(wa.get_color(Currency.Type.JUICE))
+			price = Price.new({
+				Currency.Type.SOUL: "1",
 			})
 		Type.SMART_JUICE:
 			discord_state = "This is one highly intelligent Thingy!"
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Intellijuice"
-			details.description = "Thingies will all work together to ensure that there is sufficient %s for any task." % (
-				wa.get_details(Currency.Type.JUICE).icon_and_name
-			)
-			details.icon = bag.get_resource("Shake Hands")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(50),
+			details.set_name("Intellijuice")
+			details.set_description("Thingies will all work together to ensure that there is sufficient %s for any task." % (
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Shake Hands"))
+			price = Price.new({
+				Currency.Type.SOUL: 50,
 			})
 		Type.XP02:
 			required_upgrade = Type.XP_GAIN01
-			details.name = "Smarty Pants"
-			details.description = wa.get_details(
+			details.set_name("Smarty Pants")
+			details.set_description(wa.get_details(
 				Currency.Type.XP
-			).icon_and_name + " output [b]x%s[/b]."
-			details.icon = bag.get_resource("Star")
-			cost = Cost.new({
-				Currency.Type.WILL: Value.new(20000),
+			).get_icon_and_name() + " output [b]x%s[/b].")
+			details.set_icon(bag.get_resource("Star"))
+			price = Price.new({
+				Currency.Type.WILL: 20000,
 			})
-			cost.increase_multiplier = 4.0
-			times_purchased.set_limit(3)
+			price.increase_modifier.set_to(4.0)
+			times_purchased.total.set_default_value(3)
 			thingy_attribute = Thingy.Attribute.XP_OUTPUT
-			category = "multiplied"
+			category = Book.Category.MULTIPLIED
 			mod = 1.5
 		Type.DURATION_APPLIES_TO_XP_OUTPUT:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Learned"
-			details.description = "Duration multiplies %s output." % (
-				wa.get_details(Currency.Type.XP).icon_and_name
-			)
-			details.icon = bag.get_resource("Book")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(5),
+			details.set_name("Learned")
+			details.set_description("Duration multiplies %s output." % (
+				wa.get_details(Currency.Type.XP).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Book"))
+			price = Price.new({
+				Currency.Type.SOUL: 5,
 			})
 		Type.WILL_FROM_JUICE:
 			required_upgrade = Type.SMART_JUICE
-			details.name = "Orange Juice"
-			details.description = "You gain 100%% of your current %s " % (
-				wa.get_details(Currency.Type.JUICE).icon_and_name
+			details.set_name("Orange Juice")
+			details.set_description("You gain 100%% of your current %s " % (
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name()
 			) + " as %s per second." % (
-				wa.get_details(Currency.Type.WILL).icon_and_name
-			)
-			details.icon = bag.get_resource("Heart")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(25),
+				wa.get_details(Currency.Type.WILL).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Heart"))
+			price = Price.new({
+				Currency.Type.SOUL: 25,
 			})
 		Type.UNLOCK_LUCKY_CRIT:
-			details.name = "Lucky Crit"
-			details.description = "Successful crits and lucky crits have a chance to roll for another crit, called a [i][wave amp=20 freq=2]lucky crit![/wave][/i] Crit multiplier will stack. Lucky crit chance [b]+%s%%[/b]."
-			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(1),
+			details.set_name("Lucky Crit")
+			details.set_description("Successful crits and lucky crits have a chance to roll for another crit, called a [i][wave amp=20 freq=2]lucky crit![/wave][/i] Crit multiplier will stack. Lucky crit chance [b]+%s%%[/b].")
+			details.set_icon(bag.get_resource("Dice"))
+			price = Price.new({
+				Currency.Type.SOUL: 1,
 			})
 			mod = 5.0
 			thingy_attribute = Thingy.Attribute.CRIT_CRIT
-			category = "added"
+			category = Book.Category.ADDED
 		Type.CRIT02:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Slay"
-			details.description = "Crit chance [b]+%s%%[/b]."
-			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(4),
+			details.set_name("Slay")
+			details.set_description("Crit chance [b]+%s%%[/b].")
+			details.set_icon(bag.get_resource("Dice"))
+			price = Price.new({
+				Currency.Type.SOUL: 4,
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			mod = 1.0
 			thingy_attribute = Thingy.Attribute.CRIT
-			category = "added"
+			category = Book.Category.ADDED
 		Type.JUICER:
 			required_upgrade = Type.UNLOCK_JUICE
-			details.name = "I'm da Juica, Baby!"
-			details.description = "Max %s output " % (
-				wa.get_details(Currency.Type.JUICE).icon_and_name
-			) + "[b]+%s[/b]."
-			details.icon = bag.get_resource("Juice")
-			cost = Cost.new({
-				Currency.Type.XP: Value.new("2e3"),
-				Currency.Type.COIN: Value.new("60"),
+			details.set_name("I'm da Juica, Baby!")
+			details.set_description("Max %s output " % (
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name()
+			) + "[b]+%s[/b].")
+			details.set_icon(bag.get_resource("Juice"))
+			price = Price.new({
+				Currency.Type.XP: "2e3",
+				Currency.Type.COIN: "60",
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			mod = 0.1
 			thingy_attribute = Thingy.Attribute.JUICE_OUTPUT_RANGE_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 		Type.LUCKY_CRIT2:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Isn't gambling illegal?"
-			details.description = "Lucky crit chance [b]+%s%%[/b]."
-			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({Currency.Type.WILL: Value.new("5e6")})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			details.set_name("Isn't gambling illegal?")
+			details.set_description("Lucky crit chance [b]+%s%%[/b].")
+			details.set_icon(bag.get_resource("Dice"))
+			price = Price.new({Currency.Type.WILL: "5e6"})
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			mod = 1.0
 			thingy_attribute = Thingy.Attribute.CRIT_CRIT
-			category = "added"
+			category = Book.Category.ADDED
 		Type.CRITS_AFFECT_COIN_GAIN2:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Wealth of Luck"
-			details.description = "Crits multiply %s output a second time." % (
-				wa.get_details(Currency.Type.COIN).icon_and_name
-			)
-			details.icon = bag.get_resource("Coin Hand")
-			cost = Cost.new({
-				Currency.Type.COIN: Value.new(1666),
+			details.set_name("Wealth of Luck")
+			details.set_description("Crits multiply %s output a second time." % (
+				wa.get_details(Currency.Type.COIN).get_icon_and_name()
+			))
+			details.set_icon(bag.get_resource("Coin Hand"))
+			price = Price.new({
+				Currency.Type.COIN: 1666,
 			})
 		Type.CRIT_RANGE02:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "[i]Freak Out![/i]"
-			details.description = "Maximum crit multiplier [b]+%s[/b]."
-			details.icon = bag.get_resource("Dice")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(3),
+			details.set_name("[i]Freak Out![/i]")
+			details.set_description("Maximum crit multiplier [b]+%s[/b].")
+			details.set_icon(bag.get_resource("Dice"))
+			price = Price.new({
+				Currency.Type.SOUL: 3,
 			})
-			cost.increase_multiplier = 2.0
-			times_purchased.set_limit(5)
+			price.increase_modifier.set_to(2.0)
+			times_purchased.total.set_default_value(5)
 			thingy_attribute = Thingy.Attribute.CRIT_RANGE_TOTAL
-			category = "added"
+			category = Book.Category.ADDED
 			mod = 0.1
 		Type.THINGY_AUTOBUYER:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
-			details.name = "Idle Hands"
-			details.description = "Automatically purchases Thingies."
-			details.icon = bag.get_resource("Refresh")
-			cost = Cost.new({
-				Currency.Type.SOUL: Value.new(10),
+			details.set_name("Idle Hands")
+			details.set_description("Automatically purchases Thingies.")
+			details.set_icon(bag.get_resource("Refresh"))
+			price = Price.new({
+				Currency.Type.SOUL: 10,
 			})
+	times_purchased.total.reset()
 	
 	#if "JUICE" in Thingy.Attribute.keys()[thingy_attribute]:
-		#details.color = wa.get_color(Currency.Type.JUICE)
-		#details.color = wa.get_color(Currency.Type.XP)
+		#details.set_color(wa.get_color(Currency.Type.JUICE)
+		#details.set_color(wa.get_color(Currency.Type.XP)
 	
 	match thingy_attribute:
 		Thingy.Attribute.JUICE_OUTPUT_RANGE:
@@ -680,35 +692,35 @@ func _init(_type: Type) -> void:
 			thingy_attributes_to_edit.append(th.crit_coin_output.total)
 		Thingy.Attribute.COST:
 			await th.initialized
-			for cur in th.cost.amount:
-				thingy_attributes_to_edit.append(th.cost.amount[cur])
+			for cur in th.price.price:
+				thingy_attributes_to_edit.append(th.price.price[cur])
 	
-	if unlocked_tree != up.UpgradeTree.Type.NONE:
+	if unlocked_tree != UpgradeTree.Type.NONE:
 		var tree = up.get_upgrade_tree(unlocked_tree)
-		details.color = tree.details.color
+		details.set_color(tree.details.get_color())
 		if type != Type.UNLOCK_UPGRADES:
-			details.icon = tree.details.icon
-		if details.description == "":
-			details.description = "Unlock %s upgrades." % tree.details.icon_and_name
+			details.set_icon(tree.details.get_icon())
+		if details.get_description() == "":
+			details.set_description("Unlock %s upgrades." % tree.details.get_icon_and_name())
 		match type:
 			Type.UNLOCK_RPG_TREE:
-				details.description = details.description.rstrip(".") + (
+				details.set_description(details.get_description().rstrip(".") + (
 					" and %s." % (
-						wa.get_details(Currency.Type.SOUL).icon_and_name
+						wa.get_details(Currency.Type.SOUL).get_icon_and_name()
 					)
-				)
+				))
 	
 	match category:
-		"added", "subtracted":
+		Book.Category.ADDED, Book.Category.SUBTRACTED:
 			modifier_add = mod
 			modifier = LoudFloat.new(0)
-		"multiplied", "divided":
+		Book.Category.MULTIPLIED, Book.Category.DIVIDED:
 			modifier_multiply = mod
 			modifier = LoudFloat.new(1)
 	times_purchased.changed.connect(times_purchased_changed)
-	times_purchased.increased.connect(times_purchased_increased)
-	if not details.color:
-		details.color = gv.get_random_nondark_color()
+	times_purchased.current.increased.connect(times_purchased_increased)
+	if not details.is_color_set():
+		details.set_color(gv.get_random_nondark_color())
 	if modifier:
 		modifier.changed.connect(modifier_changed)
 
@@ -718,11 +730,11 @@ func _init(_type: Type) -> void:
 
 
 func times_purchased_changed() -> void:
-	if times_purchased.less_than_limit():
+	if times_purchased.full.is_false():
 		purchased.set_to(false)
 	else:
 		purchased.set_to(true)
-	if times_purchased.equal(0):
+	if times_purchased.current.equal(0):
 		times_applied = 0
 		if modifier:
 			modifier.reset()
@@ -734,6 +746,7 @@ func times_purchased_changed() -> void:
 func times_purchased_increased() -> void:
 	if modifier:
 		while times_applied < times_purchased.get_value():
+			times_applied += 1
 			modifier.add(modifier_add)
 			modifier.multiply(modifier_multiply)
 	else:
@@ -743,7 +756,7 @@ func times_purchased_increased() -> void:
 
 
 func modifier_changed() -> void:
-	if times_purchased.equal(0):
+	if times_purchased.current.equal(0):
 		remove()
 	else:
 		apply()
@@ -754,26 +767,26 @@ func modifier_changed() -> void:
 
 
 func purchase() -> void:
-	cost.purchase()
+	price.purchase()
 	times_purchased.add(1)
-	if times_purchased.at_limit():
+	if times_purchased.is_full():
 		return
 
 
 func reset() -> void:
 	remove()
 	times_purchased.reset()
-	cost.reset_now()
+	price.reset()
 
 
 func remove() -> void:
 	for att in thingy_attributes_to_edit:
 		att.remove_change(category, self)
-	if unlocked_tree != up.UpgradeTree.Type.NONE:
+	if unlocked_tree != UpgradeTree.Type.NONE:
 		up.upgrade_trees[unlocked_tree].unlocked.set_to(false)
 	match type:
 		Type.THINGY_AUTOBUYER:
-			th.autobuyer.left.set_to(false)
+			th.autobuyer_unlocked.set_to(false)
 		Type.SMART_JUICE:
 			th.smart_juice.set_to(false)
 		Type.WILL_FROM_JUICE:
@@ -801,11 +814,11 @@ func remove() -> void:
 func apply() -> void:
 	for att in thingy_attributes_to_edit:
 		att.edit_change(category, self, modifier.get_value())
-	if unlocked_tree != up.UpgradeTree.Type.NONE:
+	if unlocked_tree != UpgradeTree.Type.NONE:
 		up.upgrade_trees[unlocked_tree].unlocked.set_to(true)
 	match type:
 		Type.THINGY_AUTOBUYER:
-			th.autobuyer.left.set_to(true)
+			th.autobuyer_unlocked.set_to(true)
 		Type.SMART_JUICE:
 			th.smart_juice.set_to(true)
 		Type.WILL_FROM_JUICE:
@@ -837,7 +850,7 @@ func apply() -> void:
 
 
 func can_afford() -> bool:
-	return cost.affordable.is_true() or gv.dev_mode
+	return price.can_afford() or gv.dev_mode
 
 
 func can_purchase() -> bool:
@@ -845,35 +858,35 @@ func can_purchase() -> bool:
 
 
 func get_purchase_limit() -> int:
-	return times_purchased.limit
+	return times_purchased.get_total()
 
 
 func get_description() -> String:
 	if modifier:
-		if times_purchased.equal(0):
+		if times_purchased.current.equal(0):
 			if (
 				thingy_attribute in [
 					Thingy.Attribute.DURATION_RANGE,
 					Thingy.Attribute.DURATION_RANGE_CURRENT
 				]
-				and category in ["subtracted", "added"]
+				and Book.is_category_additive(category)
 			):
-				return details.description % tp.quick_parse(
+				return details.get_description() % tp.quick_parse(
 					(modifier.get_value() + modifier_add) * modifier_multiply,
 					false
 				)
-			return details.description % Big.get_float_text(
+			return details.get_description() % Big.get_float_text(
 				(modifier.get_value() + modifier_add) * modifier_multiply
 			)
-		if times_purchased.less_than_limit():
-			var text = details.description % "%s -> %s"
+		if times_purchased.full.is_false():
+			var text = details.get_description() % "%s -> %s"
 			if thingy_attribute != Thingy.Attribute.NONE:
 				if (
 					thingy_attribute in [
 						Thingy.Attribute.DURATION_RANGE,
 						Thingy.Attribute.DURATION_RANGE_CURRENT
 					]
-					and category in ["subtracted", "added"]
+					and Book.is_category_additive(category)
 				):
 					if thingy_attribute == Thingy.Attribute.DURATION_RANGE:
 						return text % [
@@ -888,7 +901,7 @@ func get_description() -> String:
 						Thingy.Attribute.CRIT,
 						Thingy.Attribute.CRIT_CRIT,
 					]:
-						text = details.description % "%s -> %s%"
+						text = details.get_description() % "%s -> %s%"
 			return text % [
 				modifier.get_text(),
 				Big.get_float_text(
@@ -899,8 +912,8 @@ func get_description() -> String:
 			thingy_attribute in [
 				Thingy.Attribute.DURATION_RANGE,
 				Thingy.Attribute.DURATION_RANGE_CURRENT
-			] and category in ["subtracted", "added"]
+			] and Book.is_category_additive(category)
 		):
-			return details.description % tp.quick_parse(modifier.get_value(), false)
-		return details.description % modifier.get_text()
-	return details.description
+			return details.get_description() % tp.quick_parse(modifier.get_value(), false)
+		return details.get_description() % modifier.get_text()
+	return details.get_description()

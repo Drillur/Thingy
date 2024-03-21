@@ -3,62 +3,60 @@ extends Resource
 
 
 
-var saved_vars := [
-	"current",
-	"total",
-]
-
-signal filled
-signal emptied
+@export var current: Value
+@export var saved_total: Big
 
 var cap_current := true
-@export var current: Value
 var total: Value
 
-var full := false:
-	set(val):
-		if full != val:
-			full = val
-			if val:
-				filled.emit()
-
-var empty := false:
-	set(val):
-		if empty != val:
-			empty = val
-			if val:
-				emptied.emit()
+var full := LoudBool.new(false)
+var empty := LoudBool.new(false)
 
 
 
-func _init(base_value = 1.0) -> void:
+func _init(base_value = 1.0, base_total = base_value) -> void:
 	current = Value.new(base_value)
-	total = Value.new(base_value)
+	total = Value.new(base_total)
 	
 	current.changed.connect(emit_changed)
-	current.increased.connect(check_if_full)
+	current.changed.connect(check_if_full)
 	current.decreased.connect(check_if_empty)
 	total.changed.connect(emit_changed)
 	total.changed.connect(check_if_full)
 	total.changed.connect(check_if_empty)
+	
+	check_if_full()
+	check_if_empty()
+	SaveManager.loading.became_false.connect(load_finished)
 
 
 
-# - Signals
+#region Signals
+
+
+func load_finished() -> void:
+	if saved_total:
+		total.set_to(saved_total)
+	if cap_current:
+		check_if_full()
 
 
 func check_if_full() -> void:
-	if current.current.greater_equal(total.current):
-		full = true
+	if get_current().greater(get_total()):
+		if cap_current:
+			fill()
+		full.set_true()
+	elif get_current().equal(get_total()):
+		full.set_true()
 	else:
-		full = false
+		full.set_false()
 
 
 func check_if_empty() -> void:
-	if current.current.equal(0):
-		empty = true
-	else:
-		empty = false
+	empty.set_to(current.equal(0))
+
+
+#endregion
 
 
 
@@ -84,11 +82,14 @@ func add(amount) -> void:
 	current.add(amount)
 
 
+func add_one() -> void:
+	add(1)
+
+
 func subtract(amount) -> void:
 	if not amount is Big:
 		amount = Big.new(amount)
 	current.subtract(amount)
-	full = false
 
 
 func add_percent(percent: float) -> void:
@@ -164,7 +165,7 @@ func set_to(amount) -> void:
 	if not amount is Big:
 		amount = Big.new(amount)
 	current.set_to(amount)
-	if full and cap_current:
+	if full.is_true() and cap_current:
 		current.set_to(get_total())
 
 
@@ -174,24 +175,41 @@ func set_to_percent(percent: float, with_random_range := false) -> void:
 	set_to(Big.new(get_total()).m(multiplier))
 
 
-func fill_up() -> void:
-	if not full:
+func fill() -> void:
+	if full.is_false():
 		set_to(get_total())
+
+
+func save_total() -> void:
+	saved_total = get_total()
 
 
 
 # - Get
+
+
+func get_current() -> Big:
+	return current.current
+
 
 func get_value() -> Big:
 	return get_current()
 
 
 func get_current_percent() -> float:
-	return current.current.percent(total.current)
+	return current.current.percent(get_total())
 
 
-func get_x_percent(percent: float) -> Big:
-	return Big.new(get_total()).m(percent)
+func get_pending() -> Big:
+	return current.get_pending()
+
+
+func get_pending_percent() -> float:
+	return current.get_effective_amount().percent(get_total())
+
+
+func get_x_percent(float_between_0_and_1: float) -> Big:
+	return Big.new(get_total()).m(float_between_0_and_1)
 
 
 func get_x_percent_text(percent: float) -> String:
@@ -200,6 +218,18 @@ func get_x_percent_text(percent: float) -> String:
 
 func get_randomized_total(min_range := 0.8, max_range := 1.2) -> Big:
 	return Big.new(get_total()).m(randf_range(min_range, max_range))
+
+
+func get_midpoint() -> Big:
+	if full.is_true():
+		return get_total()
+	return Big.new(get_current()).a(get_total()).d(2)
+
+
+func get_random_point() -> Big:
+	if full.is_true():
+		return get_total()
+	return Big.new(randf_range(get_current().toFloat(), get_total().toFloat()))
 
 
 func get_total() -> Big:
@@ -216,10 +246,6 @@ func get_as_float() -> float:
 
 func get_as_int() -> int:
 	return total.get_as_int()
-
-
-func get_current() -> Big:
-	return current.current
 
 
 func get_current_text() -> String:
@@ -262,3 +288,16 @@ func is_full() -> bool:
 
 func is_not_full() -> bool:
 	return not is_full()
+
+
+
+
+#region Dev
+
+
+func report() -> void:
+	printt("Report for ValuePair ", self, " - Current/Total:")
+	current.report()
+	total.report()
+	printt("- - -")
+#endregion

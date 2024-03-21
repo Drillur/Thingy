@@ -13,6 +13,7 @@ var game_has_focus := LoudBool.new(true)
 func _ready() -> void:
 	game_has_focus.became_false.connect(game_lost_focus)
 	game_has_focus.became_true.connect(game_gained_focus)
+	setup_clock()
 	session_tracker()
 	setup_reset()
 	setup_discord()
@@ -75,6 +76,23 @@ func get_random_nondark_color() -> Color:
 	return color
 
 
+func get_list_text_from_array(arr: Array) -> String:
+	var text := ""
+	var size = arr.size()
+	var i = 0
+	while size >= 1:
+		text += arr[i]
+		if size >= 3:
+			text += ", "
+		elif size >= 2 and arr.size() >= 3:
+			text += ", and "
+		elif size >= 2:
+			text += " and "
+		size -= 1
+		i += 1
+	return text
+
+
 #endregion
 
 
@@ -122,9 +140,14 @@ signal one_second
 
 var last_clock: float
 var current_clock: float = Time.get_unix_time_from_system()
-var session_duration := LoudInt.new(0)
+var session_duration: LoudInt
 var total_duration_played: int
-var run_duration := LoudInt.new(0)
+var run_duration: LoudInt
+
+
+func setup_clock() -> void:
+	session_duration = LoudInt.new(0)
+	run_duration = LoudInt.new(0)
 
 
 func game_lost_focus() -> void:
@@ -192,7 +215,7 @@ func setup_discord() -> void:
 	#print("Discord working: " + str(DiscordSDK.get_is_discord_working()))
 	
 	# Set the first custom text row of the activity here
-	DiscordSDK.details = "They're really getting into it..."
+	#DiscordSDK.details = "They're really getting into it..."
 	
 	# Set the second custom text row of the activity here
 	DiscordSDK.state = "Waking their Thingy up"

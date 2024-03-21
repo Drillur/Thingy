@@ -43,7 +43,7 @@ signal pressed
 
 func _ready():
 	color = color
-	Settings.joypad.right.changed.connect(joypad_allowed_changed)
+	Settings.joypad_detected.changed.connect(joypad_allowed_changed)
 	joypad_allowed_changed()
 	set_icon(icon)
 	if drop_down != null:
@@ -138,7 +138,7 @@ func _on_focus_exited():
 
 
 func joypad_allowed_changed() -> void:
-	if Settings.joypad.are_true():
+	if Settings.joypad.is_true():
 		focus_mode = Control.FOCUS_ALL
 		button.focus_mode = Control.FOCUS_ALL
 	else:

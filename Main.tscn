@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://408er70eh4ns" path="res://Art/Icons/Hud/upgrades.png" id="6_jmjrv"]
 [ext_resource type="PackedScene" uid="uid://tfrl5j7jiiwd" path="res://Hud/Scenes/reset_menu.tscn" id="8_jwrlk"]
 [ext_resource type="PackedScene" uid="uid://dq3cwy5fqfot5" path="res://Hud/Scenes/Upgrades/upgrade_container.tscn" id="9_o0od1"]
-[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/purchase_button.tscn" id="9_x5lqm"]
+[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/Upgrades/purchase_button.tscn" id="9_x5lqm"]
 [ext_resource type="PackedScene" uid="uid://bbq5xo6rr5ldf" path="res://Hud/Scenes/Upgrades/upgrade_button.tscn" id="10_4ysqw"]
 [ext_resource type="Texture2D" uid="uid://bvb4ehu30w7iu" path="res://Art/Icons/Hud/Settings.png" id="12_dnau6"]
 [ext_resource type="Texture2D" uid="uid://bihfgl6qch4gh" path="res://Art/Icons/Hud/Skull.png" id="15_im36d"]

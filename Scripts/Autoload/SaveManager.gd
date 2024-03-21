@@ -2,6 +2,11 @@ extends Node
 
 
 
+# How to:
+# Delete lines with 'gv' below. That is my 'GlobalVariables' singleton.
+
+
+
 enum SaveMethod {
 	TO_FILE,
 	TO_CLIPBOARD,
@@ -88,6 +93,11 @@ var singletons_with_exports := {}
 func _ready() -> void:
 	setup_singletons_with_exports()
 	gv.save_manager_ready.set_to(true)
+
+
+func _input(_event) -> void:
+	if Input.is_action_just_pressed("save"):
+		save_game()
 
 
 func setup_singletons_with_exports() -> void:
@@ -196,6 +206,9 @@ func pack_array(array: Array) -> Dictionary:
 		var variable_class: String
 		if value is Array:
 			data[i] = pack_array(value)
+		#elif value is Wish:
+			#variable_class = "Wish"
+			#data[variable_class + str(i)] = pack_exported_properties(value)
 		elif value is int:
 			variable_class = "int"
 			data[variable_class + str(i)] = value
@@ -282,29 +295,35 @@ func unpack_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) ->
 
 
 func unpack_dictionary_to_empty_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) -> Dictionary:
+	# Only save empty dictionaries which use INT keys. If you use a STRING key like "example", you are fucked.
 	for key in packed_dictionary.keys():
-		var new_key = key
-		if key is String and int(key) == round(int(key)):
-			new_key = int(key)
+		var new_key: int = int(key)
 		match packed_dictionary[key]["_class_name"]:
 			"Thingy":
 				th.new_thingy()
 				dictionary[new_key] = th.get_latest_thingy()
 				unpack_vars(dictionary[new_key], packed_dictionary[key])
+			_:
+				print_debug("include that object's _class_name var as a case here")
+				dictionary[new_key] = packed_dictionary[key]
 	return dictionary
 
 
 func unpack_array(packed_array: Dictionary) -> Array:
+	# REMINDER: Do not save typed Arrays, unless the type is a custom class like Wish. It won't load properly
 	var array := []
 	for key in packed_array:
 		var data = packed_array[key]
 		var variable_class = key.rstrip("0123456789")
-		
-		if variable_class == "int":
-			array.append(int(data))
-		
-		else:
-			array.append(data)
+		match variable_class:
+			"int":
+				array.append(int(data))
+			#"Wish":
+				#var wish = Wish.new(Wish.Type.LOAD_RANDOM_WISH, data)
+				#wi.add_wish_and_connect_calls(wish)
+				#array.append(wish)
+			_:
+				array.append(data)
 	
 	return array
 

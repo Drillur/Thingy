@@ -74,7 +74,7 @@ func selected_index_changed() -> void:
 	
 	connect_calls()
 	
-	header.color = thingy.details.color
+	header.color = thingy.details.get_color()
 	header.text = "Thingy %s" % str(thingy.index + 1)
 
 
@@ -153,11 +153,11 @@ func juice_unlocked(flash := true) -> void:
 func level_changed(flash := true) -> void:
 	level.text = "Level [b]" + thingy.level.get_text()
 	if flash:
-		gv.flash(level, thingy.details.color)
+		gv.flash(level, thingy.details.get_color())
 
 
 func xp_changed() -> void:
-	xp_label.text = wa.get_details(Currency.Type.XP).color_text % (
+	xp_label.text = wa.get_details(Currency.Type.XP).get_color_text() % (
 		"%s/%s" % [
 			thingy.xp.get_current_text(),
 			thingy.xp.get_total_text()
@@ -166,8 +166,8 @@ func xp_changed() -> void:
 
 
 func xp_output_range_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.XP).icon_and_name + ": [b]"
-	text += wa.get_details(Currency.Type.XP).color_text
+	var text = wa.get_details(Currency.Type.XP).get_icon_and_name() + ": [b]"
+	text += wa.get_details(Currency.Type.XP).get_color_text()
 	if th.xp_output_range.is_full():
 		if th.duration_applies_to_xp_output.is_true():
 			text = text % Big.get_float_text(max(1, thingy.get_minimum_duration()) * th.xp_output_range.get_total())
@@ -190,11 +190,11 @@ func xp_output_range_changed(flash := true) -> void:
 			)
 	xp_output_range.text = text
 	if flash:
-		gv.flash(xp_output_range, thingy.details.color)
+		gv.flash(xp_output_range, thingy.details.get_color())
 
 
 func xp_increase_range_changed(flash := true) -> void:
-	var xp_color_text = wa.get_details(Currency.Type.XP).color.to_html()
+	var xp_color_text = Details.get_value("color", wa, Currency.Type.XP)
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
 		xp_color_text,
 		bag.get_resource("Arrow Up Fill").get_path()
@@ -208,12 +208,12 @@ func xp_increase_range_changed(flash := true) -> void:
 		]
 	xp_increase_range.text = text
 	if flash:
-		gv.flash(xp_increase_range, thingy.details.color)
+		gv.flash(xp_increase_range, thingy.details.get_color())
 
 
 func output_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.WILL).icon_and_name + ": [b]"
-	text += wa.get_details(Currency.Type.WILL).color_text
+	var text = wa.get_details(Currency.Type.WILL).get_icon_and_name() + ": [b]"
+	text += wa.get_details(Currency.Type.WILL).get_color_text()
 	if th.output_range.is_full():
 		text = text % thingy.get_maximum_output().get_text()
 	else:
@@ -225,12 +225,12 @@ func output_changed(flash := true) -> void:
 		)
 	will_output.text = text
 	if flash:
-		gv.flash(will_output, thingy.details.color)
+		gv.flash(will_output, thingy.details.get_color())
 
 
 func output_increase_range_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		wa.get_details(Currency.Type.XP).color.to_html(),
+		Details.get_value("color", wa, Currency.Type.XP),
 		bag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.output_increase_range.is_full():
@@ -242,12 +242,12 @@ func output_increase_range_changed(flash := true) -> void:
 		]
 	output_increase_range.text = text
 	if flash:
-		gv.flash(output_increase_range, thingy.details.color)
+		gv.flash(output_increase_range, thingy.details.get_color())
 
 
 func juice_output_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.JUICE).icon_and_name + ": [b]"
-	text += wa.get_details(Currency.Type.JUICE).color_text
+	var text = wa.get_details(Currency.Type.JUICE).get_icon_and_name() + ": [b]"
+	text += wa.get_details(Currency.Type.JUICE).get_color_text()
 	if th.juice_output_range.is_full():
 		text = text % Big.get_float_text(thingy.get_minimum_juice_output())
 	else:
@@ -259,12 +259,12 @@ func juice_output_changed(flash := true) -> void:
 		)
 	juice_output.text = text
 	if flash:
-		gv.flash(juice_output, thingy.details.color)
+		gv.flash(juice_output, thingy.details.get_color())
 
 
 func juice_input_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.JUICE).icon_and_name + ": [b]"
-	text += wa.get_details(Currency.Type.JUICE).color_text
+	var text = wa.get_details(Currency.Type.JUICE).get_icon_and_name() + ": [b]"
+	text += wa.get_details(Currency.Type.JUICE).get_color_text()
 	if th.juice_input_range.is_full():
 		text = text % Big.get_float_text(thingy.get_minimum_juice_input())
 	else:
@@ -276,12 +276,12 @@ func juice_input_changed(flash := true) -> void:
 		)
 	juice_input.text = text
 	if flash:
-		gv.flash(juice_input, thingy.details.color)
+		gv.flash(juice_input, thingy.details.get_color())
 
 
 func juice_output_increase_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		wa.get_details(Currency.Type.XP).color.to_html(),
+		Details.get_value("color", wa, Currency.Type.XP),
 		bag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.juice_output_increase_range.is_full():
@@ -293,12 +293,12 @@ func juice_output_increase_changed(flash := true) -> void:
 		]
 	juice_output_increase.text = text
 	if flash:
-		gv.flash(juice_output_increase, thingy.details.color)
+		gv.flash(juice_output_increase, thingy.details.get_color())
 
 
 func juice_input_increase_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		wa.get_details(Currency.Type.XP).color.to_html(),
+		Details.get_value("color", wa, Currency.Type.XP),
 		bag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.juice_input_increase_range.is_full():
@@ -310,21 +310,21 @@ func juice_input_increase_changed(flash := true) -> void:
 		]
 	juice_input_increase.text = text
 	if flash:
-		gv.flash(juice_input_increase, thingy.details.color)
+		gv.flash(juice_input_increase, thingy.details.get_color())
 
 
 func crit_chance_changed(flash := true) -> void:
 	crit_components.visible = th.crit_chance.greater(0)
 	crit_chance.text = "Chance: [b]%s%%" % th.crit_chance.get_text()
 	if flash:
-		gv.flash(crit_chance, thingy.details.color)
+		gv.flash(crit_chance, thingy.details.get_color())
 
 
 func crit_crit_chance_changed(flash := true) -> void:
 	crit_crit_chance.visible = th.crit_crit_chance.greater(0)
 	crit_crit_chance.text = "Lucky Chance: [b]%s%%" % th.crit_crit_chance.get_text()
 	if flash:
-		gv.flash(crit_crit_chance, thingy.details.color)
+		gv.flash(crit_crit_chance, thingy.details.get_color())
 
 
 func crit_range_changed(flash := true) -> void:
@@ -337,15 +337,15 @@ func crit_range_changed(flash := true) -> void:
 		)
 	crit_multiplier.text = crit_mult_text
 	if flash:
-		gv.flash(crit_multiplier, thingy.details.color)
+		gv.flash(crit_multiplier, thingy.details.get_color())
 		if up.is_purchased(Upgrade.Type.CRITS_AFFECT_COIN_GAIN):
 			crit_coin_output_changed()
 
 
 func crit_coin_output_changed(flash := true) -> void:
 	crit_coin.visible = th.crit_coin_output.total.greater(0)
-	var text = wa.get_details(Currency.Type.COIN).icon_and_name + ": [b]"
-	text += wa.get_details(Currency.Type.COIN).color_text
+	var text = wa.get_details(Currency.Type.COIN).get_icon_and_name() + ": [b]"
+	text += wa.get_details(Currency.Type.COIN).get_color_text()
 	if th.crit_coin_output.is_full() and th.crits_apply_to_coin.is_false():
 		text = text % th.crit_coin_output.get_total_text()
 	else:
@@ -365,7 +365,7 @@ func crit_coin_output_changed(flash := true) -> void:
 		]
 	crit_coin.text = text
 	if flash:
-		gv.flash(crit_coin, thingy.details.color)
+		gv.flash(crit_coin, thingy.details.get_color())
 
 
 func duration_changed(flash := true) -> void:
@@ -377,14 +377,14 @@ func duration_changed(flash := true) -> void:
 			tp.quick_parse(thingy.get_maximum_duration(), false)
 		]
 	if flash:
-		gv.flash(duration, thingy.details.color)
+		gv.flash(duration, thingy.details.get_color())
 	if th.duration_applies_to_xp_output.is_true():
 		xp_output_range_changed(flash)
 
 
 func duration_increase_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		wa.get_details(Currency.Type.XP).color.to_html(),
+		Details.get_value("color", wa, Currency.Type.XP),
 		bag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.duration_increase_range.is_full():
@@ -396,7 +396,7 @@ func duration_increase_changed(flash := true) -> void:
 		]
 	duration_increase.text = text
 	if flash:
-		gv.flash(duration_increase, thingy.details.color)
+		gv.flash(duration_increase, thingy.details.get_color())
 
 
 #endregion

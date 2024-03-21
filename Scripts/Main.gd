@@ -27,7 +27,7 @@ func _ready() -> void:
 	
 	if SaveManager.can_load_game():
 		SaveManager.load_game()
-		Settings.joypad.set_right(false)
+		Settings.joypad_detected.set_false()
 	else:
 		SaveManager.color.set_to(gv.get_random_nondark_color())
 	
@@ -45,7 +45,7 @@ func thingy_created() -> void:
 
 func _input(event):
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		if Settings.joypad.are_either_false() or gv.game_has_focus.is_false():
+		if Settings.joypad.is_false() or gv.game_has_focus.is_false():
 			return
 	
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -79,8 +79,8 @@ func _input(event):
 	elif Input.is_action_just_pressed("save"):
 		SaveManager.save_game()
 	elif event is InputEventMouseButton:
-		if Settings.joypad.right.is_true():
-			Settings.joypad.right.set_to(false)
+		if Settings.joypad_detected.is_true():
+			Settings.joypad_detected.set_false()
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			if sidebar.visible:
 				if (
@@ -177,14 +177,14 @@ func save_color_changed() -> void:
 
 
 func setup_currency_panel() -> void:
-	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).icon_and_name
+	will_flair.text = "[i]" + wa.get_details(Currency.Type.WILL).get_icon_and_name()
 	will_rate.modulate = wa.get_color(Currency.Type.WILL)
 	wa.get_currency(Currency.Type.WILL).amount.changed.connect(will_changed)
 	wa.get_currency(Currency.Type.WILL).net_rate.changed.connect(will_rate_changed)
 	will_changed()
 	will_rate_changed()
 	
-	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).icon_and_name
+	coin_flair.text = "[i]" + wa.get_details(Currency.Type.COIN).get_icon_and_name()
 	coin_rate.modulate = wa.get_color(Currency.Type.COIN)
 	wa.get_currency(Currency.Type.COIN).amount.changed.connect(coin_changed)
 	wa.get_currency(Currency.Type.COIN).net_rate.changed.connect(coin_rate_changed)
@@ -193,7 +193,7 @@ func setup_currency_panel() -> void:
 	coin_rate_changed()
 	coin_unlocked_changed()
 	
-	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).icon_and_name
+	xp_flair.text = "[i]" + wa.get_details(Currency.Type.XP).get_icon_and_name()
 	xp_rate.modulate = wa.get_color(Currency.Type.XP)
 	wa.get_currency(Currency.Type.XP).amount.changed.connect(xp_changed)
 	wa.get_currency(Currency.Type.XP).net_rate.changed.connect(xp_rate_changed)
@@ -202,14 +202,14 @@ func setup_currency_panel() -> void:
 	xp_rate_changed()
 	xp_unlocked_changed()
 	
-	juice_flair.text = "[i]" + wa.get_details(Currency.Type.JUICE).icon_and_name
+	juice_flair.text = "[i]" + wa.get_details(Currency.Type.JUICE).get_icon_and_name()
 	wa.get_currency(Currency.Type.JUICE).amount.changed.connect(juice_changed)
 	th.max_juice_use.changed.connect(juice_changed)
 	wa.get_currency(Currency.Type.JUICE).unlocked.changed.connect(juice_unlocked_changed)
 	juice_changed()
 	juice_unlocked_changed()
 	
-	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).icon_and_name
+	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).get_icon_and_name()
 	soul_rate.modulate = wa.get_color(Currency.Type.SOUL)
 	wa.get_currency(Currency.Type.SOUL).amount.changed.connect(soul_changed)
 	wa.get_currency(Currency.Type.SOUL).amount.pending_changed.connect(soul_changed)
@@ -228,7 +228,7 @@ func coin_unlocked_changed() -> void:
 
 func coin_changed() -> void:
 	coin_label.text = "[i]" + (
-		wa.get_details(Currency.Type.COIN).color_text % (
+		wa.get_details(Currency.Type.COIN).get_color_text() % (
 			wa.get_currency(Currency.Type.COIN).amount.get_text()
 		)
 	)
@@ -240,7 +240,7 @@ func coin_rate_changed() -> void:
 
 func will_changed() -> void:
 	will_label.text = "[i]" + (
-		wa.get_details(Currency.Type.WILL).color_text % (
+		wa.get_details(Currency.Type.WILL).get_color_text() % (
 			wa.get_currency(Currency.Type.WILL).amount.get_text()
 		)
 	)
@@ -256,7 +256,7 @@ func xp_unlocked_changed() -> void:
 
 func xp_changed() -> void:
 	xp_label.text = "[i]" + (
-		wa.get_details(Currency.Type.XP).color_text % (
+		wa.get_details(Currency.Type.XP).get_color_text() % (
 			wa.get_currency(Currency.Type.XP).amount.get_text()
 		)
 	)
@@ -271,7 +271,7 @@ func juice_unlocked_changed() -> void:
 
 
 func juice_changed() -> void:
-	juice_label.text = wa.get_details(Currency.Type.JUICE).color_text % (
+	juice_label.text = wa.get_details(Currency.Type.JUICE).get_color_text() % (
 		"[i]%s (Goal: %s)[/i]" % [
 			wa.get_amount_text(Currency.Type.JUICE),
 			th.max_juice_use.get_text(),
@@ -286,7 +286,7 @@ func soul_unlocked_changed() -> void:
 
 func soul_changed() -> void:
 	soul_label.text = "[i]" + (
-		wa.get_details(Currency.Type.SOUL).color_text % (
+		wa.get_details(Currency.Type.SOUL).get_color_text() % (
 			"%s+%s" % [
 				wa.get_amount_text(Currency.Type.SOUL),
 				wa.get_pending_amount(Currency.Type.SOUL).text
@@ -354,15 +354,15 @@ func setup_navigation_panel() -> void:
 	update_unlock_upgrades_button_visibility()
 	tab_settings.color = Settings.color
 	tab_menu.color = SaveManager.color.get_value()
-	Settings.joypad.right.changed.connect(update_navigation_button_focus_modes)
+	Settings.joypad_detected.changed.connect(update_navigation_button_focus_modes)
 	update_navigation_button_focus_modes()
 	reset_button.color = wa.get_color(Currency.Type.SOUL)
 	purchase_thingy.assign_loud_color(th.next_thingy_color)
-	purchase_thingy.setup(th.cost)
+	purchase_thingy.setup_price(th.price)
 
 
 func update_navigation_button_focus_modes() -> void:
-	if Settings.joypad.are_true():
+	if Settings.joypad.is_true():
 		for node in navigation_buttons.get_children():
 			node.focus_mode = Control.FOCUS_ALL
 			node.button.focus_mode = Control.FOCUS_ALL
@@ -409,13 +409,13 @@ func update_navigation_panel_visibility() -> void:
 	currency_panel.visible = navigation_panel.visible
 	unlock_upgrades_button.hide()
 	if navigation_panel.visible:
-		gv.flash(navigation_panel, up.get_upgrade_tree(up.UpgradeTree.Type.FIRESTARTER).details.color)
+		gv.flash(navigation_panel, up.get_upgrade_tree(UpgradeTree.Type.FIRESTARTER).details.get_color())
 
 
 func update_unlock_upgrades_button_visibility() -> void:
 	unlock_upgrades_button.visible = th.get_count() >= 3 and not navigation_panel.visible
 	if unlock_upgrades_button.visible:
-		gv.flash(unlock_upgrades_button, unlock_upgrades_button.upgrade.details.color)
+		gv.flash(unlock_upgrades_button, unlock_upgrades_button.upgrade.details.get_color())
 
 
 #endregion
@@ -461,7 +461,7 @@ func current_tab_changed() -> void:
 		match current_tab.get_value():
 			Tab.MENU:
 				sidebar_header.color = SaveManager.color.get_value()
-				sidebar_header.text = "Thingy\n1.0.0"
+				sidebar_header.text = "Thingy\n" + ProjectSettings.get_setting("application/config/version")
 				sidebar_header.icon = bag.get_icon("activeBuffs")
 			Tab.SETTINGS:
 				sidebar_header.color = Settings.color
@@ -478,12 +478,12 @@ func current_tab_changed() -> void:
 
 
 func upgrade_tab_changed(index: int = upgrade_container.tab_container.current_tab) -> void:
-	var tree: up.UpgradeTree = up.get_upgrade_tree(index + 1)
-	sidebar_header.color = tree.details.color
-	sidebar_header.text = tree.details.name
-	sidebar_header.icon = tree.details.icon
-	tab_upgrade.color = tree.details.color
-	upgrade_container.color_tab(tree.details.color)
+	var tree: UpgradeTree = up.get_upgrade_tree(index + 1)
+	sidebar_header.color = tree.details.get_color()
+	sidebar_header.text = tree.details.get_name()
+	sidebar_header.icon = tree.details.get_icon()
+	tab_upgrade.color = tree.details.get_color()
+	upgrade_container.color_tab(tree.details.get_color())
 
 
 #endregion
@@ -513,7 +513,6 @@ func fps_timer_timeout() -> void:
 	fps.text = "[b]" + str(Engine.get_frames_per_second()).pad_zeros(3) + (
 		"[/b] [img=<15>]%s[/img] [i]fps" % bag.get_resource("Speed").get_path()
 	)
-
 
 func _on_dev_button_pressed():
 	wa.get_amount(Currency.Type.WILL).m(1.1)

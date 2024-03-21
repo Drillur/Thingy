@@ -112,6 +112,10 @@ func quick_parse(duration, brief: bool) -> String:
 		)
 
 
+func quick_parse_no_text(duration) -> String:
+	return quick_parse(duration, false).split(" ")[0]
+
+
 
 func brief_parse_big(duration: Big) -> String:
 	duration = Big.new(duration)

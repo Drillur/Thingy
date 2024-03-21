@@ -9,48 +9,41 @@ signal pending_changed
 
 @export var _class_name := "Value"
 @export var current: Big
-@export var pending := Big.new(0.0)
+@export var pending: Big
 
-var added := Big.new(0)
-var subtracted := Big.new(0)
-var multiplied := Big.new(1)
-var divided := Big.new(1)
-
+var book := Book.new(Book.Type.BIG)
+var copycat_var: Resource
 var add_pending_to_current_on_game_load := true
+var minimum := Big.new(0.0)
 
 
 func _init(base_value = 0.0) -> void:
+	pending = book.book[Book.Category.PENDING].sum
 	current = Big.new(base_value)
+	minimum.changed.connect(minimum_check)
 	current.changed.connect(emit_changed)
-	current.increased.connect(emit_increase)
-	current.decreased.connect(emit_decrease)
-	pending.changed.connect(emit_pending_changed)
-	if gv.save_manager_ready.is_false():
-		gv.save_manager_ready.became_true.connect(connect_game_loaded)
-	else:
-		connect_game_loaded()
-
-
-func connect_game_loaded() -> void:
+	current.increased.connect(
+		func():
+			increased.emit())
+	current.decreased.connect(
+		func():
+			minimum_check()
+			decreased.emit())
+	book.pending_changed.connect(func(): pending_changed.emit())
+	book.changed.connect(sync)
 	SaveManager.loading.became_false.connect(game_loaded)
 
 
 func game_loaded() -> void:
 	if add_pending_to_current_on_game_load:
-		current.a(pending)
-	pending.reset()
+		if book.get_pending().greater(0):
+			current.a(pending)
+			book.book[Book.Category.PENDING].reset()
 
 
-func emit_increase() -> void:
-	increased.emit()
-
-
-func emit_decrease() -> void:
-	decreased.emit()
-
-
-func emit_pending_changed() -> void:
-	pending_changed.emit()
+func minimum_check() -> void:
+	if less(minimum):
+		set_to(minimum)
 
 
 func set_to(amount) -> void:
@@ -59,6 +52,11 @@ func set_to(amount) -> void:
 
 func change_base(new_base: float) -> void:
 	current.change_base(new_base)
+
+
+func set_minimum(_minimum) -> Value:
+	minimum.set_to(_minimum)
+	return self
 
 
 func add(amount) -> void:
@@ -74,136 +72,98 @@ func subtract(amount) -> void:
 		current.s(amount)
 
 
+func multiply(amount) -> void:
+	current.m(amount)
+
+
+func divide(amount) -> void:
+	current.d(amount)
+
+
 
 func sync() -> void:
-	var new_cur = Big.new(current.base)
-	new_cur.a(added)
-	new_cur.s(subtracted)
-	new_cur.m(multiplied)
-	new_cur.d(divided)
-	current.set_to(new_cur)
+	current.set_to(book.sync.call(current.base))
+
+
+func copycat(value: Resource) -> void:
+	change_base(0.0)
+	copycat_var = value
+	copycat_var.changed.connect(copycat_changed)
+	copycat_changed()
+
+
+func copycat_changed() -> void:
+	edit_added(copycat_var, copycat_var.get_value())
+
+
+func clear_copycat() -> void:
+	copycat_var.changed.disconnect(copycat_changed)
+	copycat_var = null
+
+
+func edit_change(category: Book.Category, source, amount) -> void:
+	book.edit_change(category, source, amount)
+
+
+func edit_pending(source, amount) -> void:
+	edit_change(Book.Category.PENDING, source, amount)
+
+
+func edit_multiplied(source, amount) -> void:
+	edit_change(Book.Category.MULTIPLIED, source, amount)
+
+
+func edit_added(source, amount) -> void:
+	edit_change(Book.Category.ADDED, source, amount)
+
+
+func edit_subtracted(source, amount) -> void:
+	edit_change(Book.Category.SUBTRACTED, source, amount)
+
+
+func remove_change(category: Book.Category, source) -> void:
+	book.remove_change(category, source)
+
+
+func remove_pending(source) -> void:
+	remove_change(Book.Category.PENDING, source)
+
+
+func remove_multiplied(source) -> void:
+	remove_change(Book.Category.MULTIPLIED, source)
+
+
+func remove_added(source) -> void:
+	remove_change(Book.Category.ADDED, source)
+
+
+func remove_subtracted(source) -> void:
+	remove_change(Book.Category.SUBTRACTED, source)
+
+
+func reset():
+	current.reset()
+	book.reset()
+
+
+func reset_pending() -> void:
+	book.reset_pending()
+
+
+
+#region Get
 
 
 func get_value() -> Big:
 	return current
 
 
-func get_pending_value() -> Big:
-	return pending
+func get_pending() -> Big:
+	return book.get_pending()
 
 
-
-func increase_added(amount) -> void:
-	added.a(amount)
-	sync()
-
-
-func decrease_added(amount) -> void:
-	added.s(amount)
-	sync()
-
-
-func increase_subtracted(amount) -> void:
-	subtracted.a(amount)
-	sync()
-
-
-func decrease_subtracted(amount) -> void:
-	subtracted.s(amount)
-	sync()
-
-
-func increase_multiplied(amount) -> void:
-	multiplied.m(amount)
-	sync()
-
-
-func decrease_multiplied(amount) -> void:
-	multiplied.d(amount)
-	sync()
-
-
-func increase_divided(amount) -> void:
-	divided.m(amount)
-	sync()
-
-
-func decrease_divided(amount) -> void:
-	divided.d(amount)
-	sync()
-
-
-var book := {
-	"added": {},
-	"subtracted": {},
-	"multiplied": {},
-	"divided": {},
-	"pending": {},
-}
-
-
-func add_change(category: String, source, amount) -> void:
-	if book[category].has(source):
-		if gv.dev_mode:
-			print_debug("This source already logged a change for this Value! Fix your code.")
-		return
-	book[category][source] = Big.new(amount)
-	match category:
-		"added":
-			increase_added(amount)
-		"subtracted":
-			increase_subtracted(amount)
-		"multiplied":
-			increase_multiplied(amount)
-		"divided":
-			increase_divided(amount)
-		"pending":
-			pending.a(amount)
-
-
-func edit_change(category: String, source, amount) -> void:
-	if book[category].has(source):
-		remove_change(category, source, false)
-	if not amount is Big:
-		amount = Big.new(amount)
-		if amount.equal(0):
-			return
-	add_change(category, source, amount)
-
-
-func remove_change(category: String, source, sync_afterwards := true) -> void:
-	if not source in book[category].keys():
-		return
-	var amount: Big = book[category][source]
-	match category:
-		"added":
-			added.s(amount)
-		"subtracted":
-			subtracted.s(amount)
-		"multiplied":
-			multiplied.d(amount)
-		"divided":
-			divided.d(amount)
-		"pending":
-			pending.s(amount)
-	book[category].erase(source)
-	if sync_afterwards:
-		sync()
-
-
-
-func reset():
-	book.clear()
-	added.reset()
-	subtracted.reset()
-	multiplied.reset()
-	divided.reset()
-	pending.reset()
-	current.reset()
-
-
-
-#region Get
+func get_effective_amount() -> Big:
+	return Big.new(get_value()).a(get_pending())
 
 
 func get_text() -> String:
@@ -211,7 +171,7 @@ func get_text() -> String:
 
 
 func get_pending_text() -> String:
-	return pending.text
+	return get_pending().text
 
 
 func get_as_float() -> float:
@@ -242,17 +202,38 @@ func equal(value) -> bool:
 	return current.equal(value)
 
 
+func get_base() -> Dictionary:
+	return current.base
+
+
 #endregion
 
 
 # - Dev
 
 
+
+#region Dev
+
+
+var variable_name: String
+
+
+func report_on_changed(_variable_name: String):
+	variable_name = _variable_name
+	changed.connect(simple_report)
+
+
+func simple_report() -> void:
+	printt(variable_name, "Value changed to:", get_text())
+
+
 func report() -> void:
-	print("Report for ", self)
-	print("    Base: ", Big.new(current.base).text)
-	print("    Added: ", added.text)
-	print("    Subtracted: ", subtracted.text)
-	print("    Multiplied: ", multiplied.text)
-	print("    Divided: ", divided.text)
-	print("    == Result: ", get_text())
+	printt("Report for Value ", str(self) if variable_name == "" else variable_name, ":")
+	printt(" - Base: ", Big.new(current.base).text)
+	book.report()
+
+
+#endregion
+
+

@@ -4,6 +4,7 @@ extends Node
 
 
 var resources := {}
+var chats := {}
 
 
 
@@ -13,9 +14,10 @@ func _ready():
 
 
 func store_all_resources() -> void:
-	dir_contents("res://Hud/")
 	dir_contents("res://Art/")
+	dir_contents("res://Hud/")
 	dir_contents("res://Themes/")
+	dir_contents("res://Scripts/Dialogue/")
 
 
 func dir_contents(path):
@@ -23,7 +25,7 @@ func dir_contents(path):
 	if dir:
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
-		if file_name in ["Animations", "Terrain"]:
+		if file_name in ["Animations",]:
 			file_name = dir.get_next()
 		
 		while file_name != "":
@@ -45,12 +47,9 @@ func dir_contents(path):
 					_path = _path.trim_suffix(".import")
 					if not resources.has(_name):
 						resources[_name] = load(_path)
+					if file_name.ends_with(".dialogue"):
+						chats[_name] = resources[_name]
 			file_name = dir.get_next()
-
-
-
-func get_icon_text(_name: String, size := 15) -> String:
-	return "[img=<%s>]%s[/img]" % [str(size), get_resource_path(_name)]
 
 
 func get_resource(_name: String) -> Resource:
@@ -61,23 +60,25 @@ func get_icon(_name: String) -> Texture2D:
 	return get_resource(_name)
 
 
-func get_progress_icon(percent: float) -> Texture2D:
-	if percent <= 0.125:
-		return get_icon("progress 1")
-	if percent <= 0.25:
-		return get_icon("progress 2")
-	if percent <= 0.375:
-		return get_icon("progress 3")
-	if percent <= 0.5:
-		return get_icon("progress 4")
-	if percent <= 0.625:
-		return get_icon("progress 5")
-	if percent <= 0.75:
-		return get_icon("progress 6")
-	if percent <= 0.875:
-		return get_icon("progress 7")
-	return get_icon("progress 8")
-
-
 func get_resource_path(_name: String) -> String:
 	return resources[_name].get_path()
+
+
+func get_scene(_name: String) -> PackedScene:
+	return get_resource(_name)
+
+
+func get_icon_text(_name: String, _color = 0) -> String:
+	if _color == 0:
+		return "[img=<15>]%s[/img]" % get_resource_path(_name)
+	return "[img=<15> color=#%s]%s[/img]" % [
+		_color.to_html(),
+		get_resource_path(_name)
+	]
+
+
+func get_icon_text_know_html(_name: String, html: String) -> String:
+	return "[img=<15> color=#%s]%s[/img]" % [
+		html,
+		get_resource_path(_name)
+	]

@@ -13,11 +13,11 @@ extends MarginContainer
 
 func _ready() -> void:
 	info.text = "[i]Free the souls of your [img=<15>]res://Art/Icons/Hud/activeBuffs.png[/img] Thingies which you have lovingly cultivated. This will also obliterate all of your [img=<15>]res://Art/Icons/Hud/upgrades.png[/img] Upgrades and currencies (except %s)." % (
-		wa.get_details(Currency.Type.SOUL).icon_and_name
+		wa.get_details(Currency.Type.SOUL).get_icon_and_name()
 	)
 	free_button.color = wa.get_color(Currency.Type.SOUL)
 	info_icon.modulate = wa.get_color(Currency.Type.SOUL)
-	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).icon_and_name
+	soul_flair.text = "[i]" + wa.get_details(Currency.Type.SOUL).get_icon_and_name()
 	wa.get_pending_amount(Currency.Type.SOUL).changed.connect(soul_changed)
 	soul_changed()
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 
 func soul_changed() -> void:
 	soul_label.text = "[i]" + (
-		wa.get_details(Currency.Type.SOUL).color_text % (
+		wa.get_details(Currency.Type.SOUL).get_color_text() % (
 			"+" + wa.get_pending_amount(Currency.Type.SOUL).text
 		)
 	)

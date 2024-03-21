@@ -18,15 +18,15 @@ const INDEX_1 := 2
 func _ready() -> void:
 	Settings.fullscreen.changed.connect(fullscreen_changed)
 	Settings.rate_mode.changed.connect(rate_mode_changed)
-	Settings.joypad.left.changed.connect(joypad_allowed_changed)
-	Settings.joypad.right.changed.connect(joypad_detected_changed)
-	Settings.joypad.right.changed.connect(update_focus_modes)
+	Settings.joypad_allowed.changed.connect(joypad_allowed_changed)
+	Settings.joypad_detected.changed.connect(joypad_detected_changed)
+	Settings.joypad_detected.changed.connect(update_focus_modes)
 	joypad_allowed_changed()
 	joypad_detected_changed()
 	update_focus_modes()
 	
 	fullscreen.pressed.connect(Settings.fullscreen.invert)
-	joypad_allowed.pressed.connect(Settings.joypad.left.invert)
+	joypad_allowed.pressed.connect(Settings.joypad_allowed.invert)
 	eta_mode.item_selected.connect(Settings.rate_mode.set_to)
 
 
@@ -35,13 +35,13 @@ func fullscreen_changed() -> void:
 
 
 func joypad_allowed_changed() -> void:
-	joypad_allowed.button_pressed = Settings.joypad.get_left()
+	joypad_allowed.button_pressed = Settings.joypad_allowed.get_value()
 	joypad_detected.visible = joypad_allowed.button_pressed
 
 
 func joypad_detected_changed() -> void:
 	joypad_detected.text = "Detected: %s" % (
-		"Yes" if Settings.joypad.get_right() else "No"
+		"Yes" if Settings.joypad_detected.get_value() else "No"
 	)
 
 
@@ -51,7 +51,7 @@ func rate_mode_changed() -> void:
 
 func update_focus_modes() -> void:
 	var i: int
-	if Settings.joypad.are_true():
+	if Settings.joypad.is_true():
 		i = Control.FOCUS_ALL
 	else:
 		i = Control.FOCUS_NONE

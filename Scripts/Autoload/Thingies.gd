@@ -7,7 +7,7 @@ signal container_loaded
 signal thingy_created
 
 @export var thingies := {}
-@export var cost: Cost
+@export var price: Price
 
 var container: ThingyContainer:
 	set(val):
@@ -15,41 +15,43 @@ var container: ThingyContainer:
 		container_loaded.emit()
 
 @export var next_thingy_color := LoudColor.new(1, 0.243, 0.208)
-var autobuyer := LoudBoolPair.new(false, true, "unlocked", "enabled")
+@export var autobuyer_unlocked := LoudBool.new(false)
+@export var autobuyer_enabled := LoudBool.new(true)
+var autobuyer := LoudBoolArray.new([autobuyer_unlocked, autobuyer_enabled])
 
-var xp_output_range := FloatPair.new(1.0, 1.0)
-var xp_increase_range := FloatPair.new(1.15, 1.15)
+var xp_output_range := LoudFloatPair.new(1.0, 1.0)
+var xp_increase_range := LoudFloatPair.new(1.15, 1.15)
 var xp_multiplier := LoudFloat.new(1.0)
 var duration_applies_to_xp_output := LoudBool.new(false)
 
-var output_range := FloatPair.new(1.0, 1.0)
-var output_increase_range := FloatPair.new(1.15, 1.15)
+var output_range := LoudFloatPair.new(1.0, 1.0)
+var output_increase_range := LoudFloatPair.new(1.15, 1.15)
 
 var crit_chance := LoudFloat.new(0.0)
-var crit_range := FloatPair.new(1.5, 1.5)
+var crit_range := LoudFloatPair.new(1.5, 1.5)
 var crit_crit_chance := LoudFloat.new(0.0)
-var crit_coin_output := FloatPair.new(0.0, 0.0)
+var crit_coin_output := LoudFloatPair.new(0.0, 0.0)
 var crits_apply_to_xp := LoudBool.new(false)
 var crits_apply_to_coin := LoudBool.new(false)
 var crits_apply_to_coin_twice := LoudBool.new(false)
 var crits_apply_to_duration := LoudBool.new(false)
 
-var duration_range := FloatPair.new(5.0, 5.0)
-var duration_increase_range := FloatPair.new(1.1, 1.1)
+var duration_range := LoudFloatPair.new(5.0, 5.0)
+var duration_increase_range := LoudFloatPair.new(1.1, 1.1)
 
-var juice_output_range := FloatPair.new(1.0, 1.0)
-var juice_input_range := FloatPair.new(1.0, 1.0)
-var juice_output_increase_range := FloatPair.new(1.1, 1.1)
-var juice_input_increase_range := FloatPair.new(1.1, 1.1)
-var juice_multiplier_range := FloatPair.new(2.0, 2.0)
+var juice_output_range := LoudFloatPair.new(1.0, 1.0)
+var juice_input_range := LoudFloatPair.new(1.0, 1.0)
+var juice_output_increase_range := LoudFloatPair.new(1.1, 1.1)
+var juice_input_increase_range := LoudFloatPair.new(1.1, 1.1)
+var juice_multiplier_range := LoudFloatPair.new(2.0, 2.0)
 var max_juice_use := Value.new(0.0)
 var smart_juice := LoudBool.new(false)
 
 
 
 func _ready():
-	cost = Cost.new({Currency.Type.WILL: Value.new(1)})
-	cost.increase_multiplier = 3.0
+	price = Price.new({Currency.Type.WILL: 1})
+	price.increase_modifier.set_to(3.0)
 	initialized.emit()
 	gv.reset.connect(reset)
 
@@ -63,7 +65,7 @@ func thingy_wants_to_fucking_die(_index: int) -> void:
 
 
 func reset(_tier: int) -> void:
-	cost.reset_now()
+	price.reset()
 	max_juice_use.reset()
 
 
@@ -73,7 +75,7 @@ func reset(_tier: int) -> void:
 
 
 func purchase_thingy() -> void:
-	cost.purchase()
+	price.purchase()
 	new_thingy()
 
 
@@ -132,15 +134,15 @@ func get_count() -> int:
 
 
 func can_afford_thingy() -> bool:
-	return cost.affordable.is_true()
+	return price.can_afford()
 
 
 func get_color(index: int) -> Color:
-	return get_thingy(index).details.color
+	return get_thingy(index).details.get_color()
 
 
 func get_latest_color() -> Color:
-	return get_latest_thingy().details.color
+	return get_latest_thingy().details.get_color()
 
 
 #endregion

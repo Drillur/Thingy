@@ -4,6 +4,7 @@ extends Resource
 
 
 signal failed_persist_check
+signal matched_reset_tier
 
 var persist_through_tier1 := LoudBool.new(false)
 var persist_through_tier2 := LoudBool.new(false)
@@ -23,13 +24,19 @@ func _init() -> void:
 func check_if_can_persist_through_tier(_tier: int) -> void:
 	if should_fail_at_tier(_tier):
 		failed_persist_check.emit()
-	
+	else:
+		if _tier == get_highest_tier_can_persist_through():
+			matched_reset_tier.emit()
 
 
 #endregion
 
 
 #region Action
+
+
+func disconnect_calls() -> void:
+	gv.reset.disconnect(check_if_can_persist_through_tier)
 
 
 func through_tier(_tier: int) -> void:
@@ -45,6 +52,10 @@ func through_tier(_tier: int) -> void:
 	if _tier >= 4:
 		persist_through_tier4.set_default_value(true)
 		persist_through_tier4.reset()
+
+
+func through_all() -> void:
+	through_tier(4) # replace with highest tier #
 
 
 #endregion

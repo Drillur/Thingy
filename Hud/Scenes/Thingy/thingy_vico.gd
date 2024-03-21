@@ -49,10 +49,7 @@ func _ready() -> void:
 
 
 func _process(_delta):
-	progress_label.text = "[i]" + tp.quick_parse(
-		(thingy.timer.wait_time - thingy.timer.time_left),
-		true
-	)
+	progress_label.text = "[i]" + thingy.timer.get_inverted_time_left_text()
 
 
 
@@ -62,13 +59,12 @@ func _process(_delta):
 func connect_calls() -> void:
 	thingy.kill_me.connect(thingy_is_sick_of_living)
 	thingy.level.increased.connect(level_increased)
-	thingy.inhand_will.changed.connect(output_changed)
-	thingy.inhand_juice.changed.connect(output_changed)
-	thingy.timer_started.connect(timer_wait_time_changed)
+	thingy.timer.started.connect(set_output_text)
+	thingy.timer.wait_time_changed.connect(timer_wait_time_changed)
 	thingy.crit_success.changed.connect(crit_success_changed)
 	thingy.level.changed.connect(level_changed)
 	xp_bar.attach_value_pair(thingy.xp)
-	output_changed()
+	set_output_text()
 	timer_wait_time_changed()
 	level_changed()
 	crit_success_changed()
@@ -78,9 +74,8 @@ func connect_calls() -> void:
 func disconnect_calls() -> void:
 	thingy.kill_me.disconnect(thingy_is_sick_of_living)
 	thingy.level.increased.disconnect(level_increased)
-	thingy.inhand_will.changed.disconnect(output_changed)
-	thingy.inhand_juice.changed.disconnect(output_changed)
-	thingy.timer_started.disconnect(timer_wait_time_changed)
+	thingy.timer.started.disconnect(set_output_text)
+	thingy.timer.wait_time_changed.disconnect(timer_wait_time_changed)
 	thingy.crit_success.changed.disconnect(crit_success_changed)
 	thingy.level.changed.disconnect(level_changed)
 	xp_bar.remove_value()
@@ -139,47 +134,44 @@ func thingy_is_sick_of_living(_index: int) -> void:
 	clear_thingy()
 
 
-func output_changed() -> void:
+func set_output_text() -> void:
+	if not thingy.inhand:
+		return
 	var text: String
 	match thingy.output_currency.get_value():
 		Currency.Type.WILL:
-			text = wa.get_details(Currency.Type.WILL).color_text % (
+			text = wa.get_details(Currency.Type.WILL).get_color_text() % (
 				"[b][i]+%s[/i][/b] %s" % [
-					thingy.inhand_will.get_text(),
-					wa.get_details(Currency.Type.WILL).icon_text
+					thingy.inhand.output[thingy.output_currency.get_value()].get_text(),
+					wa.get_details(Currency.Type.WILL).get_icon_text()
 				]
 			)
 		Currency.Type.JUICE:
-			text = wa.get_details(Currency.Type.JUICE).color_text % (
+			text = wa.get_details(Currency.Type.JUICE).get_color_text() % (
 				"[b][i]+%s[/i][/b] %s" % [
-					thingy.inhand_juice.get_text(),
-					wa.get_details(Currency.Type.JUICE).icon_text
+					thingy.inhand.output[thingy.output_currency.get_value()].get_text(),
+					wa.get_details(Currency.Type.JUICE).get_icon_text()
 				]
 			)
 	output_label.text = text
 
 
 func crit_success_changed() -> void:
+	crit_success.visible = thingy.crit_success.get_value()
 	if thingy.crit_success.is_true():
-		crit_success.show()
 		crit_success.text = "[img=<15> color=#%s]%s[/img] [b][i]x%s" % [
-			thingy.details.color.to_html(),
+			thingy.details.get_html(),
 			bag.get_resource("Dice").get_path(),
 			thingy.crit_multiplier.get_text()
 		]
-	else:
-		crit_success.hide()
 
 
 func timer_wait_time_changed() -> void:
-	max_progress_label.text = "[i]" + tp.quick_parse(
-		thingy.timer.wait_time,
-		true
-	)
+	max_progress_label.text = "[i]" + thingy.timer.get_wait_time_text()
 
 
 func level_changed() -> void:
-	level_label.text = wa.get_details(Currency.Type.XP).icon_text + " [b][i]" + thingy.level.get_text()
+	level_label.text = wa.get_details(Currency.Type.XP).get_icon_text() + " [b][i]" + thingy.level.get_text()
 
 
 func xp_unlocked_changed() -> void:
@@ -192,7 +184,7 @@ func xp_unlocked_changed() -> void:
 
 
 func level_increased() -> void:
-	gv.flash(level_label, thingy.details.color)
+	gv.flash(level_label, thingy.details.get_color())
 
 
 func thingy_created() -> void:
@@ -209,7 +201,7 @@ func thingy_created() -> void:
 func assign_thingy(_thingy: Thingy) -> void:
 	clear_thingy()
 	thingy = _thingy
-	color = thingy.details.color
+	color = thingy.details.get_color()
 	connect_calls()
 	progress_bar.attach_timer(thingy.timer)
 	index_label.text = "[i]#" + str(thingy.index + 1)

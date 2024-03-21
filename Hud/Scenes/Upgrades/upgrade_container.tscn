@@ -258,7 +258,7 @@ theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 columns = 2
 
-[node name="crit 03" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+[node name="crit_range02" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
 layout_mode = 2
 upgrade_type = 37
 
@@ -281,7 +281,7 @@ columns = 2
 
 [node name="will from juice" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer7" instance=ExtResource("2_yq021")]
 layout_mode = 2
-upgrade_type = 38
+upgrade_type = 39
 wrap_description = true
 
 [node name="JoypadControls" type="MarginContainer" parent="."]

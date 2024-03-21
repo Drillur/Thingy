@@ -51,16 +51,16 @@ func will_changed() -> void:
 func juice_changed() -> void:
 	if wa.will_from_juice.is_true():
 		var rate = Big.new(wa.get_amount(Currency.Type.JUICE)).d(60)
-		wa.get_currency(Currency.Type.WILL).gain_rate.edit_change(
-			"added", wa.get_currency(Currency.Type.JUICE), rate
+		wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(
+			wa.get_currency(Currency.Type.JUICE), rate
 		)
 
 
 func update_soul_gain_rate() -> void:
-	wa.get_currency(Currency.Type.SOUL).gain_rate.edit_change(
-		"added", self, Big.new(wa.get_pending_amount(Currency.Type.SOUL)).d(
+	wa.get_currency(Currency.Type.SOUL).gain_rate.edit_added(
+		self, Big.new(wa.get_pending_amount(Currency.Type.SOUL)).d(
 			up.get_upgrade_tree(
-				up.UpgradeTree.Type.FIRESTARTER
+				UpgradeTree.Type.FIRESTARTER
 			).get_run_duration()
 		)
 	)
@@ -127,15 +127,15 @@ func get_amount_text(cur: Currency.Type) -> String:
 
 
 func get_currency_name(cur: Currency.Type) -> String:
-	return get_details(cur).name
+	return get_details(cur).get_name()
 
 
 func get_color_text(cur: Currency.Type) -> Color:
-	return get_details(cur).color_text
+	return get_details(cur).get_color_text()
 
 
 func get_color(cur: Currency.Type) -> Color:
-	return get_details(cur).color
+	return get_details(cur).get_color()
 
 
 func is_unlocked(cur: Currency.Type) -> bool:

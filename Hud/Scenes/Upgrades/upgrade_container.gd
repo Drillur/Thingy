@@ -21,11 +21,11 @@ func _ready() -> void:
 		tab_container.set_tab_hidden(node.get_index(), true)
 		node.get_v_scroll_bar().self_modulate = up.get_upgrade_tree(
 			node.get_index() + 1
-		).details.color
+		).details.get_color()
 	get_viewport().gui_focus_changed.connect(focus_changed)
-	Settings.joypad.right.changed.connect(joypad_detected_changed)
+	Settings.joypad_detected.changed.connect(joypad_detected_changed)
 	joypad_detected_changed()
-	up.get_upgrade_tree(up.UpgradeTree.Type.VOYAGER).unlocked.changed.connect(voyager_unlocked_changed)
+	up.get_upgrade_tree(UpgradeTree.Type.VOYAGER).unlocked.changed.connect(voyager_unlocked_changed)
 	_on_tab_container_tab_changed(0)
 	SaveManager.loading.became_false.connect(_on_tab_container_tab_changed)
 	gv.reset.connect(reset)
@@ -39,14 +39,14 @@ func _input(_event):
 	if Input.is_action_just_pressed("upgrades0"):
 		tab_container.current_tab = 0
 	elif Input.is_action_just_pressed("upgrades1"):
-		if up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER):
+		if up.is_upgrade_tree_unlocked(UpgradeTree.Type.VOYAGER):
 			tab_container.current_tab = 1
 
 
 func _physics_process(_delta):
 	if not is_visible_in_tree():
 		return
-	if Settings.joypad.right.is_true():
+	if Settings.joypad_detected.is_true():
 		if Input.is_action_pressed("joy_scroll_down"):
 			current_scroll_container.scroll_vertical += int(Input.get_action_strength("joy_scroll_down") * SCROLL_SPEED)
 		elif Input.is_action_pressed("joy_scroll_up"):
@@ -66,7 +66,7 @@ func _on_visibility_changed():
 
 
 func joypad_detected_changed() -> void:
-	joypad_controls.visible = Settings.joypad.get_right()
+	joypad_controls.visible = Settings.joypad_detected.get_value()
 
 
 func focus_changed(node: Node) -> void:
@@ -82,19 +82,19 @@ func _on_tab_container_tab_changed(tab = tab_container.current_tab):
 	tab += 1
 	if up.tree_exists_and_is_unlocked(tab + 1):
 		var next_tree = up.get_upgrade_tree(tab + 1)
-		rb.modulate = next_tree.details.color
+		rb.modulate = next_tree.details.get_color()
 		return
 	if up.tree_exists_and_is_unlocked(tab - 1):
 		var prev_tree = up.get_upgrade_tree(tab - 1)
-		lb.modulate = prev_tree.details.color
+		lb.modulate = prev_tree.details.get_color()
 		return
 	var cur_tree = up.get_upgrade_tree(tab)
-	rb.modulate = cur_tree.details.color
-	lb.modulate = cur_tree.details.color
+	rb.modulate = cur_tree.details.get_color()
+	lb.modulate = cur_tree.details.get_color()
 
 
 func voyager_unlocked_changed() -> void:
-	tab_container.tabs_visible = up.is_upgrade_tree_unlocked(up.UpgradeTree.Type.VOYAGER)
+	tab_container.tabs_visible = up.is_upgrade_tree_unlocked(UpgradeTree.Type.VOYAGER)
 
 
 func reset(_tier: int) -> void:
