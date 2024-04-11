@@ -45,4 +45,3 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pr56i")
 
 [connection signal="resized" from="." to="." method="_on_resized"]
-[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]

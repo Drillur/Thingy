@@ -69,17 +69,17 @@ func _init(_type: Type) -> void:
 			unlocked = LoudBool.new(true)
 		Type.COIN:
 			details.set_color(Color(1, 0.867, 0))
-			details.set_icon(bag.get_resource("Coin"))
+			details.set_icon(bag.get_resource("Coin"), false)
 		Type.XP:
 			details.set_name("Experience")
 			details.set_color(Color(0.894, 0.51, 1))
-			details.set_icon(bag.get_resource("Star"))
+			details.set_icon(bag.get_resource("Star"), false)
 		Type.JUICE:
 			details.set_color(Color(0.424, 0.957, 0.125))
-			details.set_icon(bag.get_resource("Juice"))
+			details.set_icon(bag.get_resource("Juice"), false)
 		Type.SOUL:
 			details.set_color(Color(0.918, 0.2, 0.553))
-			details.set_icon(bag.get_resource("Ghost"))
+			details.set_icon(bag.get_resource("Ghost"), false)
 			persist.through_tier(1)
 			amount.add_pending_to_current_on_game_load = false
 

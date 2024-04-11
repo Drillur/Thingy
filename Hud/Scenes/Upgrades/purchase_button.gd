@@ -32,12 +32,14 @@ var color: Color:
 			return
 		color = val
 		button.modulate = color
+		texture_rect.modulate = color
 		if not remove_cost_components:
 			cost_components.color = color
 
 
 
 func _ready() -> void:
+	times_purchased.hide()
 	if remove_cost_components:
 		cost_components.queue_free()
 	if remove_title_components:
@@ -58,6 +60,10 @@ func setup_price(_price: Price) -> void:
 		await ready
 	cost_components.price = price
 	cost_components.custom_minimum_size.x = 170
+	price.all_affordable.became_true.connect(
+		func():
+			gv.flash(self, color)
+	)
 
 
 func assign_loud_color(_loud_color: LoudColor) -> void:
@@ -113,7 +119,6 @@ func _on_button_mouse_entered():
 
 func lock() -> void:
 	texture_rect.texture = bag.get_resource("Locked")
-	texture_rect.modulate = color
 	cost_components.hide()
 	title.hide()
 	description.hide()

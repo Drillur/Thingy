@@ -73,6 +73,7 @@ var index: int
 var just_born := true
 var details = Details.new()
 var timer := LoudTimer.new(1.0, 1.0)
+var next_job_haste_divider := LoudFloat.new(1.0)
 
 
 
@@ -100,8 +101,6 @@ func _init(_index: int) -> void:
 	timer.wait_time_range.current.book.add_multiplier(duration_modifier)
 	timer.wait_time_range.total.book.add_multiplier(duration_modifier)
 	timer.wait_time_range.total.book.add_multiplier(th.duration_range.total)
-	timer.wait_time_range.current.book.add_multiplier(crit_multiplier)
-	timer.wait_time_range.total.book.add_multiplier(crit_multiplier)
 	
 	if gv.root_ready.is_false():
 		SaveManager.loading.became_false.connect(first_start)
@@ -129,11 +128,21 @@ func reset() -> void:
 
 func timer_timeout() -> void:
 	inhand.add_currencies()
-	if inhand.xp:
-		xp.add(inhand.xp.get_value())
+	if inhand.output_has(Currency.Type.XP):
+		xp.add(inhand.output[Currency.Type.XP])
 	inhand.clear()
 	inhand = null
+	if th.crits_apply_to_next_job_duration.is_true():
+		if next_job_haste_divider.greater(1.0):
+			next_job_haste_divider.reset()
+			timer.wait_time_range.current.remove_divided(next_job_haste_divider)
+			timer.wait_time_range.total.remove_divided(next_job_haste_divider)
+		if crit_success.is_true():
+			next_job_haste_divider.set_to(crit_multiplier.get_value())
 	crit_multiplier.reset()
+	if th.crits_apply_to_duration.is_true():
+		timer.wait_time_range.current.remove_divided(crit_multiplier)
+		timer.wait_time_range.total.remove_divided(crit_multiplier)
 	juiced.reset()
 	start_timer()
 
@@ -207,6 +216,12 @@ func get_output_currency() -> Currency.Type:
 func set_inhands() -> void:
 	if successful_crit_roll():
 		roll_for_lucky_crits()
+		if th.crits_apply_to_duration.is_true():
+			timer.wait_time_range.current.edit_divided(crit_multiplier, crit_multiplier.get_value())
+			timer.wait_time_range.total.edit_divided(crit_multiplier, crit_multiplier.get_value())
+	if next_job_haste_divider.greater(1.0):
+		timer.wait_time_range.current.edit_divided(next_job_haste_divider, next_job_haste_divider.get_value())
+		timer.wait_time_range.total.edit_divided(next_job_haste_divider, next_job_haste_divider.get_value())
 	inhand = Inhand.new()
 	set_inhand_xp()
 	set_coin_inhand()
@@ -248,20 +263,20 @@ func set_inhand_xp() -> void:
 		new_inhand *= crit_multiplier.get_value()
 	if th.duration_applies_to_xp_output.is_true():
 		new_inhand *= max(1, timer.wait_time)
-	inhand.set_xp(LoudFloat.new(new_inhand))
+	inhand.add_output({Currency.Type.XP: new_inhand})
 
 
 func set_coin_inhand() -> void:
 	if crit_success.is_false():
 		return
-	var new_inhand = th.crit_coin_output.get_random_point()
+	var new_inhand := th.crit_coin_output.get_random_point()
 	if juiced.is_true():
 		new_inhand *= juiced_multiplier.get_value()
 	if th.crits_apply_to_coin.is_true():
 		new_inhand *= crit_multiplier.get_value()
 	if th.crits_apply_to_coin_twice.is_true():
 		new_inhand *= crit_multiplier.get_value()
-	inhand.set_coin(Big.new(new_inhand))
+	inhand.add_output({Currency.Type.COIN: Big.new(new_inhand)})
 
 
 func log_rates() -> void:
@@ -276,11 +291,13 @@ func log_rates() -> void:
 					self, Big.new(inhand.output[Currency.Type.JUICE]).d(timer.wait_time)
 				)
 			wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
-				self, Big.new(inhand.xp).d(timer.wait_time)
+				self,
+				Big.new(inhand.output[Currency.Type.XP]).d(timer.wait_time)
 			)
 			if crit_success.is_true():
 				wa.get_currency(Currency.Type.COIN).gain_rate.edit_added(
-					self, Big.new(inhand.coin).d(timer.wait_time)
+					self,
+					Big.new(inhand.output[Currency.Type.COIN]).d(timer.wait_time)
 				)
 		wa.RateMode.MINIMUM:
 			wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(

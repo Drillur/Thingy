@@ -22,13 +22,12 @@ var progress: float = -1:
 var bar_size := LoudInt.new(-1)
 var display_pending := false
 var resize_queued := false
-var visible_in_tree := false
-var update_queued := false
+
+var queue := await Queueable.new(self)
 
 var timer: LoudTimer
 var value: Resource
 var price: Price
-var pending_price: bool
 
 
 
@@ -55,23 +54,6 @@ func bar_size_changed() -> void:
 	progress_bar.size = Vector2(bar_size.get_value(), size.y)
 
 
-func _on_visibility_changed():
-	visible_in_tree = is_visible_in_tree()
-	if visible_in_tree and update_queued:
-		update_queued = false
-		if price:
-			update_by_price()
-		elif value:
-			update_progress()
-		elif timer:
-			set_process(true)
-	elif not visible_in_tree:
-		if timer:
-			set_process(false)
-			update_queued = true
-
-
-
 
 # - Action
 
@@ -93,38 +75,34 @@ func attach_value_pair(_value_pair: ValuePair, _pending_value := false) -> void:
 	display_pending = _pending_value
 	remove_value()
 	value = _value_pair
-	value.changed.connect(update_progress)
+	queue.method = update_progress
 	if display_pending:
-		if not value.current.pending_changed.is_connected(update_progress):
-			value.current.pending_changed.connect(update_progress)
-	value.full.became_true.connect(update_progress)
-	update_progress.call_deferred()
+		value.current.pending_changed.connect(queue.call_method)
+	value.changed.connect(queue.call_method)
+	value.full.became_true.connect(queue.call_method)
+	queue.call_method()
 
 
 func attach_float_pair(_float_pair: LoudFloatPair) -> void:
 	remove_value()
 	value = _float_pair
-	value.changed.connect(update_progress)
-	value.full.became_true.connect(update_progress)
-	update_progress.call_deferred()
+	queue.method = update_progress
+	value.changed.connect(queue.call_method)
+	value.full.became_true.connect(queue.call_method)
+	queue.call_method()
 
 
 func remove_value() -> void:
 	if value != null:
-		value.changed.disconnect(update_progress)
-		value.full.became_true.disconnect(update_progress)
-		if value is ValuePair and value.current.pending_changed.is_connected(update_progress):
-			value.current.pending_changed.disconnect(update_progress)
+		value.changed.disconnect(queue.call_method)
+		value.full.became_true.disconnect(queue.call_method)
+		if value is ValuePair and display_pending:# and value.current.pending_changed.is_connected(queue.call_method):
+			value.current.pending_changed.disconnect(queue.call_method)
 		value = null
 
 
 func update_progress() -> void:
 	# value_pair only
-	if update_queued:
-		return
-	if not visible_in_tree:
-		update_queued = true
-		return 
 	if value:
 		if display_pending:
 			set_deferred("progress", value.get_pending_percent())
@@ -134,7 +112,7 @@ func update_progress() -> void:
 
 func attach_price(_price: Price, _pending_price := false) -> void:
 	price = _price
-	pending_price = _pending_price
+	display_pending = _pending_price
 	if not is_node_ready():
 		await ready
 	progress = 0
@@ -146,38 +124,39 @@ func attach_price(_price: Price, _pending_price := false) -> void:
 
 func connect_calls_price() -> void:
 	#price.changed.connect(update_by_price)
+	queue.method = update_by_price
 	for x in price.price.keys():
 		var currency = wa.get_currency(x)
-		currency.amount.changed.connect(update_by_price)
+		if display_pending:
+			currency.amount.pending_changed.connect(queue.call_method)
+		currency.amount.changed.connect(queue.call_method)
 	await get_tree().physics_frame
-	update_by_price()
+	queue.call_method()
 
 
 func disconnect_calls_price() -> void:
 	#price.changed.disconnect(update_by_price)
 	for x in price.price.keys():
 		var currency = wa.get_currency(x)
-		currency.amount.changed.disconnect(update_by_price)
+		if display_pending:
+			currency.amount.pending_changed.disconnect(queue.call_method)
+		currency.amount.changed.disconnect(queue.call_method)
 
 
 func update_by_price() -> void:
-	if update_queued:
-		return
-	if not visible_in_tree:
-		update_queued = true
 	set_progress_by_price()
 	update_edge_by_price()
 
 
 func update_edge_by_price() -> void:
-	if pending_price:
+	if display_pending:
 		edge.set_deferred("visible", not is_equal_approx(price.get_pending_progress_percent(), 1.0))
 	else:
 		edge.set_deferred("visible", not is_equal_approx(price.get_progress_percent(), 1.0))
 
 
 func set_progress_by_price() -> void:
-	if pending_price:
+	if display_pending:
 		set_deferred("progress", price.get_pending_progress_percent())
 	else:
 		set_deferred("progress", price.get_progress_percent())

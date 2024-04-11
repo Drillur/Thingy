@@ -336,7 +336,7 @@ func _on_soul_components_resized():
 
 
 @onready var navigation_panel = %"Navigation Panel"
-@onready var unlock_upgrades_button = %UnlockUpgradesButton
+@onready var unlock_upgrades_button = %UNLOCK_UPGRADES
 @onready var purchase_thingy = %"Purchase Thingy"
 @onready var navigation_buttons = %"Navigation Buttons"
 @onready var tab_upgrade = %"Tab Upgrade"

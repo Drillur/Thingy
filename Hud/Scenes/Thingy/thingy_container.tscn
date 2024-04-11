@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Hud/Scenes/Thingy/thingy_container.gd" id="1_2egv3"]
 [ext_resource type="PackedScene" uid="uid://btmej8oakg4f1" path="res://Hud/Scenes/Thingy/thingy_vico.tscn" id="2_y25jd"]
-[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/purchase_button.tscn" id="4_7f4hf"]
+[ext_resource type="PackedScene" uid="uid://dky60pdpk0ffa" path="res://Hud/Scenes/Upgrades/purchase_button.tscn" id="4_7f4hf"]
 [ext_resource type="Texture2D" uid="uid://c81tbq6j5hhl6" path="res://Art/Icons/Hud/arrow-up-s-line.png" id="5_jrt6d"]
 [ext_resource type="Texture2D" uid="uid://d328m6cljbdnh" path="res://Art/Icons/Hud/arrow-down-s-line.png" id="5_vkcv4"]
 [ext_resource type="Texture2D" uid="uid://dsiwa3s1c7mj" path="res://Art/Icons/Hud/Up Skip.png" id="6_5vs1g"]
@@ -93,7 +93,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 icon = ExtResource("6_5vs1g")
 remove_cost_components = true
-allow_focus = false
 
 [node name="Up" parent="HBoxContainer/HBoxContainer/Navigation Buttons/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
@@ -102,7 +101,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 icon = ExtResource("5_jrt6d")
 remove_cost_components = true
-allow_focus = false
 
 [node name="Down" parent="HBoxContainer/HBoxContainer/Navigation Buttons/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
@@ -111,7 +109,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 icon = ExtResource("5_vkcv4")
 remove_cost_components = true
-allow_focus = false
 
 [node name="ToBot" parent="HBoxContainer/HBoxContainer/Navigation Buttons/VBoxContainer3" instance=ExtResource("4_7f4hf")]
 unique_name_in_owner = true
@@ -120,7 +117,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 icon = ExtResource("8_dgp3g")
 remove_cost_components = true
-allow_focus = false
 
 [node name="Navigation Joypad" type="VBoxContainer" parent="HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true

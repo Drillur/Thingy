@@ -35,6 +35,7 @@ var crits_apply_to_xp := LoudBool.new(false)
 var crits_apply_to_coin := LoudBool.new(false)
 var crits_apply_to_coin_twice := LoudBool.new(false)
 var crits_apply_to_duration := LoudBool.new(false)
+var crits_apply_to_next_job_duration := LoudBool.new(false)
 
 var duration_range := LoudFloatPair.new(5.0, 5.0)
 var duration_increase_range := LoudFloatPair.new(1.1, 1.1)

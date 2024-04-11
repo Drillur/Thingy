@@ -7,9 +7,9 @@ enum Type {
 	UNLOCK_UPGRADES,
 	HASTE01,
 	OUTPUT01,
-	COST01,
+	COST01,#
 	XP02,
-	UNLOCK_RPG_TREE,
+	UNLOCK_VOYAGER,
 	UNLOCK_XP,
 	UNLOCK_CRIT,
 	CRIT01,
@@ -18,24 +18,24 @@ enum Type {
 	CURRENT_DURATION_RANGE01,
 	TOTAL_XP_GAIN01,
 	OUTPUT02,
-	XP_GAIN01,
-	XP01,
+	XP_GAIN01,#
+	XP01,#
 	DURATION01,
 	DURATION_INCREASE01,
 	CRITS_AFFECT_XP_GAIN,
-	CRIT_RANGE01,
+	CRIT_RANGE01,#
 	CRITS_AFFECT_COIN_GAIN,
 	DURATION02,
 	OUTPUT03,
-	COIN01,
-	CRITS_APPLY_TO_DURATION,
+	COIN01,#
+	CRITS_AFFECT_DURATION,
 	
 	
 	UNLOCK_JUICE,
 	DURATION03,
 	OUTPUT_INCREASE01,
 	UNLOCK_LUCKY_CRIT,
-	DURATION_APPLIES_TO_XP_OUTPUT,
+	DURATION_AFFECTS_XP_OUTPUT,
 	CURRENT_XP_INCREASE_RANGE01,
 	OUTPUT_INCREASE_RANGE_TOTAL01,
 	CRIT02,
@@ -44,10 +44,13 @@ enum Type {
 	SMART_JUICE,
 	THINGY_AUTOBUYER,
 	
-	JUICER,
-	LUCKY_CRIT2,
-	CRITS_AFFECT_COIN_GAIN2,
+	JUICER,#
+	LUCKY_CRIT2,#
+	CRITS_AFFECT_COIN_GAIN2,#
+	CRITS_AFFECT_NEXT_DURATION,#
 }
+
+static var data: Dictionary
 
 @export var times_purchased := LoudIntPair.new(0, 1)
 @export var purchased := LoudBool.new(false)
@@ -92,40 +95,50 @@ var unlocked_tree: UpgradeTree.Type
 func _init(_type: Type) -> void:
 	type = _type
 	key = Type.keys()[type]
-	if type < Type.UNLOCK_JUICE:
-		tree = UpgradeTree.Type.FIRESTARTER
-	else:
-		tree = UpgradeTree.Type.VOYAGER
-	details.set_name(key.capitalize())
-	persist.failed_persist_check.connect(reset)
-	var mod: float
-	match type:
-		Type.UNLOCK_UPGRADES:
-			discord_state = "Discovering Upgrades to their Thingy"
-			price = Price.new({Currency.Type.WILL: 10})
-			details.set_color(up.upgrade_color)
-			details.set_icon(bag.get_resource("upgrades"))
-			unlocked_tree = UpgradeTree.Type.FIRESTARTER
-			persist.through_tier(4)
-		Type.HASTE01:
-			details.set_name("Urgency")
-			details.set_description("Duration [b]-%s[/b].")
-			details.set_icon(bag.get_resource("Speed"))
-			price = Price.new({Currency.Type.WILL: 20})
-			thingy_attribute = Thingy.Attribute.DURATION_RANGE
-			category = Book.Category.SUBTRACTED
-			mod = 1.0
-		Type.OUTPUT01:
-			details.set_name("Boxer")
+	var my_data: Dictionary = data.get(key)
+	details.set_name(my_data.get("Name"))
+	tree = UpgradeTree.Type[my_data.get("Tree").to_upper()]
+	set_price(my_data.get("Cost"))
+	if my_data.get("Cost Increase"):
+		price.increase_modifier.set_to(float(my_data.get("Cost Increase")))
+	if my_data.get("Thingy Attribute"):
+		thingy_attribute = Thingy.Attribute[my_data.get("Thingy Attribute")]
+	if my_data.get("Category"):
+		category = Book.Category[my_data.get("Category").to_upper()]
+	if my_data.get("Icon"):
+		details.set_icon(bag.get_icon(my_data.get("Icon")))
+	if my_data.get("Color"):
+		details.set_color(wa.get_color(Currency.Type[my_data.get("Color").to_upper()]))
+	if my_data.get("Discord State"):
+		discord_state = my_data.get("Discord State")
+	var operator: String
+	match category:
+		Book.Category.ADDED:
+			operator = "+"
+		Book.Category.SUBTRACTED:
+			operator = "-"
+		Book.Category.MULTIPLIED:
+			operator = "x"
+		Book.Category.DIVIDED:
+			operator = "/"
+	match thingy_attribute:
+		Thingy.Attribute.DURATION_RANGE:
+			details.set_description("Duration [b]%s[/b]." % (operator + "%s"))
+		Thingy.Attribute.CRIT:
+			details.set_description("Crit chance [b]%s[/b]." % (operator + "%s%%"))
+		Thingy.Attribute.OUTPUT_RANGE:
 			details.set_description(wa.get_details(
 				Currency.Type.WILL
-			).get_icon_and_name() + " output [b]+%s[/b].")
-			details.set_color(wa.get_color(Currency.Type.WILL))
-			details.set_icon(bag.get_resource("Boxing"))
-			price = Price.new({Currency.Type.WILL: 30})
-			thingy_attribute = Thingy.Attribute.OUTPUT_RANGE
-			category = Book.Category.ADDED
-			mod = 1.0
+			).get_icon_and_name() + " output [b]%s[/b]." % (operator + "%s"))
+	var mod: float
+	if my_data.get("Mod"):
+		mod = my_data.get("Mod")
+	
+	match type:
+		Type.UNLOCK_UPGRADES:
+			details.set_color(up.upgrade_color)
+			unlocked_tree = UpgradeTree.Type.FIRESTARTER
+			persist.through_tier(4)
 		Type.COST01:
 			details.set_name("Greed")
 			details.set_description("Cost [b]x%s[/b].")
@@ -137,14 +150,10 @@ func _init(_type: Type) -> void:
 			category = Book.Category.MULTIPLIED
 			mod = 0.75
 		Type.UNLOCK_XP:
-			details.set_name("Adventurer")
 			details.set_description("Unlocks %s and Thingy levels." % wa.get_details(
 				Currency.Type.XP
 			).get_icon_and_colored_name())
-			details.set_color(wa.get_color(Currency.Type.XP))
-			details.set_icon(bag.get_resource("Star"))
-			price = Price.new({Currency.Type.WILL: 50})
-		Type.UNLOCK_RPG_TREE:
+		Type.UNLOCK_VOYAGER:
 			discord_state = "About to reset their Thingy"
 			required_upgrade = Type.UNLOCK_XP
 			unlocked_tree = UpgradeTree.Type.VOYAGER
@@ -155,15 +164,6 @@ func _init(_type: Type) -> void:
 				Currency.Type.COIN: 250,
 			})
 			persist.through_tier(1)
-		Type.UNLOCK_CRIT:
-			discord_state = "Their Thingy can score Critical Hits!"
-			details.set_name("Low Roller")
-			details.set_description("Crit chance [b]+%s%%[/b].")
-			details.set_icon(bag.get_resource("Dice"))
-			price = Price.new({Currency.Type.XP: 100})
-			thingy_attribute = Thingy.Attribute.CRIT
-			category = Book.Category.ADDED
-			mod = 5.0
 		Type.CRITS_GIVE_GOLD:
 			discord_state = "Earning money from their Thingy"
 			required_upgrade = Type.UNLOCK_CRIT
@@ -443,13 +443,21 @@ func _init(_type: Type) -> void:
 			thingy_attribute = Thingy.Attribute.CRIT_COIN_OUTPUT
 			category = Book.Category.ADDED
 			mod = 1
-		Type.CRITS_APPLY_TO_DURATION:
+		Type.CRITS_AFFECT_DURATION:
 			required_upgrade = Type.CRITS_AFFECT_COIN_GAIN
 			details.set_name("Theif's Gait")
 			details.set_description("Crits divide duration.")
 			details.set_icon(bag.get_resource("Speed"))
 			price = Price.new({
 				Currency.Type.COIN: 100,
+			})
+		Type.CRITS_AFFECT_NEXT_DURATION:
+			required_upgrade = Type.CRITS_AFFECT_DURATION
+			details.set_name("Double Tap")
+			details.set_description("Crits divide the next job's duration.")
+			details.set_icon(bag.get_resource("Speed"))
+			price = Price.new({
+				Currency.Type.COIN: 9001,
 			})
 		Type.UNLOCK_JUICE:
 			discord_state = "Their Thingy is really Juicy."
@@ -488,7 +496,7 @@ func _init(_type: Type) -> void:
 			thingy_attribute = Thingy.Attribute.XP_OUTPUT
 			category = Book.Category.MULTIPLIED
 			mod = 1.5
-		Type.DURATION_APPLIES_TO_XP_OUTPUT:
+		Type.DURATION_AFFECTS_XP_OUTPUT:
 			required_upgrade = Type.UNLOCK_LUCKY_CRIT
 			details.set_name("Learned")
 			details.set_description("Duration multiplies %s output." % (
@@ -592,6 +600,8 @@ func _init(_type: Type) -> void:
 				Currency.Type.SOUL: 10,
 			})
 	times_purchased.total.reset()
+	price.owner_purchased.copycat(purchased)
+	persist.failed_persist_check.connect(reset)
 	
 	#if "JUICE" in Thingy.Attribute.keys()[thingy_attribute]:
 		#details.set_color(wa.get_color(Currency.Type.JUICE)
@@ -696,14 +706,14 @@ func _init(_type: Type) -> void:
 				thingy_attributes_to_edit.append(th.price.price[cur])
 	
 	if unlocked_tree != UpgradeTree.Type.NONE:
-		var tree = up.get_upgrade_tree(unlocked_tree)
-		details.set_color(tree.details.get_color())
+		var _tree = up.get_upgrade_tree(unlocked_tree)
+		details.set_color(_tree.details.get_color())
 		if type != Type.UNLOCK_UPGRADES:
-			details.set_icon(tree.details.get_icon())
+			details.set_icon(_tree.details.get_icon())
 		if details.get_description() == "":
-			details.set_description("Unlock %s upgrades." % tree.details.get_icon_and_name())
+			details.set_description("Unlock %s upgrades." % _tree.details.get_icon_and_name())
 		match type:
-			Type.UNLOCK_RPG_TREE:
+			Type.UNLOCK_VOYAGER:
 				details.set_description(details.get_description().rstrip(".") + (
 					" and %s." % (
 						wa.get_details(Currency.Type.SOUL).get_icon_and_name()
@@ -724,6 +734,15 @@ func _init(_type: Type) -> void:
 	if modifier:
 		modifier.changed.connect(modifier_changed)
 
+
+func set_price(_cost_text: String) -> void:
+	var price_dict := {}
+	for text in _cost_text.split(", "):
+		var split = text.split(" ")
+		var currency_name = split[0].to_upper()
+		var amount = split[1]
+		price_dict[Currency.Type[currency_name]] = amount
+	price = Price.new(price_dict)
 
 
 # - Signals
@@ -799,16 +818,16 @@ func remove() -> void:
 			th.crits_apply_to_coin_twice.set_to(false)
 		Type.UNLOCK_XP:
 			wa.lock(Currency.Type.XP)
-		Type.CRITS_APPLY_TO_DURATION:
-			th.crits_apply_to_duration.set_to(false)
+		Type.CRITS_AFFECT_DURATION:
+			th.CRITS_AFFECT_DURATION.set_to(false)
 		Type.CRITS_GIVE_GOLD:
 			wa.lock(Currency.Type.COIN)
 		Type.UNLOCK_JUICE:
 			wa.lock(Currency.Type.JUICE)
-		Type.UNLOCK_RPG_TREE:
+		Type.UNLOCK_VOYAGER:
 			wa.lock(Currency.Type.SOUL)
-		Type.DURATION_APPLIES_TO_XP_OUTPUT:
-			th.duration_applies_to_xp_output.set_to(false)
+		Type.DURATION_AFFECTS_XP_OUTPUT:
+			th.DURATION_AFFECTS_XP_OUTPUT.set_to(false)
 
 
 func apply() -> void:
@@ -831,16 +850,16 @@ func apply() -> void:
 			th.crits_apply_to_coin_twice.set_to(true)
 		Type.UNLOCK_XP:
 			wa.unlock(Currency.Type.XP)
-		Type.CRITS_APPLY_TO_DURATION:
-			th.crits_apply_to_duration.set_to(true)
+		Type.CRITS_AFFECT_DURATION:
+			th.CRITS_AFFECT_DURATION.set_to(true)
 		Type.CRITS_GIVE_GOLD:
 			wa.unlock(Currency.Type.COIN)
 		Type.UNLOCK_JUICE:
 			wa.unlock(Currency.Type.JUICE)
-		Type.UNLOCK_RPG_TREE:
+		Type.UNLOCK_VOYAGER:
 			wa.unlock(Currency.Type.SOUL)
-		Type.DURATION_APPLIES_TO_XP_OUTPUT:
-			th.duration_applies_to_xp_output.set_to(true)
+		Type.DURATION_AFFECTS_XP_OUTPUT:
+			th.DURATION_AFFECTS_XP_OUTPUT.set_to(true)
 	
 	times_applied += 1
 

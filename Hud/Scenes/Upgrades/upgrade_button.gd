@@ -3,7 +3,6 @@ extends MarginContainer
 
 
 
-@export var upgrade_type: Upgrade.Type
 @export var wrap_description := false:
 	set(val):
 		wrap_description = val
@@ -23,7 +22,7 @@ var setup_done := false
 
 
 func _ready() -> void:
-	upgrade = up.get_upgrade(upgrade_type) as Upgrade
+	upgrade = up.get_upgrade(Upgrade.Type[name]) as Upgrade
 	upgrade.vico = self
 	
 	enabled_border.visible = not upgrade.enabled.get_value()
@@ -34,6 +33,7 @@ func _ready() -> void:
 	pb.button.mouse_entered.connect(tooltip_time)
 	pb.autobuyer_anim.modulate = upgrade.details.get_color()
 	pb.autobuyer_anim.speed_scale = 3.0
+	upgrade.times_purchased.changed.connect(set_description_text)
 	#upgrade.unlocked_and_not_purchased.changed.connect(update_autobuyer_anim_visibility)
 	#upgrade.autobuyer.changed.connect(update_autobuyer_anim_visibility)
 	pb.color = upgrade.details.get_color()
@@ -92,7 +92,7 @@ func setup() -> void:
 	if upgrade.times_purchased.get_total() > 1:
 		pb.times_purchased.show()
 		pb.times_purchased.watch_int_pair(upgrade.times_purchased, upgrade.details.get_color())
-	pb.texture_rect.modulate = Color.WHITE
+	#pb.texture_rect.modulate = Color.WHITE
 	set_cost_visibility()
 	pb.texture_rect.texture = upgrade.details.get_icon()
 	if setup_done:
@@ -111,7 +111,7 @@ func _on_purchase_button_pressed():
 		elif not upgrade.can_afford():
 			pb.cost_components.flash_missing_currencies()
 		elif upgrade.available_now.is_true():
-			upgrade.price.request_purchase(true)
+			upgrade.purchase()
 	else:
 		upgrade.enabled.invert()
 

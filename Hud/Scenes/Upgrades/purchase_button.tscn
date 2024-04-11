@@ -93,6 +93,7 @@ autowrap_mode = 0
 
 [node name="times purchased" parent="VBoxContainer/Details/VBoxContainer/TitleComponents" instance=ExtResource("5_4iwff")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 4
 text = "4/5"

@@ -3,8 +3,6 @@ extends Resource
 
 
 
-var xp: LoudFloat
-var coin: Big
 var output := {}
 var input := {}
 
@@ -14,27 +12,14 @@ var input := {}
 
 
 func add_output(_output: Dictionary) -> void:
-	output[_output.keys()[0]] = _output.values()[0]
-
-
-func set_xp(_xp: LoudFloat) -> void:
-	xp = _xp
-	var currency := wa.get_currency(Currency.Type.XP)
-	currency.edit_pending(self, xp.get_value())
-	add_output({Currency.Type.XP: xp.get_value()})
-
-
-func set_coin(_coin: Big) -> void:
-	coin = _coin
-	var currency := wa.get_currency(Currency.Type.COIN)
-	currency.edit_pending(self, coin)
+	for currency_type in _output:
+		output[currency_type] = _output[currency_type]
 
 
 func edit_pending() -> void:
-	for x in output.keys():
-		var currency := wa.get_currency(x)
-		currency.edit_pending(self, output[x])
-	
+	for currency_type in output.keys():
+		var currency := wa.get_currency(currency_type)
+		currency.edit_pending(self, output[currency_type])
 
 
 func clear_pending() -> void:
@@ -73,6 +58,10 @@ func clear() -> void:
 
 func has_input() -> bool:
 	return input.size() > 0
+
+
+func output_has(_currency_type: Currency.Type) -> bool:
+	return output.has(_currency_type)
 
 
 #endregion

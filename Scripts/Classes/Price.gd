@@ -14,7 +14,7 @@ var purchase_requested_cd := PhysicsCooldown.new(purchase_requested)
 var currency_types: Array[Currency.Type]
 var increase_modifier := LoudFloat.new(1.0)
 
-var all_affordable := LoudBool.new(false)
+var all_affordable := LoudBoolArray.new()
 
 var price := {}
 var affordable := {}
@@ -36,27 +36,28 @@ func add_price(currency_type: Currency.Type, base_value) -> void:
 	price[currency_type] = Value.new(base_value)
 	affordable[currency_type] = LoudBool.new(false)
 	currency_types.append(currency_type)
-	affordable[currency_type].changed.connect(affordable_changed)
+	all_affordable.add_bool(affordable[currency_type])
 	check_currency(currency_type)
-	var disconnect_calls = func():
+	var update_calls = func():
 		if owner_purchased.is_true() or owner_unlocked.is_false():
 			if wa.get_currency(currency_type).increased__type.is_connected(currency_increased):
 				wa.get_currency(currency_type).increased__type.disconnect(currency_increased)
 			if wa.get_currency(currency_type).decreased__type.is_connected(currency_decreased):
 				wa.get_currency(currency_type).decreased__type.disconnect(currency_decreased)
-	owner_purchased.became_true.connect(disconnect_calls)
-	owner_unlocked.became_false.connect(disconnect_calls)
-	disconnect_calls.call()
+		else:
+			if not wa.get_currency(currency_type).increased__type.is_connected(currency_increased):
+				wa.get_currency(currency_type).increased__type.connect(currency_increased)
+			if not wa.get_currency(currency_type).decreased__type.is_connected(currency_decreased):
+				wa.get_currency(currency_type).decreased__type.connect(currency_decreased)
+	owner_purchased.changed.connect(update_calls)
+	owner_unlocked.changed.connect(update_calls)
+	update_calls.call()
 	price[currency_type].changed.connect(emit_changed)
 	price[currency_type].book.add_powerer(increase_modifier, times_increased, -1)
 
 
 
 #region Signals
-
-
-func affordable_changed() -> void:
-	all_affordable.set_to(are_all_affordable())
 
 
 func currency_increased(currency_type: Currency.Type) -> void:
@@ -91,16 +92,6 @@ func check_currency(currency_type: Currency.Type) -> void:
 	affordable[currency_type].set_to(
 		amount.greater_equal(get_price(currency_type))
 	)
-	if affordable[currency_type].is_true():
-		if wa.get_currency(currency_type).increased__type.is_connected(currency_increased):
-			wa.get_currency(currency_type).increased__type.disconnect(currency_increased)
-		if not wa.get_currency(currency_type).decreased__type.is_connected(currency_decreased):
-			wa.get_currency(currency_type).decreased__type.connect(currency_decreased)
-	else:
-		if not wa.get_currency(currency_type).increased__type.is_connected(currency_increased):
-			wa.get_currency(currency_type).increased__type.connect(currency_increased)
-		if wa.get_currency(currency_type).decreased__type.is_connected(currency_decreased):
-			wa.get_currency(currency_type).decreased__type.disconnect(currency_decreased)
 
 
 #endregion

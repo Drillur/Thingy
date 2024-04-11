@@ -50,6 +50,10 @@ func get_upgrade(upgrade_type: Upgrade.Type) -> Upgrade:
 	return upgrades[upgrade_type]
 
 
+func get_details(upgrade_type: Upgrade.Type) -> Details:
+	return get_upgrade(upgrade_type).details
+
+
 func get_color(upgrade_type: Upgrade.Type) -> Color:
 	return get_upgrade(upgrade_type).details.get_color()
 

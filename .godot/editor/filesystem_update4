@@ -6,19 +6,21 @@ res://Hud/Themes/Subtle Background.tres
 res://Hud/Themes/Title.tres
 res://Hud/Themes/Subtle Background Rounded.tres
 res://Hud/Themes/Standard Rounded.tres
+res://Scripts/Classes/LoudVar/LoudFloat.gd
+res://Scripts/Classes/Thingy.gd
 res://Hud/Scenes/Thingy/thingy_vico.tscn
 res://Hud/Scenes/Thingy/thingy_widget.tscn
 res://Hud/Scenes/Upgrades/upgrade_container.tscn
 res://Hud/Scenes/Upgrades/upgrade_button.tscn
-res://Hud/Scenes/Upgrades/purchase_button.tscn
 res://Hud/Scenes/Upgrades/cost_components.tscn
-res://Scripts/Main.gd
-res://Scripts/Autoload/SaveManager.gd
-res://Scripts/Classes/Thingy.gd
-res://Scripts/Classes/LoudVar/LoudInt.gd
+res://Hud/Scenes/Thingy/thingy_container.tscn
+res://Hud/Scenes/Upgrades/purchase_button.tscn
 res://Scripts/Classes/Upgrade/Upgrade.gd
-res://Scripts/Classes/Inhand.gd
-res://Scripts/Classes/Details.gd
-res://Hud/Scenes/Upgrades/purchase_button.gd
+res://Scripts/Classes/LoudVar/LoudDict.gd
+res://Scripts/Autoload/Thingies.gd
+res://Scripts/Classes/LoudVar/Book.gd
 res://Hud/Scenes/Upgrades/upgrade_button.gd
-res://Hud/Scenes/RichLabel.gd
+res://Scripts/Autoload/Resources.gd
+res://Scripts/Thingy Data.json
+res://Scripts/Main.gd
+res://Hud/Scenes/bar.gd
