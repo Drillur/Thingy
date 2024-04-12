@@ -22,10 +22,9 @@ signal pressed
 signal right_clicked
 
 
+var locked: bool
 var loud_color: LoudColor
-
 var price: Price
-
 var color: Color:
 	set(val):
 		if color == val:
@@ -62,7 +61,8 @@ func setup_price(_price: Price) -> void:
 	cost_components.custom_minimum_size.x = 170
 	price.all_affordable.became_true.connect(
 		func():
-			gv.flash(self, color)
+			if not locked:
+				gv.flash(self, color)
 	)
 
 
@@ -117,7 +117,14 @@ func _on_button_mouse_entered():
 # - Action
 
 
+func unlock() -> void:
+	locked = false
+	title_components.show()
+	title.show()
+
+
 func lock() -> void:
+	locked = true
 	texture_rect.texture = bag.get_resource("Locked")
 	cost_components.hide()
 	title.hide()

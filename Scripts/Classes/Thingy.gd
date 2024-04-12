@@ -216,6 +216,8 @@ func get_output_currency() -> Currency.Type:
 func set_inhands() -> void:
 	if successful_crit_roll():
 		roll_for_lucky_crits()
+		if th.crits_add_to_all_output.is_true():
+			th.all_output.add(0.01)
 		if th.crits_apply_to_duration.is_true():
 			timer.wait_time_range.current.edit_divided(crit_multiplier, crit_multiplier.get_value())
 			timer.wait_time_range.total.edit_divided(crit_multiplier, crit_multiplier.get_value())
@@ -290,10 +292,11 @@ func log_rates() -> void:
 				wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
 					self, Big.new(inhand.output[Currency.Type.JUICE]).d(timer.wait_time)
 				)
-			wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
-				self,
-				Big.new(inhand.output[Currency.Type.XP]).d(timer.wait_time)
-			)
+			if wa.is_unlocked(Currency.Type.XP):
+				wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
+					self,
+					Big.new(inhand.output[Currency.Type.XP]).d(timer.wait_time)
+				)
 			if crit_success.is_true():
 				wa.get_currency(Currency.Type.COIN).gain_rate.edit_added(
 					self,
@@ -303,12 +306,14 @@ func log_rates() -> void:
 			wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(
 				self, get_minimum_output().d(get_minimum_duration())
 			)
-			wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
-				self, get_minimum_xp_output() / get_minimum_duration()
-			)
-			wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
-				self, get_minimum_juice_output() / get_minimum_duration()
-			)
+			if wa.is_unlocked(Currency.Type.XP):
+				wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
+					self, get_minimum_xp_output() / get_minimum_duration()
+				)
+			if wa.is_unlocked(Currency.Type.JUICE):
+				wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
+					self, get_minimum_juice_output() / get_minimum_duration()
+				)
 			var coin_rate = (
 				get_minimum_coin_output() * get_crit_chance_divider()
 			) / get_minimum_duration()

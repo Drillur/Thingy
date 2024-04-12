@@ -6,10 +6,9 @@ res://Hud/Themes/Subtle Background.tres
 res://Hud/Themes/Title.tres
 res://Hud/Themes/Subtle Background Rounded.tres
 res://Hud/Themes/Standard Rounded.tres
-res://Scripts/Classes/Upgrade/Upgrade.gd
 res://Scripts/Autoload/Thingies.gd
+res://Scripts/Classes/Upgrade/Upgrade.gd
 res://Scripts/Classes/Thingy.gd
-res://Hud/Scenes/Thingy/thingy_widget.gd
 res://Main.tscn
 res://Hud/Scenes/Thingy/thingy_vico.tscn
 res://Hud/Scenes/Thingy/thingy_widget.tscn
@@ -18,3 +17,7 @@ res://Hud/Scenes/Upgrades/cost_components.tscn
 res://Hud/Scenes/Thingy/thingy_container.tscn
 res://Hud/Scenes/Upgrades/purchase_button.tscn
 res://Resources/Thingy Data.json
+res://Hud/Scenes/Upgrades/upgrade_button.gd
+res://Hud/Scenes/Upgrades/purchase_button.gd
+res://Scripts/Classes/LoudVar/LoudInt.gd
+res://Scripts/Classes/LoudVar/LoudIntPair.gd

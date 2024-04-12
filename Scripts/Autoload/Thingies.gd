@@ -19,6 +19,9 @@ var container: ThingyContainer:
 @export var autobuyer_enabled := LoudBool.new(true)
 var autobuyer := LoudBoolArray.new([autobuyer_unlocked, autobuyer_enabled])
 
+var all_output := LoudFloat.new(1.0)
+var crits_add_to_all_output := LoudBool.new(false)
+
 var xp_output_range := LoudFloatPair.new(1.0, 1.0)
 var xp_increase_range := LoudFloatPair.new(1.15, 1.15)
 var xp_multiplier := LoudFloat.new(1.0)
@@ -51,6 +54,15 @@ var smart_juice := LoudBool.new(false)
 
 
 func _ready():
+	xp_output_range.current.book.add_multiplier(all_output)
+	xp_output_range.total.book.add_multiplier(all_output)
+	output_range.current.book.add_multiplier(all_output)
+	output_range.total.book.add_multiplier(all_output)
+	crit_coin_output.current.book.add_multiplier(all_output)
+	crit_coin_output.total.book.add_multiplier(all_output)
+	juice_output_range.current.book.add_multiplier(all_output)
+	juice_output_range.total.book.add_multiplier(all_output)
+	
 	price = Price.new({Currency.Type.WILL: 1})
 	price.increase_modifier.set_to(3.0)
 	initialized.emit()

@@ -44,10 +44,12 @@ enum Type {
 	SMART_JUICE,
 	THINGY_AUTOBUYER,
 	
-	JUICER,#
-	LUCKY_CRIT2,#
-	CRITS_AFFECT_COIN_GAIN2,#
-	CRITS_AFFECT_NEXT_DURATION,#
+	JUICER,
+	LUCKY_CRIT2,
+	CRITS_AFFECT_COIN_GAIN2,
+	CRITS_AFFECT_NEXT_DURATION,
+	CRITS_AFFECT_ALL_OUTPUT,
+	JUICE_OUT_INC_TOT,
 }
 
 static var data: Dictionary
@@ -115,6 +117,7 @@ func _init(_type: Type) -> void:
 		times_purchased.total.set_default_value(my_data.get("Limit"))
 	if my_data.get("Required Upgrade"):
 		required_upgrade = Type[my_data.get("Required Upgrade")]
+	
 	var operator: String
 	match category:
 		Book.Category.ADDED:
@@ -257,25 +260,61 @@ func _init(_type: Type) -> void:
 			for cur in th.price.price:
 				thingy_attributes_to_edit.append(th.price.price[cur])
 		Thingy.Attribute.JUICE_MULTIPLIER_RANGE:
+			details.set_description("%s multiplier [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_multiplier_range.current)
 			thingy_attributes_to_edit.append(th.juice_multiplier_range.total)
 		Thingy.Attribute.JUICE_MULTIPLIER_RANGE_CURRENT:
+			details.set_description("Minimum %s multiplier [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_multiplier_range.current)
 		Thingy.Attribute.JUICE_MULTIPLIER_RANGE_TOTAL:
+			details.set_description("Maximum %s multiplier [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_multiplier_range.total)
 		Thingy.Attribute.JUICE_INPUT_RANGE:
+			details.set_description("%s input [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_input_range.current)
 			thingy_attributes_to_edit.append(th.juice_input_range.total)
 		Thingy.Attribute.JUICE_INPUT_RANGE_CURRENT:
+			details.set_description("Minimum %s input [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_input_range.current)
 		Thingy.Attribute.JUICE_INPUT_RANGE_TOTAL:
+			details.set_description("Maximum %s input [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_input_range.total)
 		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE:
+			details.set_description("%s input increase [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_input_increase_range.current)
 			thingy_attributes_to_edit.append(th.juice_input_increase_range.total)
 		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE_CURRENT:
+			details.set_description("Minimum %s input increase [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_input_increase_range.current)
 		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE_TOTAL:
+			details.set_description("Maximum %s input increase [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_input_increase_range.total)
 		Thingy.Attribute.JUICE_OUTPUT_RANGE:
 			details.set_description("%s output [b]%s[/b]." % [
@@ -297,14 +336,28 @@ func _init(_type: Type) -> void:
 			])
 			thingy_attributes_to_edit.append(th.juice_output_range.total)
 		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE:
+			details.set_description("%s output increase [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_output_increase_range.current)
 			thingy_attributes_to_edit.append(th.juice_output_increase_range.total)
 		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE_CURRENT:
+			details.set_description("Minimum %s output increase [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_output_increase_range.current)
 		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE_TOTAL:
+			details.set_description("Maximum %s output increase [b]%s[/b]." % [
+				wa.get_details(Currency.Type.JUICE).get_icon_and_name(),
+				(operator + "%s")
+			])
 			thingy_attributes_to_edit.append(th.juice_output_increase_range.total)
 	
 	match type:
+		Type.CRITS_AFFECT_ALL_OUTPUT:
+			details.set_description("Global output multiplier +0.01 per crit.")
 		Type.UNLOCK_UPGRADES:
 			details.set_color(up.upgrade_color)
 			unlocked_tree = UpgradeTree.Type.FIRESTARTER
@@ -315,6 +368,7 @@ func _init(_type: Type) -> void:
 			).get_icon_and_colored_name())
 		Type.UNLOCK_VOYAGER:
 			persist.through_tier(1)
+			unlocked_tree = UpgradeTree.Type.VOYAGER
 		Type.CRITS_GIVE_GOLD:
 			details.set_description("All crits produce up to %s " + wa.get_details(
 				Currency.Type.COIN
@@ -386,7 +440,7 @@ func _init(_type: Type) -> void:
 		Book.Category.MULTIPLIED, Book.Category.DIVIDED:
 			modifier_multiply = mod
 			modifier = LoudFloat.new(1)
-	times_purchased.changed.connect(times_purchased_changed)
+	times_purchased.current.changed.connect(times_purchased_changed)
 	times_purchased.current.increased.connect(times_purchased_increased)
 	if not details.is_color_set():
 		details.set_color(gv.get_random_nondark_color())
@@ -423,10 +477,13 @@ func times_purchased_changed() -> void:
 
 func times_purchased_increased() -> void:
 	if modifier:
+		print(times_purchased.get_current(), "; ",times_purchased.get_text())
 		while times_applied < times_purchased.get_value():
 			times_applied += 1
-			modifier.add(modifier_add)
-			modifier.multiply(modifier_multiply)
+			if modifier_add != 0.0:
+				modifier.add(modifier_add)
+			elif modifier_multiply != 1.0:
+				modifier.multiply(modifier_multiply)
 	else:
 		apply()
 
@@ -463,6 +520,9 @@ func remove() -> void:
 	if unlocked_tree != UpgradeTree.Type.NONE:
 		up.upgrade_trees[unlocked_tree].unlocked.set_to(false)
 	match type:
+		Type.CRITS_AFFECT_ALL_OUTPUT:
+			th.crits_add_to_all_output.set_false()
+			th.all_output.reset()
 		Type.THINGY_AUTOBUYER:
 			th.autobuyer_unlocked.set_to(false)
 		Type.SMART_JUICE:
@@ -495,6 +555,8 @@ func apply() -> void:
 	if unlocked_tree != UpgradeTree.Type.NONE:
 		up.upgrade_trees[unlocked_tree].unlocked.set_to(true)
 	match type:
+		Type.CRITS_AFFECT_ALL_OUTPUT:
+			th.crits_add_to_all_output.set_true()
 		Type.THINGY_AUTOBUYER:
 			th.autobuyer_unlocked.set_to(true)
 		Type.SMART_JUICE:
@@ -566,14 +628,13 @@ func get_description() -> String:
 					]
 					and Book.is_category_additive(category)
 				):
-					if thingy_attribute == Thingy.Attribute.DURATION_RANGE:
-						return text % [
-							tp.quick_parse(modifier.get_value(), true),
-							tp.quick_parse(
-								(modifier.get_value() + modifier_add) * modifier_multiply,
-								true
-							)
-						]
+					return text % [
+						tp.quick_parse(modifier.get_value(), true),
+						tp.quick_parse(
+							(modifier.get_value() + modifier_add) * modifier_multiply,
+							true
+						)
+					]
 				else:
 					if thingy_attribute in [
 						Thingy.Attribute.CRIT,

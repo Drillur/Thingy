@@ -92,7 +92,6 @@ layout_mode = 2
 
 [node name="DURATION01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
-size_flags_horizontal = 3
 
 [node name="CRITS_AFFECT_COIN_GAIN" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
@@ -158,6 +157,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="CRITS_AFFECT_NEXT_DURATION" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+visible = false
 layout_mode = 2
 
 [node name="W" type="ScrollContainer" parent="TabContainer"]
@@ -240,9 +240,15 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
-columns = 2
+columns = 3
 
 [node name="WILL_FROM_JUICE" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="CRITS_AFFECT_ALL_OUTPUT" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="JUICE_OUT_INC_TOT" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="JoypadControls" type="MarginContainer" parent="."]

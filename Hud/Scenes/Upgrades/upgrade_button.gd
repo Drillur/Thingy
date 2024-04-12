@@ -17,7 +17,6 @@ extends MarginContainer
 @onready var enabled_border = %"Enabled Border"
 
 var upgrade: Upgrade
-var setup_done := false
 
 
 
@@ -33,7 +32,10 @@ func _ready() -> void:
 	pb.button.mouse_entered.connect(tooltip_time)
 	pb.autobuyer_anim.modulate = upgrade.details.get_color()
 	pb.autobuyer_anim.speed_scale = 3.0
-	upgrade.times_purchased.changed.connect(set_description_text)
+	if upgrade.modifier:
+		upgrade.modifier.changed.connect(set_description_text)
+	else:
+		upgrade.times_purchased.changed.connect(set_description_text)
 	#upgrade.unlocked_and_not_purchased.changed.connect(update_autobuyer_anim_visibility)
 	#upgrade.autobuyer.changed.connect(update_autobuyer_anim_visibility)
 	pb.color = upgrade.details.get_color()
@@ -85,8 +87,7 @@ func get_parent_until_scroll_container(node) -> int:
 
 
 func setup() -> void:
-	pb.title_components.show()
-	pb.title.show()
+	pb.unlock()
 	pb.title.text = upgrade.details.get_name()
 	set_description_text()
 	if upgrade.times_purchased.get_total() > 1:
@@ -95,9 +96,6 @@ func setup() -> void:
 	#pb.texture_rect.modulate = Color.WHITE
 	set_cost_visibility()
 	pb.texture_rect.texture = upgrade.details.get_icon()
-	if setup_done:
-		return
-	setup_done = true
 
 
 func _on_purchase_button_pressed():
@@ -185,3 +183,14 @@ func _on_focus_entered():
 
 func tooltip_time() -> void:
 	pass#Tooltip.new_tooltip(Tooltip.Type.UPGRADE_TOOLTIP, {"upgrade_type": upgrade.type}, pb.button, self)
+
+
+func lock() -> void:
+	pb.lock()
+	size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+
+
+func unlock() -> void:
+	pb.unlock()
+	size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	
