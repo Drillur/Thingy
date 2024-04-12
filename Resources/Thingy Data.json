@@ -352,7 +352,7 @@
 	},
 	"OUTPUT03": {
 	  "Name": "Batter",
-	  "Required Upgrade": "TOTAL_OUTPUT_RANGE_01",
+	  "Required Upgrade": "TOTAL_OUTPUT_RANGE01",
 	  "Tree": "Firestarter",
 	  "Icon": "Boxing",
 	  "Color": null,

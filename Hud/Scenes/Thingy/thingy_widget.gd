@@ -32,7 +32,7 @@ var thingy: Thingy:
 			wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked)
 			wa.get_unlocked(Currency.Type.JUICE).changed.connect(juice_unlocked)
 			th.xp_output_range.changed.connect(xp_output_range_changed)
-			th.duration_applies_to_xp_output.changed.connect(xp_output_range_changed)
+			th.duration_affects_xp_output.changed.connect(xp_output_range_changed)
 			th.xp_increase_range.changed.connect(xp_increase_range_changed)
 			th.output_increase_range.changed.connect(output_changed)
 			th.output_range.changed.connect(output_changed)
@@ -169,12 +169,12 @@ func xp_output_range_changed(flash := true) -> void:
 	var text = wa.get_details(Currency.Type.XP).get_icon_and_name() + ": [b]"
 	text += wa.get_details(Currency.Type.XP).get_color_text()
 	if th.xp_output_range.is_full():
-		if th.duration_applies_to_xp_output.is_true():
+		if th.duration_affects_xp_output.is_true():
 			text = text % Big.get_float_text(max(1, thingy.get_minimum_duration()) * th.xp_output_range.get_total())
 		else:
 			text = text % th.xp_output_range.get_total_text()
 	else:
-		if th.duration_applies_to_xp_output.is_true():
+		if th.duration_affects_xp_output.is_true():
 			text = text % (
 				"%s-%s" % [
 					Big.get_float_text(max(1, thingy.get_minimum_duration()) * th.xp_output_range.get_current()),
@@ -378,7 +378,7 @@ func duration_changed(flash := true) -> void:
 		]
 	if flash:
 		gv.flash(duration, thingy.details.get_color())
-	if th.duration_applies_to_xp_output.is_true():
+	if th.duration_affects_xp_output.is_true():
 		xp_output_range_changed(flash)
 
 

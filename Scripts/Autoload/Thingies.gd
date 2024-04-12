@@ -22,7 +22,7 @@ var autobuyer := LoudBoolArray.new([autobuyer_unlocked, autobuyer_enabled])
 var xp_output_range := LoudFloatPair.new(1.0, 1.0)
 var xp_increase_range := LoudFloatPair.new(1.15, 1.15)
 var xp_multiplier := LoudFloat.new(1.0)
-var duration_applies_to_xp_output := LoudBool.new(false)
+var duration_affects_xp_output := LoudBool.new(false)
 
 var output_range := LoudFloatPair.new(1.0, 1.0)
 var output_increase_range := LoudFloatPair.new(1.15, 1.15)

@@ -261,7 +261,7 @@ func set_inhand_xp() -> void:
 		new_inhand *= juiced_multiplier.get_value()
 	if crit_success.is_true() and th.crits_apply_to_xp.is_true():
 		new_inhand *= crit_multiplier.get_value()
-	if th.duration_applies_to_xp_output.is_true():
+	if th.duration_affects_xp_output.is_true():
 		new_inhand *= max(1, timer.wait_time)
 	inhand.add_output({Currency.Type.XP: new_inhand})
 

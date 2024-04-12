@@ -57,11 +57,11 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="UNLOCK_CRIT" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
+[node name="UNLOCK_XP" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="UNLOCK_XP" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
+[node name="UNLOCK_CRIT" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -72,32 +72,32 @@ theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 columns = 3
 
-[node name="CRIT01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+[node name="OUTPUT02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="CRITS_GIVE_GOLD" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="OUTPUT02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+[node name="CRIT01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="TOTAL_OUTPUT_RANGE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="CURRENT_DURATION_RANGE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="TOTAL_OUTPUT_RANGE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+[node name="XP_GAIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="DURATION01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DURATION02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
-layout_mode = 2
-
-[node name="TOTAL_XP_GAIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
-layout_mode = 2
-
 [node name="CRITS_AFFECT_COIN_GAIN" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="CRIT_RANGE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="GridContainer2" type="GridContainer" parent="TabContainer/Q/MarginContainer/VBoxContainer"]
@@ -110,25 +110,25 @@ columns = 2
 [node name="CRITS_AFFECT_XP_GAIN" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="DURATION03" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+[node name="DURATION_INCREASE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="COST01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="CRITS_AFFECT_DURATION" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
+[node name="TOTAL_XP_GAIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="DURATION02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="COIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
 [node name="OUTPUT03" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
-layout_mode = 2
-
-[node name="XP02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
-layout_mode = 2
-
-[node name="DURATION_INCREASE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
-layout_mode = 2
-
-[node name="OUTPUT_INCREASE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
-layout_mode = 2
-
-[node name="UNLOCK_LUCKY_CRIT" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/Q/MarginContainer/VBoxContainer"]
@@ -145,13 +145,19 @@ theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 columns = 3
 
-[node name="WILL_FROM_JUICE" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+[node name="JUICER" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="SMART_JUICE" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+[node name="LUCKY_CRIT2" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="THINGY_AUTOBUYER" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+[node name="OUTPUT_INCREASE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="XP02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="CRITS_AFFECT_NEXT_DURATION" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="W" type="ScrollContainer" parent="TabContainer"]
@@ -192,23 +198,41 @@ columns = 2
 [node name="DURATION03" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
+[node name="UNLOCK_LUCKY_CRIT" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="CURRENT_XP_INCREASE_RANGE01" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="OUTPUT_INCREASE_RANGE_TOTAL01" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
 [node name="GridContainer5" type="GridContainer" parent="TabContainer/W/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
-columns = 2
+columns = 3
+
+[node name="XP01" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="CRIT02" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
+layout_mode = 2
 
 [node name="DURATION_AFFECTS_XP_OUTPUT" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="CURRENT_XP_INCREASE_RANGE01" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
+[node name="CRIT_RANGE02" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="OUTPUT_INCREASE_RANGE_TOTAL01" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
+[node name="THINGY_AUTOBUYER" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="CRIT02" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
+[node name="CRITS_AFFECT_COIN_GAIN2" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer5" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="SMART_JUICE" parent="TabContainer/W/MarginContainer/VBoxContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="GridContainer6" type="GridContainer" parent="TabContainer/W/MarginContainer/VBoxContainer"]
@@ -218,15 +242,8 @@ theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 columns = 2
 
-[node name="CRIT_RANGE02" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+[node name="WILL_FROM_JUICE" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
 layout_mode = 2
-
-[node name="GridContainer7" type="GridContainer" parent="TabContainer/W/MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 16
-columns = 2
 
 [node name="JoypadControls" type="MarginContainer" parent="."]
 unique_name_in_owner = true
@@ -234,6 +251,7 @@ layout_mode = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
+metadata/_edit_lock_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="JoypadControls"]
 layout_mode = 2
