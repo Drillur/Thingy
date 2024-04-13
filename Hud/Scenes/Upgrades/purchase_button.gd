@@ -85,10 +85,12 @@ func _on_button_pressed():
 
 
 func _on_button_gui_input(event: InputEvent):
-	if event is InputEventMouseButton:
-		if event.is_pressed():
-			if event.button_mask == MOUSE_BUTTON_MASK_RIGHT:
-				right_click()
+	if (
+		event is InputEventMouseButton
+		and event.button_mask == MOUSE_BUTTON_MASK_RIGHT
+		and event.is_pressed()
+	):
+		right_click()
 
 
 func right_click() -> void:

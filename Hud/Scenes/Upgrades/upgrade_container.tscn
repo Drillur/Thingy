@@ -157,7 +157,6 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="CRITS_AFFECT_NEXT_DURATION" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer4" instance=ExtResource("2_yq021")]
-visible = false
 layout_mode = 2
 
 [node name="W" type="ScrollContainer" parent="TabContainer"]
@@ -249,6 +248,12 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="JUICE_OUT_INC_TOT" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="COIN_INC_TOT" parent="TabContainer/W/MarginContainer/VBoxContainer/GridContainer6" instance=ExtResource("2_yq021")]
+layout_mode = 2
+
+[node name="WILL_POW_LEVELS" parent="TabContainer/W/MarginContainer/VBoxContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="JoypadControls" type="MarginContainer" parent="."]

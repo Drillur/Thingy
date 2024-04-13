@@ -29,6 +29,9 @@ enum Attribute {
 	CRIT_COIN_OUTPUT,
 	CRIT_COIN_OUTPUT_CURRENT,
 	CRIT_COIN_OUTPUT_TOTAL,
+	COIN_INCREASE,
+	COIN_INCREASE_CURRENT,
+	COIN_INCREASE_TOTAL,
 	CURRENT_XP_INCREASE_RANGE,
 	XP_OUTPUT_TOTAL,
 	XP_OUTPUT_CURRENT,
@@ -54,6 +57,7 @@ enum Attribute {
 
 @export var level := LoudInt.new(1)
 @export var output_multiplier := Big.new(1.0)
+@export var coin_output_multiplier := LoudFloat.new(1.0)
 @export var xp := ValuePair.new(10.0).do_not_cap_current()
 @export var xp_modifier := LoudFloat.new(1.0)
 @export var duration_modifier := LoudFloat.new(1.0)
@@ -158,6 +162,7 @@ func level_changed() -> void:
 	duration_modifier.multiply(th.duration_increase_range.get_random_point())
 	juice_input_modifier.multiply(th.juice_input_increase_range.get_random_point())
 	juice_output_modifier.multiply(th.juice_output_increase_range.get_random_point())
+	coin_output_multiplier.multiply(th.coin_increase.get_random_point())
 
 
 func juiced_became_true() -> void:
@@ -424,6 +429,14 @@ func get_random_juice_output() -> float:
 
 func get_maximum_juice_output() -> float:
 	return juice_output_modifier.get_value() * th.juice_output_range.get_total()
+
+
+static func is_attribute_duration_related(_attribute: Attribute) -> bool:
+	return _attribute in [
+		Attribute.DURATION_RANGE,
+		Attribute.DURATION_RANGE_CURRENT,
+		Attribute.DURATION_RANGE_TOTAL,
+	]
 
 
 #endregion

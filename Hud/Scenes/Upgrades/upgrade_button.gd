@@ -16,26 +16,29 @@ extends MarginContainer
 @onready var pb = $"Purchase Button" as PurchaseButton
 @onready var enabled_border = %"Enabled Border"
 
+var description_queue := await Queueable.new(self)
+
 var upgrade: Upgrade
 
 
 
 func _ready() -> void:
 	upgrade = up.get_upgrade(Upgrade.Type[name]) as Upgrade
+	if not Upgrade.data.has(upgrade.key):
+		return
 	upgrade.vico = self
 	
-	enabled_border.visible = not upgrade.enabled.get_value()
-	upgrade.enabled.became_true.connect(enabled_border.hide)
-	upgrade.enabled.became_false.connect(enabled_border.show)
+	description_queue.method = set_description_text
+	enabled_border.visible = upgrade.purchased.is_true() and upgrade.applied.is_false()
+	upgrade.applied.became_true.connect(enabled_border.hide)
+	upgrade.applied.became_false.connect(enabled_border.show)
 	upgrade.unlocked.changed.connect(unlocked_changed)
 	upgrade.purchased.changed.connect(upgrade_purchased_changed)
 	pb.button.mouse_entered.connect(tooltip_time)
 	pb.autobuyer_anim.modulate = upgrade.details.get_color()
 	pb.autobuyer_anim.speed_scale = 3.0
-	if upgrade.modifier:
-		upgrade.modifier.changed.connect(set_description_text)
-	else:
-		upgrade.times_purchased.changed.connect(set_description_text)
+	upgrade.times_purchased.changed.connect(description_queue.call_method)
+	upgrade.applied.changed.connect(description_queue.call_method)
 	#upgrade.unlocked_and_not_purchased.changed.connect(update_autobuyer_anim_visibility)
 	#upgrade.autobuyer.changed.connect(update_autobuyer_anim_visibility)
 	pb.color = upgrade.details.get_color()
@@ -89,7 +92,7 @@ func get_parent_until_scroll_container(node) -> int:
 func setup() -> void:
 	pb.unlock()
 	pb.title.text = upgrade.details.get_name()
-	set_description_text()
+	description_queue.call_method()
 	if upgrade.times_purchased.get_total() > 1:
 		pb.times_purchased.show()
 		pb.times_purchased.watch_int_pair(upgrade.times_purchased, upgrade.details.get_color())
@@ -110,14 +113,15 @@ func _on_purchase_button_pressed():
 			pb.cost_components.flash_missing_currencies()
 		elif upgrade.available_now.is_true():
 			upgrade.purchase()
-	else:
-		upgrade.enabled.invert()
 
 
 func _on_purchase_button_right_clicked():
-	if gv.dev_mode and upgrade.purchased.is_true():
-		upgrade.purchased.set_false()
-		pass
+	if upgrade.times_purchased.current.equal(0):
+		return
+	if upgrade.applied.is_true():
+		upgrade.remove()
+	else:
+		upgrade.apply()
 
 
 func upgrade_purchased_changed() -> void:

@@ -274,7 +274,7 @@
 	  "Color": null,
 	  "Cost": "Will 3000, Coin 8",
 	  "Limit": 5,
-	  "Cost Increase": 2,
+	  "Cost Increase": 3,
 	  "Thingy Attribute": "CRIT_RANGE_TOTAL",
 	  "Category": "ADDED",
 	  "Mod": 0.1,
@@ -534,7 +534,7 @@
 	},
 	"XP02": {
 	  "Name": "Smarty Pants",
-	  "Required Upgrade": "XP_GAIN01",
+	  "Required Upgrade": "UNLOCK_JUICE",
 	  "Tree": "Firestarter",
 	  "Icon": "Star",
 	  "Color": null,
@@ -588,6 +588,20 @@
 	  "Mod": 0.03,
 	  "Discord State": null
 	},
+	"COIN_INC_TOT": {
+	  "Name": "With Interest",
+	  "Required Upgrade": "SMART_JUICE",
+	  "Tree": "Voyager",
+	  "Icon": "Coin Hand",
+	  "Color": null,
+	  "Cost": "Soul 49.717673529828972756734686140872",
+	  "Limit": 5,
+	  "Cost Increase": 1.15,
+	  "Thingy Attribute": "COIN_INCREASE_TOTAL",
+	  "Category": "ADDED",
+	  "Mod": 0.02,
+	  "Discord State": null
+	},
 	"COIN01": {
 	  "Name": "Fiscal",
 	  "Required Upgrade": "CRITS_GIVE_GOLD",
@@ -600,6 +614,20 @@
 	  "Thingy Attribute": "CRIT_COIN_OUTPUT",
 	  "Category": "ADDED",
 	  "Mod": 1,
+	  "Discord State": null
+	},
+	"WILL_POW_LEVELS": {
+	  "Name": "Thy Will be Done",
+	  "Required Upgrade": "SMART_JUICE",
+	  "Tree": "Voyager",
+	  "Icon": "Cross",
+	  "Color": null,
+	  "Cost": "Soul 666",
+	  "Limit": null,
+	  "Cost Increase": null,
+	  "Thingy Attribute": null,
+	  "Category": null,
+	  "Mod": null,
 	  "Discord State": null
 	}
   }
