@@ -3,8 +3,8 @@ extends Resource
 
 
 
-var output := {}
-var input := {}
+@export var output := {}
+@export var input := {}
 
 
 

@@ -229,7 +229,7 @@ func get_midpoint() -> Big:
 func get_random_point() -> Big:
 	if full.is_true():
 		return get_total()
-	return Big.new(randf_range(get_current().toFloat(), get_total().toFloat()))
+	return Big.new(RollLog._randf_range(get_current().toFloat(), get_total().toFloat()))
 
 
 func get_total() -> Big:

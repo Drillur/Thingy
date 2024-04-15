@@ -24,6 +24,7 @@ extends MarginContainer
 @onready var input_components = %"Input Components"
 @onready var juice_input = %"Juice Input"
 @onready var juice_input_increase = %"Juice Input Increase"
+@onready var coin_output_increase = %"Coin Output Increase"
 
 var thingy: Thingy:
 	set(val):
@@ -50,6 +51,8 @@ var thingy: Thingy:
 			th.juice_input_range.changed.connect(juice_input_changed)
 			th.juice_output_increase_range.changed.connect(juice_output_increase_changed)
 			th.juice_input_increase_range.changed.connect(juice_input_increase_changed)
+			th.coin_increase.changed.connect(diplay_coin_output_increase)
+			diplay_coin_output_increase()
 			xp_unlocked()
 			juice_unlocked()
 
@@ -84,9 +87,18 @@ func connect_calls() -> void:
 	thingy.level.changed.connect(level_changed)
 	thingy.xp.changed.connect(xp_changed)
 	thingy.level.changed.connect(output_changed)
-	thingy.duration_modifier.changed.connect(duration_changed)
-	thingy.juice_output_modifier.changed.connect(juice_output_changed)
-	thingy.juice_input_modifier.changed.connect(juice_input_changed)
+	thingy.duration_multiplier.changed.connect(duration_changed)
+	thingy.juice_output_multiplier.changed.connect(juice_output_changed)
+	thingy.juice_input_multiplier.changed.connect(juice_input_changed)
+	thingy.coin_output_multiplier.changed.connect(crit_coin_output_changed)
+	coin_output_increase.watch_float_pair(
+		th.coin_increase,
+		{
+			"prepended_text": "[img=<15>]res://Art/Icons/Hud/Arrow Up Fill.png[/img] [b]x",
+			"middle": "-",
+			"display_both": false,
+		}
+	)
 	level_changed(false)
 	xp_changed()
 	xp_output_range_changed(false)
@@ -110,9 +122,10 @@ func disconnect_calls() -> void:
 	thingy.level.changed.disconnect(level_changed)
 	thingy.xp.changed.disconnect(xp_changed)
 	thingy.level.changed.disconnect(output_changed)
-	thingy.duration_modifier.changed.disconnect(duration_changed)
-	thingy.juice_output_modifier.changed.disconnect(juice_output_changed)
-	thingy.juice_input_modifier.changed.disconnect(juice_input_changed)
+	thingy.duration_multiplier.changed.disconnect(duration_changed)
+	thingy.juice_output_multiplier.changed.disconnect(juice_output_changed)
+	thingy.juice_input_multiplier.changed.disconnect(juice_input_changed)
+	thingy.coin_output_multiplier.changed.disconnect(crit_coin_output_changed)
 
 
 
@@ -356,16 +369,28 @@ func crit_coin_output_changed(flash := true) -> void:
 		text = text % "%s-%s" % [
 			Big.get_float_text(th.crit_coin_output.get_current() * (
 				(th.crit_range.get_current() if th.crits_apply_to_coin.is_true() else 1.0) *
-				(th.crit_range.get_current() if th.crits_apply_to_coin_twice.is_true() else 1.0)
+				(th.crit_range.get_current() if th.crits_apply_to_coin_twice.is_true() else 1.0) *
+				thingy.coin_output_multiplier.get_value()
 			)),
 			Big.get_float_text(th.crit_coin_output.get_total() * (
 				(th.crit_range.get_total() if th.crits_apply_to_coin.is_true() else 1.0) *
-				(th.crit_range.get_total() if th.crits_apply_to_coin_twice.is_true() else 1.0)
+				(th.crit_range.get_total() if th.crits_apply_to_coin_twice.is_true() else 1.0) *
+				thingy.coin_output_multiplier.get_value()
 			))
 		]
 	crit_coin.text = text
 	if flash:
 		gv.flash(crit_coin, thingy.details.get_color())
+
+
+func diplay_coin_output_increase() -> void:
+	coin_output_increase.get_parent().visible = (
+		crit_coin.get_parent().visible
+		and (
+			th.coin_increase.current.not_equal(1)
+			or th.coin_increase.total.not_equal(1)
+		)
+	)
 
 
 func duration_changed(flash := true) -> void:

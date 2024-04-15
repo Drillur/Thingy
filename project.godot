@@ -26,6 +26,7 @@ tp="*res://Scripts/Autoload/TimeParser.gd"
 SaveManager="*res://Scripts/Autoload/SaveManager.gd"
 gv="*res://Scripts/Autoload/Overseer.gd"
 Settings="*res://Scripts/Autoload/Settings.gd"
+RollLog="*res://Scripts/Classes/LoudVar/RollLog.gd"
 wa="*res://Scripts/Autoload/Wallet.gd"
 up="*res://Scripts/Autoload/Upgrades.gd"
 th="*res://Scripts/Autoload/Thingies.gd"
@@ -151,6 +152,10 @@ joy_prev_upgrade_tree={
 [input_devices]
 
 pointing/emulate_touch_from_mouse=true
+
+[physics]
+
+2d/default_gravity=80.0
 
 [rendering]
 

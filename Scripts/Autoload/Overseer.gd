@@ -7,6 +7,7 @@ var root: CanvasLayer
 var root_ready := LoudBool.new(false)
 var save_manager_ready := LoudBool.new(false)
 var game_has_focus := LoudBool.new(true)
+var flying_texts: Array[FlyingText]
 
 
 

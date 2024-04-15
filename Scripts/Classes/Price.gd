@@ -7,7 +7,6 @@ signal purchase_requested
 
 @export var times_purchased := LoudInt.new(0)
 
-var times_increased := LoudInt.new(0)
 var owner_purchased := LoudBool.new(false)
 var owner_unlocked := LoudBool.new(true)
 var purchase_requested_cd := PhysicsCooldown.new(purchase_requested)
@@ -27,9 +26,6 @@ func _init(data: Dictionary) -> void:
 			add_price(currency_type, data[currency_type])
 	owner_purchased.became_false.connect(check_all)
 	owner_unlocked.became_true.connect(check_all)
-	times_purchased.changed.connect(update_price_based_on_times_purchased)
-	increase_modifier.changed.connect(update_price_based_on_times_purchased)
-	update_price_based_on_times_purchased()
 
 
 func add_price(currency_type: Currency.Type, base_value) -> void:
@@ -53,7 +49,7 @@ func add_price(currency_type: Currency.Type, base_value) -> void:
 	owner_unlocked.changed.connect(update_calls)
 	update_calls.call()
 	price[currency_type].changed.connect(emit_changed)
-	price[currency_type].book.add_powerer(increase_modifier, times_increased, -1)
+	price[currency_type].book.add_powerer(increase_modifier, times_purchased, 0)
 
 
 
@@ -70,10 +66,6 @@ func currency_decreased(currency_type: Currency.Type) -> void:
 	if affordable[currency_type].is_true():
 		check_currency(currency_type)
 	emit_changed()
-
-
-func update_price_based_on_times_purchased() -> void:
-	edit_all(self, Big.new(increase_modifier.get_value()).power(times_purchased.get_value()))
 
 
 #endregion
@@ -101,7 +93,6 @@ func check_currency(currency_type: Currency.Type) -> void:
 
 
 func reset() -> void:
-	times_increased.reset()
 	times_purchased.reset()
 	check_all()
 	emit_changed()
@@ -109,7 +100,8 @@ func reset() -> void:
 
 func purchase() -> void:
 	spend()
-	times_purchased.add(1)
+	if not times_purchased.copycat_var:
+		times_purchased.add(1)
 
 
 func spend() -> void:
@@ -127,11 +119,6 @@ func refund() -> void:
 func edit_change(currency_type: Currency.Type, source, amount) -> void:
 	price[currency_type].edit_multiplied(source, amount)
 	check_currency(currency_type)
-
-
-func edit_all(source, amount) -> void:
-	for currency_type in currency_types:
-		edit_change(currency_type, source, amount)
 
 
 func request_purchase(manual: bool, override_safe := false) -> void:
@@ -162,13 +149,6 @@ func set_unlocked(_unlocked: LoudBool) -> void:
 
 func can_afford() -> bool:
 	return all_affordable.is_true()
-
-
-func are_all_affordable() -> bool:
-	for currency_type in currency_types:
-		if affordable[currency_type].is_false():
-			return false
-	return true
 
 
 func get_price(currency_type: Currency.Type) -> Big:

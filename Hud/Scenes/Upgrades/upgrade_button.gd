@@ -8,10 +8,7 @@ extends MarginContainer
 		wrap_description = val
 		if not is_node_ready():
 			await ready
-		if val:
-			pb.description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		else:
-			pb.description.autowrap_mode = TextServer.AUTOWRAP_OFF
+		update_wrap_mode()
 
 @onready var pb = $"Purchase Button" as PurchaseButton
 @onready var enabled_border = %"Enabled Border"
@@ -21,12 +18,12 @@ var description_queue := await Queueable.new(self)
 var upgrade: Upgrade
 
 
-
 func _ready() -> void:
 	upgrade = up.get_upgrade(Upgrade.Type[name]) as Upgrade
 	if not Upgrade.data.has(upgrade.key):
 		return
 	upgrade.vico = self
+	update_wrap_mode()
 	
 	description_queue.method = set_description_text
 	enabled_border.visible = upgrade.purchased.is_true() and upgrade.applied.is_false()
@@ -65,6 +62,13 @@ func set_tab() -> void:
 			upgrade.persist.through_tier(3)
 		7, 8:
 			upgrade.persist.through_tier(4)
+
+
+func update_wrap_mode():
+	if wrap_description:
+		pb.description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	else:
+		pb.description.autowrap_mode = TextServer.AUTOWRAP_OFF
 
 
 #region Signals

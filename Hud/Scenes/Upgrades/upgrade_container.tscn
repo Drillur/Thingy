@@ -60,10 +60,12 @@ size_flags_horizontal = 3
 [node name="UNLOCK_XP" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
 layout_mode = 2
 size_flags_horizontal = 3
+wrap_description = true
 
 [node name="UNLOCK_CRIT" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer3" instance=ExtResource("2_yq021")]
 layout_mode = 2
 size_flags_horizontal = 3
+wrap_description = true
 
 [node name="GridContainer" type="GridContainer" parent="TabContainer/Q/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -83,6 +85,7 @@ layout_mode = 2
 
 [node name="TOTAL_OUTPUT_RANGE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2
+wrap_description = true
 
 [node name="CURRENT_DURATION_RANGE01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("2_yq021")]
 layout_mode = 2

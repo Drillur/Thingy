@@ -9,7 +9,7 @@ signal pending_changed
 
 @export var _class_name := "Value"
 @export var current: Big
-@export var pending: Big
+var pending: Big
 
 var book := Book.new(Book.Type.BIG)
 var copycat_var: Resource

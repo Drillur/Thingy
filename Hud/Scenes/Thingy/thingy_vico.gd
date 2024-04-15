@@ -15,6 +15,7 @@ extends MarginContainer
 @onready var border = %Border
 @onready var crit_success = %CritSuccess
 @onready var button = %Button
+@onready var flying_texts = %FlyingTexts
 
 var thingy: Thingy
 
@@ -49,7 +50,7 @@ func _ready() -> void:
 
 
 func _process(_delta):
-	progress_label.text = "[i]" + thingy.timer.get_inverted_time_left_text()
+	progress_label.text = "[i]" + thingy.timer.get_time_elapsed_text()
 
 
 
@@ -59,12 +60,11 @@ func _process(_delta):
 func connect_calls() -> void:
 	thingy.kill_me.connect(thingy_is_sick_of_living)
 	thingy.level.increased.connect(level_increased)
-	thingy.timer.started.connect(set_output_text)
+	thingy.timer.started.connect(timer_started)
 	thingy.timer.wait_time_changed.connect(timer_wait_time_changed)
 	thingy.crit_success.changed.connect(crit_success_changed)
 	thingy.level.changed.connect(level_changed)
 	xp_bar.attach_value_pair(thingy.xp)
-	set_output_text()
 	timer_wait_time_changed()
 	level_changed()
 	crit_success_changed()
@@ -74,7 +74,7 @@ func connect_calls() -> void:
 func disconnect_calls() -> void:
 	thingy.kill_me.disconnect(thingy_is_sick_of_living)
 	thingy.level.increased.disconnect(level_increased)
-	thingy.timer.started.disconnect(set_output_text)
+	thingy.timer.started.disconnect(timer_started)
 	thingy.timer.wait_time_changed.disconnect(timer_wait_time_changed)
 	thingy.crit_success.changed.disconnect(crit_success_changed)
 	thingy.level.changed.disconnect(level_changed)
@@ -132,6 +132,12 @@ func _on_button_pressed():
 func thingy_is_sick_of_living(_index: int) -> void:
 	# signal 'kill_me' passes its index ^
 	clear_thingy()
+
+
+func timer_started() -> void:
+	set_output_text()
+	if thingy.last_most_noteworthy_roll != RollLog.RollQuality.AVERAGE:
+		throw_crit_text()
 
 
 func set_output_text() -> void:
@@ -199,10 +205,13 @@ func thingy_created() -> void:
 
 
 func assign_thingy(_thingy: Thingy) -> void:
+	if SaveManager.loading.is_true():
+		await SaveManager.loading.became_false
 	clear_thingy()
 	thingy = _thingy
 	color = thingy.details.get_color()
 	connect_calls()
+	set_output_text()
 	progress_bar.attach_timer(thingy.timer)
 	index_label.text = "[i]#" + str(thingy.index + 1)
 	set_process(true)
@@ -218,6 +227,20 @@ func clear_thingy() -> void:
 	set_process(false)
 	thingy = null
 	hide()
+
+
+func throw_crit_text() -> void:
+	var text = FlyingText.new(
+		FlyingText.Type.ROLL_TEXT,
+		flying_texts, # node used to determine text locations
+		FlyingText.global_flying_texts_parent, # node that will hold texts
+		[1, 1], # collision
+	)
+	text.add({
+		"quality": thingy.last_most_noteworthy_roll,
+		"percent": thingy.last_most_noteworthy_roll_percent
+	})
+	text.go()
 
 
 

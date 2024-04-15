@@ -105,6 +105,7 @@ func _init(_type: Type) -> void:
 	set_price(my_data.get("Cost"))
 	if my_data.get("Cost Increase"):
 		price.increase_modifier.set_to(float(my_data.get("Cost Increase")))
+		price.times_purchased.copycat(times_purchased.current)
 	if my_data.get("Thingy Attribute"):
 		thingy_attribute = Thingy.Attribute[my_data.get("Thingy Attribute")]
 	if my_data.get("Icon"):

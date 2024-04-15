@@ -60,6 +60,7 @@ func _init(_type: Type) -> void:
 	amount = Value.new(0)
 	amount.increased.connect(emit_increased)
 	amount.decreased.connect(emit_decreased)
+	amount.add_pending_to_current_on_game_load = false
 	details.set_name(key.capitalize())
 	match type:
 		Type.WILL:
@@ -81,7 +82,6 @@ func _init(_type: Type) -> void:
 			details.set_color(Color(0.918, 0.2, 0.553))
 			details.set_icon(bag.get_resource("Ghost"), false)
 			persist.through_tier(1)
-			amount.add_pending_to_current_on_game_load = false
 
 
 #endregion

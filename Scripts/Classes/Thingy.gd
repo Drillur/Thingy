@@ -55,29 +55,34 @@ enum Attribute {
 	JUICE_MULTIPLIER_RANGE_TOTAL,
 }
 
-@export var level := LoudInt.new(1)
-@export var output_multiplier := Big.new(1.0)
-@export var coin_output_multiplier := LoudFloat.new(1.0)
-@export var xp := ValuePair.new(10.0).do_not_cap_current()
-@export var xp_modifier := LoudFloat.new(1.0)
-@export var duration_modifier := LoudFloat.new(1.0)
-@export var juice_output_modifier := LoudFloat.new(1.0)
-@export var juice_input_modifier := LoudFloat.new(1.0)
-@export var crit_multiplier := LoudFloat.new(1.0)
-@export var juiced_multiplier := LoudFloat.new(1.0)
-@export var output_currency := LoudInt.new(Currency.Type.WILL)
-@export var color := LoudColor.new(th.next_thingy_color.get_value())
-
-var juiced := LoudBool.new(false)
-var crit_success := LoudBool.new(false)
-var inhand: Inhand
-var persist := Persist.new()
-
 var index: int
 var just_born := true
 var details = Details.new()
-var timer := LoudTimer.new(1.0, 1.0)
-var next_job_haste_divider := LoudFloat.new(1.0)
+@export var color := LoudColor.new(th.next_thingy_color.get_value())
+var persist := Persist.new()
+
+@export var level := LoudInt.new(1)
+@export var xp := ValuePair.new(10.0).do_not_cap_current()
+
+@export var output_multiplier := Big.new(1.0)
+@export var xp_multiplier := LoudFloat.new(1.0)
+@export var crit_multiplier := LoudFloat.new(1.0)
+@export var juiced_multiplier := LoudFloat.new(1.0)
+@export var duration_multiplier := LoudFloat.new(1.0)
+@export var coin_output_multiplier := LoudFloat.new(1.0)
+@export var juice_input_multiplier := LoudFloat.new(1.0)
+@export var juice_output_multiplier := LoudFloat.new(1.0)
+
+@export var inhand := Inhand.new()
+@export var juiced := LoudBool.new(false)
+@export var output_currency := LoudInt.new(Currency.Type.WILL)
+@export var crit_success := LoudBool.new(false)
+
+@export var timer := LoudTimer.new(1.0, 1.0)
+@export var next_job_haste_divider := LoudFloat.new(1.0)
+
+var last_most_noteworthy_roll: RollLog.RollQuality
+var last_most_noteworthy_roll_percent: float
 
 
 
@@ -89,22 +94,24 @@ func _init(_index: int) -> void:
 	xp.current.current.change_base(0.0)
 	xp.current.reset()
 	xp.full.became_true.connect(xp_filled)
-	xp.total.book.add_multiplier(xp_modifier)
+	xp.total.book.add_multiplier(xp_multiplier)
 	xp.total.book.add_multiplier(th.xp_multiplier)
-	level.changed.connect(level_changed)
+	level.increased.connect(level_increased)
 	crit_multiplier.became_not_1.connect(crit_success.set_true)
 	crit_multiplier.renewed.connect(crit_success.set_false)
-	juice_input_modifier.changed.connect(juice_input_modifier_changed)
-	juice_input_modifier_changed()
-	juiced.became_true.connect(juiced_became_true)
+	juice_input_multiplier.changed.connect(juice_input_multiplier_changed)
+	juice_input_multiplier_changed()
+	juiced.changed.connect(juiced_changed)
 	timer.timeout.connect(timer_timeout)
 	Settings.rate_mode.changed.connect(rate_mode_changed)
 	rate_mode_changed()
 	timer.started.connect(log_rates)
 	timer.wait_time_range.current.book.add_multiplier(th.duration_range.current)
-	timer.wait_time_range.current.book.add_multiplier(duration_modifier)
-	timer.wait_time_range.total.book.add_multiplier(duration_modifier)
+	timer.wait_time_range.current.book.add_multiplier(duration_multiplier)
+	timer.wait_time_range.total.book.add_multiplier(duration_multiplier)
 	timer.wait_time_range.total.book.add_multiplier(th.duration_range.total)
+	timer.wait_time_range.current.book.add_divider(juiced_multiplier)
+	timer.wait_time_range.total.book.add_divider(juiced_multiplier)
 	
 	if gv.root_ready.is_false():
 		SaveManager.loading.became_false.connect(first_start)
@@ -117,7 +124,11 @@ func _init(_index: int) -> void:
 func first_start() -> void:
 	await th.get_tree().physics_frame
 	await th.get_tree().physics_frame
-	start_timer()
+	if should_resume_task_from_previous_game():
+		inhand.edit_pending()
+		timer.resume_from_load()
+	else:
+		start_timer()
 
 
 
@@ -144,6 +155,8 @@ func timer_timeout() -> void:
 		if crit_success.is_true():
 			next_job_haste_divider.set_to(crit_multiplier.get_value())
 	crit_multiplier.reset()
+	last_most_noteworthy_roll = RollLog.RollQuality.AVERAGE
+	last_most_noteworthy_roll_percent = 0.5
 	if th.crits_apply_to_duration.is_true():
 		timer.wait_time_range.current.remove_divided(crit_multiplier)
 		timer.wait_time_range.total.remove_divided(crit_multiplier)
@@ -156,25 +169,27 @@ func xp_filled() -> void:
 	level.add(1)
 
 
-func level_changed() -> void:
+func level_increased() -> void:
 	output_multiplier.m(th.output_increase_range.get_random_point())
-	xp_modifier.multiply(th.xp_increase_range.get_random_point())
-	duration_modifier.multiply(th.duration_increase_range.get_random_point())
-	juice_input_modifier.multiply(th.juice_input_increase_range.get_random_point())
-	juice_output_modifier.multiply(th.juice_output_increase_range.get_random_point())
+	xp_multiplier.multiply(th.xp_increase_range.get_random_point())
+	duration_multiplier.multiply(th.duration_increase_range.get_random_point())
+	juice_input_multiplier.multiply(th.juice_input_increase_range.get_random_point())
+	juice_output_multiplier.multiply(th.juice_output_increase_range.get_random_point())
 	coin_output_multiplier.multiply(th.coin_increase.get_random_point())
 
 
-func juiced_became_true() -> void:
-	juiced_multiplier.set_to(
-		th.juice_multiplier_range.get_random_point() * (
-			crit_multiplier.get_value() if crit_success.is_true() else 1.0
+func juiced_changed() -> void:
+	if juiced.is_true():
+		juiced_multiplier.set_to(
+			th.juice_multiplier_range.get_random_point() * (
+				crit_multiplier.get_value() if crit_success.is_true() else 1.0
+			)
 		)
-	)
-	timer.divide_wait_time(juiced_multiplier, juiced_multiplier.get_value())
+	elif juiced.is_false():
+		juiced_multiplier.reset()
 
 
-func juice_input_modifier_changed() -> void:
+func juice_input_multiplier_changed() -> void:
 	th.max_juice_use.edit_added(self, get_maximum_juice_input() * 2)
 
 
@@ -226,6 +241,7 @@ func set_inhands() -> void:
 		if th.crits_apply_to_duration.is_true():
 			timer.wait_time_range.current.edit_divided(crit_multiplier, crit_multiplier.get_value())
 			timer.wait_time_range.total.edit_divided(crit_multiplier, crit_multiplier.get_value())
+	update_last_most_noteworthy_roll()
 	if next_job_haste_divider.greater(1.0):
 		timer.wait_time_range.current.edit_divided(next_job_haste_divider, next_job_haste_divider.get_value())
 		timer.wait_time_range.total.edit_divided(next_job_haste_divider, next_job_haste_divider.get_value())
@@ -252,9 +268,9 @@ func set_inhand_will() -> void:
 
 func set_inhand_juice() -> void:
 	inhand.add_output({Currency.Type.JUICE:
-		get_random_output().m(
+		get_random_juice_output() * (
 			crit_multiplier.get_value() if crit_success.is_true() else 1.0
-		).m(
+		) * (
 			juiced_multiplier.get_value() if juiced.is_true() else 1.0
 		)
 	})
@@ -335,25 +351,33 @@ func remove_rates() -> void:
 
 
 func should_juice() -> bool:
-	var juice_drank = get_random_juice_input()
-	if wa.get_amount(Currency.Type.JUICE).greater_equal(juice_drank):
-		wa.subtract(Currency.Type.JUICE, juice_drank)
+	var amount_juice_drank = get_random_juice_input()
+	if wa.can_afford(Currency.Type.JUICE, amount_juice_drank):
+		wa.subtract(Currency.Type.JUICE, amount_juice_drank)
 		return true
 	return false
+
+
+func update_last_most_noteworthy_roll() -> void:
+	if last_most_noteworthy_roll < RollLog.last_roll_quality:
+		last_most_noteworthy_roll = RollLog.last_roll_quality
+		last_most_noteworthy_roll_percent = RollLog.last_roll_percent
 
 
 #region Action
 
 
 func successful_crit_roll() -> bool:
-	if randf_range(0, 100) < get_crit_chance():
+	if RollLog.successful_crit_roll(get_crit_chance()):
+		update_last_most_noteworthy_roll()
 		crit_multiplier.multiply(th.crit_range.get_random_point())
 		return true
 	return false
 
 
 func roll_for_lucky_crits() -> void:
-	while randf_range(0, 100) < th.crit_crit_chance.get_value():
+	while RollLog.successful_lucky_crit_roll(th.crit_crit_chance.get_value()):
+		update_last_most_noteworthy_roll()
 		crit_multiplier.multiply(th.crit_range.get_random_point())
 
 
@@ -362,6 +386,18 @@ func roll_for_lucky_crits() -> void:
 
 
 #region Get
+
+
+func is_working() -> bool:
+	return timer.is_running()
+
+
+func should_resume_task_from_previous_game() -> bool:
+	if timer.running.is_false():
+		return false
+	if inhand == null:
+		return false
+	return true
 
 
 func get_crit_chance() -> float:
@@ -396,39 +432,39 @@ func get_minimum_coin_output() -> float:
 
 
 func get_random_duration() -> float:
-	return duration_modifier.get_value() * th.duration_range.get_random_point()
+	return duration_multiplier.get_value() * th.duration_range.get_random_point()
 
 
 func get_minimum_duration() -> float:
-	return duration_modifier.get_value() * th.duration_range.get_current()
+	return duration_multiplier.get_value() * th.duration_range.get_current()
 
 
 func get_maximum_duration() -> float:
-	return duration_modifier.get_value() * th.duration_range.get_total()
+	return duration_multiplier.get_value() * th.duration_range.get_total()
 
 
 func get_minimum_juice_input() -> float:
-	return juice_input_modifier.get_value() * th.juice_input_range.get_current()
+	return juice_input_multiplier.get_value() * th.juice_input_range.get_current()
 
 
 func get_random_juice_input() -> float:
-	return juice_input_modifier.get_value() * th.juice_input_range.get_random_point()
+	return juice_input_multiplier.get_value() * th.juice_input_range.get_random_point()
 
 
 func get_maximum_juice_input() -> float:
-	return juice_input_modifier.get_value() * th.juice_input_range.get_total()
+	return juice_input_multiplier.get_value() * th.juice_input_range.get_total()
 
 
 func get_minimum_juice_output() -> float:
-	return juice_output_modifier.get_value() * th.juice_output_range.get_current()
+	return juice_output_multiplier.get_value() * th.juice_output_range.get_current()
 
 
 func get_random_juice_output() -> float:
-	return juice_output_modifier.get_value() * th.juice_output_range.get_random_point()
+	return juice_output_multiplier.get_value() * th.juice_output_range.get_random_point()
 
 
 func get_maximum_juice_output() -> float:
-	return juice_output_modifier.get_value() * th.juice_output_range.get_total()
+	return juice_output_multiplier.get_value() * th.juice_output_range.get_total()
 
 
 static func is_attribute_duration_related(_attribute: Attribute) -> bool:

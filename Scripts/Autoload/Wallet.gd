@@ -106,6 +106,10 @@ func get_amount(cur: Currency.Type) -> Big:
 	return get_currency(cur).get_amount()
 
 
+func can_afford(_currency_type: Currency.Type, _amount) -> bool:
+	return get_amount(_currency_type).greater_equal(_amount)
+
+
 func get_pending_amount(cur: Currency.Type) -> Big:
 	return get_currency(cur).amount.pending
 

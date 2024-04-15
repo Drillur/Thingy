@@ -11,6 +11,8 @@ signal renewed
 signal increased
 signal decreased
 
+@export var _class_name := "Big"
+
 var changed_cooldown := PhysicsCooldown.new(changed)
 var increase_cooldown := PhysicsCooldown.new(increased)
 var decrease_cooldown := PhysicsCooldown.new(decreased)
@@ -549,27 +551,3 @@ func format_exponent(value: int) -> String:
 		output += string[i]
 	
 	return output
-
-
-static func rand_range(_min: Big, _max: Big) -> Big:
-	var result := Big.new()
-	if _min.greater_equal(_max):
-		printerr("Big Error: _min value is larger than random float range Max!")
-		return _max
-
-	# 0 - 9,999,999 range? Do a standard randf_range
-	if _max.exponent - _min.exponent < 6:
-		result.exponent = _min.exponent
-		result.mantissa = randf_range(_min.mantissa, 10 ** (_max.exponent - _min.exponent) * _max.mantissa)
-	else:
-		result.exponent = randi_range(_min.exponent, _max.exponent)
-		if result.exponent == _min.exponent:
-			result.mantissa = randf_range(_min.mantissa, 10.0)
-		elif result.exponent == _max.exponent:
-			result.mantissa = randf_range(0.0, _max.mantissa)
-		else:
-			result.mantissa = randf_range(1.0, 10.0)
-			while is_zero_approx(result.mantissa):
-				result.mantissa = randf_range(1.0, 10.0)
-	result.calculate(result)
-	return result

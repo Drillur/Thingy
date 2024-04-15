@@ -22,7 +22,6 @@ enum LoadMethod {
 
 const SAVE_BASE_PATH := "user://"
 const SAVE_EXTENSION := ".thingy"
-
 const RANDOM_PATH_POOL := [
 	"PaperPilot",
 	"Carl",
@@ -298,14 +297,32 @@ func unpack_dictionary_to_empty_dictionary(dictionary: Dictionary, packed_dictio
 	# Only save empty dictionaries which use INT keys. If you use a STRING key like "example", you are fucked.
 	for key in packed_dictionary.keys():
 		var new_key: int = int(key)
-		match packed_dictionary[key]["_class_name"]:
-			"Thingy":
-				th.new_thingy()
-				dictionary[new_key] = th.get_latest_thingy()
-				unpack_vars(dictionary[new_key], packed_dictionary[key])
-			_:
-				print_debug("include that object's _class_name var as a case here")
-				dictionary[new_key] = packed_dictionary[key]
+		if typeof(packed_dictionary[key]) in [TYPE_INT, TYPE_FLOAT, TYPE_STRING]:
+			dictionary[new_key] = packed_dictionary[key]
+		else:
+			match packed_dictionary[key]["_class_name"]:
+				"LoudFloat":
+					var x := LoudFloat.new(0.0)
+					dictionary[new_key] = x
+					unpack_vars(dictionary[new_key], packed_dictionary[key])
+					x.set_default_value(x.current)
+				"Value":
+					var x := Value.new(0.0)
+					dictionary[new_key] = x
+					unpack_vars(dictionary[new_key], packed_dictionary[key])
+					x.change_base(x.current.toFloat())
+				"Thingy":
+					th.new_thingy()
+					dictionary[new_key] = th.get_latest_thingy()
+					unpack_vars(dictionary[new_key], packed_dictionary[key])
+				"Big":
+					var x := Big.new(0.0)
+					dictionary[new_key] = x
+					unpack_vars(dictionary[new_key], packed_dictionary[key])
+					x.change_base(x.toFloat())
+				_:
+					dictionary[new_key] = packed_dictionary[key]
+					print_debug("include that object's _class_name var as a case here")
 	return dictionary
 
 
@@ -330,9 +347,9 @@ func unpack_array(packed_array: Dictionary) -> Array:
 
 func update_save_version() -> void:
 	var version_text = ProjectSettings.get("application/config/version").split(".")
-	save_version.major = version_text[0]
-	save_version.minor = version_text[1]
-	save_version.revision = version_text[2]
+	save_version.major = int(version_text[0])
+	save_version.minor = int(version_text[1])
+	save_version.revision = int(version_text[2])
 
 
 

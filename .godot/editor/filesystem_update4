@@ -13,9 +13,5 @@ res://Hud/Scenes/Upgrades/upgrade_button.tscn
 res://Hud/Scenes/Upgrades/cost_components.tscn
 res://Hud/Scenes/Thingy/thingy_container.tscn
 res://Hud/Scenes/Upgrades/purchase_button.tscn
-res://Scripts/Classes/Upgrade/Upgrade.gd
-res://Scripts/Classes/Thingy.gd
-res://Hud/Scenes/Upgrades/upgrade_button.gd
-res://Hud/Scenes/Upgrades/purchase_button.gd
-res://Scripts/Autoload/Thingies.gd
+res://Hud/Scenes/flying_text.tscn
 res://Resources/Thingy Data.json

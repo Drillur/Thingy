@@ -12,6 +12,7 @@ var big: Big
 var price_big: Big
 var loud_string: LoudString
 var int_pair: LoudIntPair
+var float_pair: LoudFloatPair
 
 var queue := await Queueable.new(self)
 
@@ -158,3 +159,31 @@ func int_pair_changed() -> void:
 		int_pair.get_text()
 	)
 	set_deferred("text", new_text)
+
+
+func watch_float_pair(_float_pair: LoudFloatPair, _data := {}) -> void:
+	if float_pair:
+		if float_pair == _float_pair:
+			return
+		queue.queued = false
+		float_pair.changed.disconnect(queue.call_method)
+	var middle: String = "/" if not _data.has("middle") else _data.get("middle")
+	var prepended_text: String = "" if not _data.has("prepended_text") else _data.get("prepended_text")
+	var appended_text: String = "" if not _data.has("appended_text") else _data.get("appended_text")
+	var display_both: bool = true if not _data.has("display_both") else _data.get("display_both")
+	float_pair = _float_pair
+	var update_text = func():
+		set_deferred("text", "%s%s%s" % [
+			prepended_text,
+			float_pair.get_total_text() if float_pair.is_full() and not display_both else (
+				float_pair.get_text() if middle == "/" else "%s%s%s" % [
+					float_pair.get_current_text(),
+					middle,
+					float_pair.get_total_text()
+				]
+			),
+			appended_text,
+		])
+	queue.method = update_text
+	float_pair.changed.connect(queue.call_method)
+	queue.call_method()

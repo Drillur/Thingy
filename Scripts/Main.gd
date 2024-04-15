@@ -31,8 +31,14 @@ func _ready() -> void:
 	else:
 		SaveManager.color.set_to(gv.get_random_nondark_color())
 	
+	FlyingText.global_flying_texts_parent = $Control
+	
 	gv.root = self
 	gv.root_ready.set_to(true)
+	
+	while true:
+		await get_tree().create_timer(10).timeout
+		RollLog.report()
 
 
 
