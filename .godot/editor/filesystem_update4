@@ -15,3 +15,10 @@ res://Hud/Scenes/Thingy/thingy_container.tscn
 res://Hud/Scenes/Upgrades/purchase_button.tscn
 res://Hud/Scenes/flying_text.tscn
 res://Resources/Thingy Data.json
+res://Scripts/Classes/LoudVar/RollLog.gd
+res://Scripts/Classes/Thingy.gd
+res://Hud/Scenes/FlyingText.gd
+res://Scripts/Classes/Price.gd
+res://Scripts/Classes/Currency.gd
+res://Scripts/Classes/Inhand.gd
+res://Scripts/Classes/LoudVar/Book.gd

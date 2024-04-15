@@ -65,6 +65,11 @@ func add(data: Dictionary) -> void:
 			vico.setup_currency(data)
 		Type.ROLL_TEXT:
 			vico.setup_roll_text(data)
+			if data.get("quality") in [
+				RollLog.RollQuality.UNBELIEVABLY_BAD,
+				RollLog.RollQuality.GODLIKE,
+			]:
+				duration = 10.0
 		Type.JUST_TEXT:
 			vico.setup_text(data)
 

@@ -118,7 +118,7 @@ layout_mode = 2
 [node name="COST01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="CRITS_AFFECT_DURATION" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+[node name="COIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="TOTAL_XP_GAIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
@@ -127,7 +127,7 @@ layout_mode = 2
 [node name="DURATION02" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
-[node name="COIN01" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
+[node name="CRITS_AFFECT_DURATION" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]
 layout_mode = 2
 
 [node name="OUTPUT03" parent="TabContainer/Q/MarginContainer/VBoxContainer/GridContainer2" instance=ExtResource("2_yq021")]

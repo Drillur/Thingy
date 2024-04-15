@@ -73,7 +73,7 @@ var persist := Persist.new()
 @export var juice_input_multiplier := LoudFloat.new(1.0)
 @export var juice_output_multiplier := LoudFloat.new(1.0)
 
-@export var inhand := Inhand.new()
+@export var inhand := Inhand.new(self)
 @export var juiced := LoudBool.new(false)
 @export var output_currency := LoudInt.new(Currency.Type.WILL)
 @export var crit_success := LoudBool.new(false)
@@ -156,7 +156,6 @@ func timer_timeout() -> void:
 			next_job_haste_divider.set_to(crit_multiplier.get_value())
 	crit_multiplier.reset()
 	last_most_noteworthy_roll = RollLog.RollQuality.AVERAGE
-	last_most_noteworthy_roll_percent = 0.5
 	if th.crits_apply_to_duration.is_true():
 		timer.wait_time_range.current.remove_divided(crit_multiplier)
 		timer.wait_time_range.total.remove_divided(crit_multiplier)
@@ -245,7 +244,7 @@ func set_inhands() -> void:
 	if next_job_haste_divider.greater(1.0):
 		timer.wait_time_range.current.edit_divided(next_job_haste_divider, next_job_haste_divider.get_value())
 		timer.wait_time_range.total.edit_divided(next_job_haste_divider, next_job_haste_divider.get_value())
-	inhand = Inhand.new()
+	inhand = Inhand.new(self)
 	set_inhand_xp()
 	set_coin_inhand()
 	match output_currency.get_value():
@@ -303,51 +302,14 @@ func set_coin_inhand() -> void:
 
 
 func log_rates() -> void:
-	match Settings.rate_mode.get_value():
-		wa.RateMode.LIVE:
-			if Currency.Type.WILL in inhand.output.keys():
-				wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(
-					self, Big.new(inhand.output[Currency.Type.WILL]).d(timer.wait_time)
-				)
-			elif Currency.Type.JUICE in inhand.output.keys():
-				wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
-					self, Big.new(inhand.output[Currency.Type.JUICE]).d(timer.wait_time)
-				)
-			if wa.is_unlocked(Currency.Type.XP):
-				wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
-					self,
-					Big.new(inhand.output[Currency.Type.XP]).d(timer.wait_time)
-				)
-			if crit_success.is_true():
-				wa.get_currency(Currency.Type.COIN).gain_rate.edit_added(
-					self,
-					Big.new(inhand.output[Currency.Type.COIN]).d(timer.wait_time)
-				)
-		wa.RateMode.MINIMUM:
-			wa.get_currency(Currency.Type.WILL).gain_rate.edit_added(
-				self, get_minimum_output().d(get_minimum_duration())
-			)
-			if wa.is_unlocked(Currency.Type.XP):
-				wa.get_currency(Currency.Type.XP).gain_rate.edit_added(
-					self, get_minimum_xp_output() / get_minimum_duration()
-				)
-			if wa.is_unlocked(Currency.Type.JUICE):
-				wa.get_currency(Currency.Type.JUICE).gain_rate.edit_added(
-					self, get_minimum_juice_output() / get_minimum_duration()
-				)
-			var coin_rate = (
-				get_minimum_coin_output() * get_crit_chance_divider()
-			) / get_minimum_duration()
-			wa.get_currency(Currency.Type.COIN).gain_rate.edit_added(
-				self, coin_rate
-			)
+	inhand.log_rates()
 
 
 func remove_rates() -> void:
-	wa.get_currency(Currency.Type.WILL).gain_rate.remove_added(self)
-	wa.get_currency(Currency.Type.XP).gain_rate.remove_added(self)
-	wa.get_currency(Currency.Type.JUICE).gain_rate.remove_added(self)
-	wa.get_currency(Currency.Type.COIN).gain_rate.remove_added(self)
+	for currency_type in Currency.Type.values():
+		if Currency.is_invalid(currency_type):
+			continue
+		wa.get_currency(currency_type).gain_rate.remove_added(self)
 
 
 func should_juice() -> bool:

@@ -21,51 +21,59 @@ var affordable := {}
 
 
 func _init(data: Dictionary) -> void:
-	if data.size() > 0:
-		for currency_type in data.keys():
-			add_price(currency_type, data[currency_type])
-	owner_purchased.became_false.connect(check_all)
-	owner_unlocked.became_true.connect(check_all)
+	for currency_type in data.keys():
+		add_price(currency_type, data[currency_type])
 
 
-func add_price(currency_type: Currency.Type, base_value) -> void:
-	price[currency_type] = Value.new(base_value)
-	affordable[currency_type] = LoudBool.new(false)
-	currency_types.append(currency_type)
-	all_affordable.add_bool(affordable[currency_type])
-	check_currency(currency_type)
+func add_price(_currency_type: Currency.Type, base_value) -> void:
+	price[_currency_type] = Value.new(base_value)
+	price[_currency_type].book.add_powerer(increase_modifier, times_purchased, 0)
+	price[_currency_type].changed.connect(emit_changed)
+	currency_types.append(_currency_type)
+	var x = LoudBool.new(false)
+	all_affordable.add_bool(x)
+	
+	# Check currency
+	var check_currency = func():
+		x.set_to(wa.can_afford(_currency_type, get_price(_currency_type)))
+	times_purchased.renewed.connect(check_currency)
+	owner_purchased.became_false.connect(check_currency)
+	owner_unlocked.became_true.connect(check_currency)
+	price[_currency_type].changed.connect(check_currency)
+	check_currency.call()
+	
+	# Currency increased or decreased
+	var currency_increased = func() -> void:
+		if x.is_false():
+			check_currency.call()
+		emit_changed()
+	var currency_decreased = func() -> void:
+		if x.is_true():
+			check_currency.call()
+		emit_changed()
+	
+	# Update signal connections
+	var currency_amount: Value = wa.get_currency(_currency_type).amount
 	var update_calls = func():
 		if owner_purchased.is_true() or owner_unlocked.is_false():
-			if wa.get_currency(currency_type).increased__type.is_connected(currency_increased):
-				wa.get_currency(currency_type).increased__type.disconnect(currency_increased)
-			if wa.get_currency(currency_type).decreased__type.is_connected(currency_decreased):
-				wa.get_currency(currency_type).decreased__type.disconnect(currency_decreased)
+			if currency_amount.increased.is_connected(currency_increased):
+				currency_amount.increased.disconnect(currency_increased)
+			if currency_amount.decreased.is_connected(currency_decreased):
+				currency_amount.decreased.disconnect(currency_decreased)
 		else:
-			if not wa.get_currency(currency_type).increased__type.is_connected(currency_increased):
-				wa.get_currency(currency_type).increased__type.connect(currency_increased)
-			if not wa.get_currency(currency_type).decreased__type.is_connected(currency_decreased):
-				wa.get_currency(currency_type).decreased__type.connect(currency_decreased)
+			if not currency_amount.increased.is_connected(currency_increased):
+				currency_amount.increased.connect(currency_increased)
+			if not currency_amount.decreased.is_connected(currency_decreased):
+				currency_amount.decreased.connect(currency_decreased)
 	owner_purchased.changed.connect(update_calls)
 	owner_unlocked.changed.connect(update_calls)
 	update_calls.call()
-	price[currency_type].changed.connect(emit_changed)
-	price[currency_type].book.add_powerer(increase_modifier, times_purchased, 0)
 
 
 
 #region Signals
 
 
-func currency_increased(currency_type: Currency.Type) -> void:
-	if affordable[currency_type].is_false():
-		check_currency(currency_type)
-	emit_changed()
-
-
-func currency_decreased(currency_type: Currency.Type) -> void:
-	if affordable[currency_type].is_true():
-		check_currency(currency_type)
-	emit_changed()
 
 
 #endregion
@@ -73,17 +81,6 @@ func currency_decreased(currency_type: Currency.Type) -> void:
 
 #region Internal
 
-
-func check_all() -> void:
-	for currency_type in currency_types:
-		check_currency(currency_type)
-
-
-func check_currency(currency_type: Currency.Type) -> void:
-	var amount = wa.get_amount(currency_type)
-	affordable[currency_type].set_to(
-		amount.greater_equal(get_price(currency_type))
-	)
 
 
 #endregion
@@ -94,7 +91,6 @@ func check_currency(currency_type: Currency.Type) -> void:
 
 func reset() -> void:
 	times_purchased.reset()
-	check_all()
 	emit_changed()
 
 
@@ -107,7 +103,7 @@ func purchase() -> void:
 func spend() -> void:
 	for currency_type in currency_types:
 		wa.subtract(currency_type, get_price(currency_type))
-	check_all()
+	#check_all()
 	emit_changed()
 
 
@@ -118,7 +114,6 @@ func refund() -> void:
 
 func edit_change(currency_type: Currency.Type, source, amount) -> void:
 	price[currency_type].edit_multiplied(source, amount)
-	check_currency(currency_type)
 
 
 func request_purchase(manual: bool, override_safe := false) -> void:

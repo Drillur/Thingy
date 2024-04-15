@@ -6,6 +6,13 @@ extends Resource
 @export var output := {}
 @export var input := {}
 
+var thingy: Thingy
+
+
+
+func _init(_thingy: Thingy) -> void:
+	thingy = _thingy
+
 
 
 #region Action
@@ -31,6 +38,46 @@ func clear_pending() -> void:
 func add_currencies() -> void:
 	for x in output.keys():
 		wa.add(x, output[x])
+
+
+func log_rates() -> void:
+	var minimum_duration := thingy.get_minimum_duration()
+	for currency_type in Currency.Type.values():
+		if Currency.is_invalid(currency_type):
+			continue
+		var gain_rate: Value = wa.get_currency(currency_type).gain_rate
+		if not currency_type in output.keys():
+			gain_rate.remove_added(thingy)
+			continue
+		match Settings.rate_mode.get_value():
+			wa.RateMode.LIVE:
+				gain_rate.edit_added(
+					thingy,
+					Big.new(output[currency_type]).d(thingy.timer.wait_time.get_value())
+				)
+			wa.RateMode.MINIMUM:
+				match currency_type:
+					Currency.Type.WILL:
+						gain_rate.edit_added(
+							thingy,
+							thingy.get_minimum_output().d(minimum_duration)
+						)
+					Currency.Type.XP:
+						gain_rate.edit_added(
+							self,
+							thingy.get_minimum_xp_output() / minimum_duration
+						)
+					Currency.Type.JUICE:
+						gain_rate.edit_added(
+							self,
+							thingy.get_minimum_juice_output() / minimum_duration
+						)
+					Currency.Type.COIN:
+						gain_rate.edit_added(
+							self,
+							thingy.get_minimum_coin_output() * 
+							thingy.get_crit_chance_divider() / minimum_duration
+						)
 
 
 func refund() -> void:

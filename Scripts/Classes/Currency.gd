@@ -15,8 +15,6 @@ enum Type {
 const NONE := Type.NONE
 
 signal sync_requested
-signal increased__type(_type)
-signal decreased__type(_type)
 signal increased__amount(_amount)
 
 var type: Type
@@ -58,8 +56,6 @@ func _init(_type: Type) -> void:
 	persist.disconnect_calls()
 
 	amount = Value.new(0)
-	amount.increased.connect(emit_increased)
-	amount.decreased.connect(emit_decreased)
 	amount.add_pending_to_current_on_game_load = false
 	details.set_name(key.capitalize())
 	match type:
@@ -88,14 +84,6 @@ func _init(_type: Type) -> void:
 
 
 #region Internal
-
-
-func emit_increased() -> void:
-	increased__type.emit(type)
-
-
-func emit_decreased() -> void:
-	decreased__type.emit(type)
 
 
 #endregion
@@ -200,6 +188,14 @@ func get_pending() -> Big:
 
 func get_effective_amount() -> Big:
 	return amount.get_effective_amount()
+
+
+static func is_valid(_currency_type: Type) -> bool:
+	return _currency_type != Currency.Type.NONE
+
+
+static func is_invalid(_currency_type: Type) -> bool:
+	return not is_valid(_currency_type)
 
 
 #endregion
