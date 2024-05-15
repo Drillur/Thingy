@@ -7,7 +7,7 @@ const MANTISSA_PRECISSION = 0.0000001
 const MIN_INTEGER: int = -9223372036854775807
 const MAX_INTEGER: int = 9223372036854775806
 
-signal renewed
+signal reset_to_base
 signal increased
 signal decreased
 
@@ -80,7 +80,7 @@ func _init(mant = 1.0, _exponent = -1):
 func reset() -> void:
 	mantissa = base.mantissa
 	exponent = base.exponent
-	renewed.emit()
+	reset_to_base.emit()
 	emit_decrease()
 	emit_increase()
 	emit_change()

@@ -21,7 +21,7 @@ config/windows_native_icon="res://Art/Icons/Icon.ico"
 
 [autoload]
 
-bag="*res://Scripts/Autoload/Resources.gd"
+ResourceBag="*res://Scripts/Autoload/ResourceBag.gd"
 tp="*res://Scripts/Autoload/TimeParser.gd"
 SaveManager="*res://Scripts/Autoload/SaveManager.gd"
 gv="*res://Scripts/Autoload/Overseer.gd"
@@ -163,3 +163,4 @@ textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.0507813, 0.0507813, 0.0507813, 1)
+environment/bg_color=Color(0.14, 0.14, 0.14, 1)

@@ -14,11 +14,20 @@ res://Hud/Scenes/Upgrades/cost_components.tscn
 res://Hud/Scenes/Thingy/thingy_container.tscn
 res://Hud/Scenes/Upgrades/purchase_button.tscn
 res://Hud/Scenes/flying_text.tscn
-res://Resources/Thingy Data.json
-res://Scripts/Classes/LoudVar/RollLog.gd
-res://Scripts/Classes/Thingy.gd
-res://Hud/Scenes/FlyingText.gd
-res://Scripts/Classes/Price.gd
+res://Hud/Scenes/Upgrades/upgrade_button.gd
+res://Scripts/Classes/Value.gd
+res://Scripts/Classes/Upgrade/Upgrade.gd
 res://Scripts/Classes/Currency.gd
 res://Scripts/Classes/Inhand.gd
-res://Scripts/Classes/LoudVar/Book.gd
+res://Scripts/Classes/Thingy.gd
+res://Hud/Scenes/Thingy/thingy_vico.gd
+res://Scripts/Autoload/SaveManager.gd
+res://Scripts/Autoload/Thingies.gd
+res://Scripts/Autoload/Upgrades.gd
+res://Hud/Scenes/Upgrades/purchase_button.gd
+res://Hud/Scenes/RichLabel.gd
+res://Hud/Scenes/Upgrades/cost_components.gd
+res://Scripts/Classes/LoudVar/LoudString.gd
+res://Hud/Scenes/Thingy/thingy_widget.gd
+res://Hud/Scenes/Queueable/Queuable.gd
+res://Scripts/Classes/LoudVar/LoudFloatPair.gd

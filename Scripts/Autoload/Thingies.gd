@@ -6,7 +6,7 @@ signal initialized
 signal container_loaded
 signal thingy_created
 
-@export var thingies := {}
+@export var thingies: Array[Thingy]
 @export var price: Price
 
 var container: ThingyContainer:
@@ -64,7 +64,7 @@ func _ready():
 	juice_output_range.current.book.add_multiplier(all_output)
 	juice_output_range.total.book.add_multiplier(all_output)
 	
-	price = Price.new({Currency.Type.WILL: 1})
+	price = Price.new({"WILL": 1})
 	price.increase_modifier.set_to(3.0)
 	initialized.emit()
 	gv.reset.connect(reset)
@@ -95,7 +95,7 @@ func purchase_thingy() -> void:
 
 func new_thingy() -> void:
 	var new_index = thingies.size()
-	thingies[new_index] = Thingy.new(new_index)
+	thingies.append(Thingy.new(new_index))
 	next_thingy_color.set_to(gv.get_random_nondark_color())
 	thingy_created.emit()
 
@@ -140,7 +140,7 @@ func get_bottom_index() -> int:
 
 
 func has_thingy(index: int) -> bool:
-	return index in thingies.keys()
+	return index < thingies.size() and index >= 0
 
 
 func get_count() -> int:

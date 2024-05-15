@@ -16,7 +16,8 @@ extends MarginContainer
 @onready var title_components = %TitleComponents
 @onready var description = %Description
 @onready var autobuyer_anim = %AutobuyerAnim
-@onready var times_purchased = %"times purchased"
+@onready var times_purchased_current = %"Times Purchased Current"
+@onready var times_purchased_total = %"Times Purchased Total"
 
 signal pressed
 signal right_clicked
@@ -38,7 +39,7 @@ var color: Color:
 
 
 func _ready() -> void:
-	times_purchased.hide()
+	times_purchased_current.get_parent().hide()
 	if remove_cost_components:
 		cost_components.queue_free()
 	if remove_title_components:
@@ -127,8 +128,8 @@ func unlock() -> void:
 
 func lock() -> void:
 	locked = true
-	texture_rect.texture = bag.get_resource("Locked")
+	texture_rect.texture = ResourceBag.get_resource("Locked")
 	cost_components.hide()
 	title.hide()
 	description.hide()
-	times_purchased.hide()
+	times_purchased_current.get_parent().hide()

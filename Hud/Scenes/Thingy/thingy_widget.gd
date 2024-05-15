@@ -29,9 +29,9 @@ extends MarginContainer
 var thingy: Thingy:
 	set(val):
 		thingy = val
-		if not wa.get_unlocked(Currency.Type.XP).changed.is_connected(xp_unlocked):
-			wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked)
-			wa.get_unlocked(Currency.Type.JUICE).changed.connect(juice_unlocked)
+		if not wa.get_unlocked("XP").changed.is_connected(xp_unlocked):
+			wa.get_unlocked("XP").changed.connect(xp_unlocked)
+			wa.get_unlocked("JUICE").changed.connect(juice_unlocked)
 			th.xp_output_range.changed.connect(xp_output_range_changed)
 			th.duration_affects_xp_output.changed.connect(xp_output_range_changed)
 			th.xp_increase_range.changed.connect(xp_increase_range_changed)
@@ -91,14 +91,7 @@ func connect_calls() -> void:
 	thingy.juice_output_multiplier.changed.connect(juice_output_changed)
 	thingy.juice_input_multiplier.changed.connect(juice_input_changed)
 	thingy.coin_output_multiplier.changed.connect(crit_coin_output_changed)
-	coin_output_increase.watch_float_pair(
-		th.coin_increase,
-		{
-			"prepended_text": "[img=<15>]res://Art/Icons/Hud/Arrow Up Fill.png[/img] [b]x",
-			"middle": "-",
-			"display_both": false,
-		}
-	)
+	coin_output_increase.attach_float_pair(th.coin_increase)
 	level_changed(false)
 	xp_changed()
 	xp_output_range_changed(false)
@@ -133,7 +126,7 @@ func disconnect_calls() -> void:
 
 
 func xp_unlocked(flash := true) -> void:
-	xp_components.visible = wa.is_unlocked(Currency.Type.XP)
+	xp_components.visible = wa.is_unlocked("XP")
 	xp_output_range.visible = xp_components.visible
 	xp_increase_range.get_parent().visible = xp_components.visible
 	output_increase_range.get_parent().visible = xp_components.visible
@@ -141,26 +134,26 @@ func xp_unlocked(flash := true) -> void:
 	juice_output_increase.get_parent().visible = xp_components.visible and input_components.visible
 	juice_input_increase.get_parent().visible = xp_components.visible and input_components.visible
 	if flash:
-		gv.flash(level, wa.get_color(Currency.Type.XP))
-		gv.flash(xp_label, wa.get_color(Currency.Type.XP))
-		gv.flash(xp_increase_range, wa.get_color(Currency.Type.XP))
-		gv.flash(xp_bar, wa.get_color(Currency.Type.XP))
-		gv.flash(xp_output_range, wa.get_color(Currency.Type.XP))
-		gv.flash(output_increase_range, wa.get_color(Currency.Type.XP))
-		gv.flash(duration_increase, wa.get_color(Currency.Type.XP))
+		gv.flash(level, wa.get_color("XP"))
+		gv.flash(xp_label, wa.get_color("XP"))
+		gv.flash(xp_increase_range, wa.get_color("XP"))
+		gv.flash(xp_bar, wa.get_color("XP"))
+		gv.flash(xp_output_range, wa.get_color("XP"))
+		gv.flash(output_increase_range, wa.get_color("XP"))
+		gv.flash(duration_increase, wa.get_color("XP"))
 
 
 func juice_unlocked(flash := true) -> void:
-	input_components.visible = wa.is_unlocked(Currency.Type.JUICE)
+	input_components.visible = wa.is_unlocked("JUICE")
 	juice_input.visible = input_components.visible
 	juice_output.visible = input_components.visible
 	juice_output_increase.get_parent().visible = input_components.visible and xp_components.visible
 	juice_input_increase.get_parent().visible = input_components.visible and xp_components.visible
 	if flash:
-		gv.flash(juice_output, wa.get_color(Currency.Type.JUICE))
-		gv.flash(juice_output_increase, wa.get_color(Currency.Type.JUICE))
-		gv.flash(juice_input, wa.get_color(Currency.Type.JUICE))
-		gv.flash(juice_input_increase, wa.get_color(Currency.Type.JUICE))
+		gv.flash(juice_output, wa.get_color("JUICE"))
+		gv.flash(juice_output_increase, wa.get_color("JUICE"))
+		gv.flash(juice_input, wa.get_color("JUICE"))
+		gv.flash(juice_input_increase, wa.get_color("JUICE"))
 
 
 func level_changed(flash := true) -> void:
@@ -170,7 +163,7 @@ func level_changed(flash := true) -> void:
 
 
 func xp_changed() -> void:
-	xp_label.text = wa.get_details(Currency.Type.XP).get_color_text() % (
+	xp_label.text = wa.get_details("XP").get_color_text() % (
 		"%s/%s" % [
 			thingy.xp.get_current_text(),
 			thingy.xp.get_total_text()
@@ -179,8 +172,8 @@ func xp_changed() -> void:
 
 
 func xp_output_range_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.XP).get_icon_and_name() + ": [b]"
-	text += wa.get_details(Currency.Type.XP).get_color_text()
+	var text = wa.get_details("XP").get_icon_and_name() + ": [b]"
+	text += wa.get_details("XP").get_color_text()
 	if th.xp_output_range.is_full():
 		if th.duration_affects_xp_output.is_true():
 			text = text % Big.get_float_text(max(1, thingy.get_minimum_duration()) * th.xp_output_range.get_total())
@@ -207,10 +200,10 @@ func xp_output_range_changed(flash := true) -> void:
 
 
 func xp_increase_range_changed(flash := true) -> void:
-	var xp_color_text = Details.get_value("color", wa, Currency.Type.XP)
+	var xp_color_text = Details.get_value("color", wa, "XP")
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
 		xp_color_text,
-		bag.get_resource("Arrow Up Fill").get_path()
+		ResourceBag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.xp_increase_range.is_full():
 		text += th.xp_increase_range.get_total_text()
@@ -225,8 +218,8 @@ func xp_increase_range_changed(flash := true) -> void:
 
 
 func output_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.WILL).get_icon_and_name() + ": [b]"
-	text += wa.get_details(Currency.Type.WILL).get_color_text()
+	var text = wa.get_details("WILL").get_icon_and_name() + ": [b]"
+	text += wa.get_details("WILL").get_color_text()
 	if th.output_range.is_full():
 		text = text % thingy.get_maximum_output().get_text()
 	else:
@@ -243,8 +236,8 @@ func output_changed(flash := true) -> void:
 
 func output_increase_range_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		Details.get_value("color", wa, Currency.Type.XP),
-		bag.get_resource("Arrow Up Fill").get_path()
+		Details.get_value("color", wa, "XP"),
+		ResourceBag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.output_increase_range.is_full():
 		text += th.output_increase_range.get_total_text()
@@ -259,8 +252,8 @@ func output_increase_range_changed(flash := true) -> void:
 
 
 func juice_output_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.JUICE).get_icon_and_name() + ": [b]"
-	text += wa.get_details(Currency.Type.JUICE).get_color_text()
+	var text = wa.get_details("JUICE").get_icon_and_name() + ": [b]"
+	text += wa.get_details("JUICE").get_color_text()
 	if th.juice_output_range.is_full():
 		text = text % Big.get_float_text(thingy.get_minimum_juice_output())
 	else:
@@ -276,8 +269,8 @@ func juice_output_changed(flash := true) -> void:
 
 
 func juice_input_changed(flash := true) -> void:
-	var text = wa.get_details(Currency.Type.JUICE).get_icon_and_name() + ": [b]"
-	text += wa.get_details(Currency.Type.JUICE).get_color_text()
+	var text = wa.get_details("JUICE").get_icon_and_name() + ": [b]"
+	text += wa.get_details("JUICE").get_color_text()
 	if th.juice_input_range.is_full():
 		text = text % Big.get_float_text(thingy.get_minimum_juice_input())
 	else:
@@ -294,8 +287,8 @@ func juice_input_changed(flash := true) -> void:
 
 func juice_output_increase_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		Details.get_value("color", wa, Currency.Type.XP),
-		bag.get_resource("Arrow Up Fill").get_path()
+		Details.get_value("color", wa, "XP"),
+		ResourceBag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.juice_output_increase_range.is_full():
 		text += th.juice_output_increase_range.get_total_text()
@@ -311,8 +304,8 @@ func juice_output_increase_changed(flash := true) -> void:
 
 func juice_input_increase_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		Details.get_value("color", wa, Currency.Type.XP),
-		bag.get_resource("Arrow Up Fill").get_path()
+		Details.get_value("color", wa, "XP"),
+		ResourceBag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.juice_input_increase_range.is_full():
 		text += th.juice_input_increase_range.get_total_text()
@@ -351,14 +344,14 @@ func crit_range_changed(flash := true) -> void:
 	crit_multiplier.text = crit_mult_text
 	if flash:
 		gv.flash(crit_multiplier, thingy.details.get_color())
-		if up.is_purchased(Upgrade.Type.CRITS_AFFECT_COIN_GAIN):
+		if up.is_purchased("CRITS_AFFECT_COIN_GAIN"):
 			crit_coin_output_changed()
 
 
 func crit_coin_output_changed(flash := true) -> void:
 	crit_coin.visible = th.crit_coin_output.total.greater(0)
-	var text = wa.get_details(Currency.Type.COIN).get_icon_and_name() + ": [b]"
-	text += wa.get_details(Currency.Type.COIN).get_color_text()
+	var text = wa.get_details("COIN").get_icon_and_name() + ": [b]"
+	text += wa.get_details("COIN").get_color_text()
 	if th.crit_coin_output.is_full() and th.crits_apply_to_coin.is_false():
 		text = text % th.crit_coin_output.get_total_text()
 	else:
@@ -409,8 +402,8 @@ func duration_changed(flash := true) -> void:
 
 func duration_increase_changed(flash := true) -> void:
 	var text = "[img=<15> color=#%s]%s[/img] [b]x" % [
-		Details.get_value("color", wa, Currency.Type.XP),
-		bag.get_resource("Arrow Up Fill").get_path()
+		Details.get_value("color", wa, "XP"),
+		ResourceBag.get_resource("Arrow Up Fill").get_path()
 	]
 	if th.duration_increase_range.is_full():
 		text += th.duration_increase_range.get_total_text()

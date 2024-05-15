@@ -38,7 +38,7 @@ func _ready() -> void:
 	await th.container_loaded
 	th.thingy_created.connect(thingy_created)
 	th.container.selected_index.changed.connect(selected_index_changed)
-	wa.get_unlocked(Currency.Type.XP).changed.connect(xp_unlocked_changed)
+	wa.get_unlocked("XP").changed.connect(xp_unlocked_changed)
 	xp_unlocked_changed()
 	
 	match get_index():
@@ -61,7 +61,7 @@ func connect_calls() -> void:
 	thingy.kill_me.connect(thingy_is_sick_of_living)
 	thingy.level.increased.connect(level_increased)
 	thingy.timer.started.connect(timer_started)
-	thingy.timer.wait_time_changed.connect(timer_wait_time_changed)
+	thingy.timer.wait_time.changed.connect(timer_wait_time_changed)
 	thingy.crit_success.changed.connect(crit_success_changed)
 	thingy.level.changed.connect(level_changed)
 	xp_bar.attach_value_pair(thingy.xp)
@@ -75,7 +75,7 @@ func disconnect_calls() -> void:
 	thingy.kill_me.disconnect(thingy_is_sick_of_living)
 	thingy.level.increased.disconnect(level_increased)
 	thingy.timer.started.disconnect(timer_started)
-	thingy.timer.wait_time_changed.disconnect(timer_wait_time_changed)
+	thingy.timer.wait_time.changed.disconnect(timer_wait_time_changed)
 	thingy.crit_success.changed.disconnect(crit_success_changed)
 	thingy.level.changed.disconnect(level_changed)
 	xp_bar.remove_value()
@@ -145,18 +145,18 @@ func set_output_text() -> void:
 		return
 	var text: String
 	match thingy.output_currency.get_value():
-		Currency.Type.WILL:
-			text = wa.get_details(Currency.Type.WILL).get_color_text() % (
+		"WILL":
+			text = wa.get_details("WILL").get_color_text() % (
 				"[b][i]+%s[/i][/b] %s" % [
 					thingy.inhand.output[thingy.output_currency.get_value()].get_text(),
-					wa.get_details(Currency.Type.WILL).get_icon_text()
+					wa.get_details("WILL").get_icon_text()
 				]
 			)
-		Currency.Type.JUICE:
-			text = wa.get_details(Currency.Type.JUICE).get_color_text() % (
+		"JUICE":
+			text = wa.get_details("JUICE").get_color_text() % (
 				"[b][i]+%s[/i][/b] %s" % [
 					thingy.inhand.output[thingy.output_currency.get_value()].get_text(),
-					wa.get_details(Currency.Type.JUICE).get_icon_text()
+					wa.get_details("JUICE").get_icon_text()
 				]
 			)
 	output_label.text = text
@@ -167,7 +167,7 @@ func crit_success_changed() -> void:
 	if thingy.crit_success.is_true():
 		crit_success.text = "[img=<15> color=#%s]%s[/img] [b][i]x%s" % [
 			thingy.details.get_html(),
-			bag.get_resource("Dice").get_path(),
+			ResourceBag.get_resource("Dice").get_path(),
 			thingy.crit_multiplier.get_text()
 		]
 
@@ -177,11 +177,11 @@ func timer_wait_time_changed() -> void:
 
 
 func level_changed() -> void:
-	level_label.text = wa.get_details(Currency.Type.XP).get_icon_text() + " [b][i]" + thingy.level.get_text()
+	level_label.text = wa.get_details("XP").get_icon_text() + " [b][i]" + thingy.level.get_text()
 
 
 func xp_unlocked_changed() -> void:
-	if wa.is_unlocked(Currency.Type.XP):
+	if wa.is_unlocked("XP"):
 		xp_labels.show()
 		xp_bar.show()
 	else:

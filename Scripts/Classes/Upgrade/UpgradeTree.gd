@@ -28,10 +28,10 @@ func _init(_type: Type) -> void:
 	match type:
 		Type.FIRESTARTER:
 			details.set_color(Color(0.89, 0.118, 0.263))
-			details.set_icon(bag.get_resource("Fire"))
+			details.set_icon(ResourceBag.get_resource("Fire"), false)
 		Type.VOYAGER:
 			details.set_color(Color(0.118, 0.725, 0.89))
-			details.set_icon(bag.get_resource("Map"))
+			details.set_icon(ResourceBag.get_resource("Map"), false)
 			persist.through_tier(1)
 
 

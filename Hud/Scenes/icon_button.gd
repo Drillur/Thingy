@@ -109,11 +109,11 @@ func hide_check() -> void:
 
 
 func set_theme_standard() -> void:
-	button.theme = bag.get_resource("Standard")
+	button.theme = ResourceBag.get_resource("Standard")
 
 
 func set_theme_invis() -> void:
-	button.theme = bag.get_resource("Invis")
+	button.theme = ResourceBag.get_resource("Invis")
 
 
 

@@ -33,7 +33,7 @@ var price: Price
 
 func _ready() -> void:
 	if kill_background:
-		$bg.theme = bag.get_resource("Invis")
+		$bg.theme = ResourceBag.get_resource("Invis")
 	call_deferred("_on_resized")
 	set_process(false)
 	bar_size.changed.connect(bar_size_changed)

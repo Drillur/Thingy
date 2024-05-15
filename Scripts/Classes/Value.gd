@@ -12,7 +12,9 @@ signal pending_changed
 var pending: Big
 
 var book := Book.new(Book.Type.BIG)
-var copycat_var: Resource
+var copycat_num: Resource
+var competitor: Value
+var in_first: LoudBool
 var add_pending_to_current_on_game_load := true
 var minimum := Big.new(0.0)
 
@@ -87,18 +89,50 @@ func sync() -> void:
 
 func copycat(value: Resource) -> void:
 	change_base(0.0)
-	copycat_var = value
-	copycat_var.changed.connect(copycat_changed)
+	copycat_num = value
+	copycat_num.changed.connect(copycat_changed)
 	copycat_changed()
 
 
 func copycat_changed() -> void:
-	edit_added(copycat_var, copycat_var.get_value())
+	edit_added(copycat_num, copycat_num.get_value())
 
 
 func clear_copycat() -> void:
-	copycat_var.changed.disconnect(copycat_changed)
-	copycat_var = null
+	copycat_num.changed.disconnect(copycat_changed)
+	copycat_num = null
+
+
+func race(value: Value) -> void:
+	competitor = value
+	in_first = LoudBool.new(greater_equal(competitor.get_value()))
+	in_first.became_false.connect(fell_behind)
+	in_first.became_true.connect(overtook)
+	if in_first.is_true():
+		overtook()
+	else:
+		fell_behind()
+
+
+func fell_behind() -> void:
+	competitor.decreased.connect(update_places)
+	increased.connect(update_places)
+	if decreased.is_connected(update_places):
+		competitor.increased.disconnect(update_places)
+		decreased.disconnect(update_places)
+
+
+func overtook() -> void:
+	competitor.increased.connect(update_places)
+	decreased.connect(update_places)
+	if increased.is_connected(update_places):
+		competitor.decreased.disconnect(update_places)
+		increased.disconnect(update_places)
+
+
+func update_places() -> void:
+	in_first.set_to(greater_equal(competitor.get_value()))
+	
 
 
 func edit_change(category: Book.Category, source, amount) -> void:

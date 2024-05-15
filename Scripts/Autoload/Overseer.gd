@@ -34,7 +34,7 @@ func _notification(what):
 func flash(parent: Node, color = Color(1, 0, 0)) -> void:
 	if Engine.get_frames_per_second() < 60:
 		return
-	var _flash = bag.get_resource("flash").instantiate()
+	var _flash = ResourceBag.get_resource("flash").instantiate()
 	parent.add_child(_flash)
 	_flash.flash(color)
 
@@ -251,6 +251,63 @@ func update_discord_details(text: String) -> void:
 func update_discord_state(text: String) -> void:
 	DiscordSDK.state = text
 	DiscordSDK.refresh()
+
+
+#endregion
+
+
+#region Dev
+
+
+func report(object: Object, max_depth := 2) -> void:
+	var vars = get_script_variables(object.get_script())
+	var _class_name: String
+	if "_class_name" in vars:
+		_class_name = object.get("_class_name")
+	else:
+		_class_name = object.get_class()
+	printt("Report:", _class_name, object)
+	print(get_object_report_text(object, 1, max_depth))
+
+
+func get_object_report_text(object: Object, depth: int, max_depth: int) -> String:
+	if depth > max_depth:
+		return str(object)
+	if object.get_script() == null:
+		return ""
+	var vars = get_script_variables(object.get_script())
+	var text: String = ""
+	for x in vars:
+		if x == "_class_name":
+			continue
+		
+		text += "\n"
+		for i in depth:
+			text += "-\t"
+		text += x + ": "
+		
+		if object.get(x) is LoudBool or object.get(x) is LoudColor:
+			text += str(object.get(x).get_value())
+		elif object.get(x) is Object:
+			if object.get(x).has_method("get_text"):
+				text += object.get(x).get_text()
+			else:
+				text += get_object_report_text(object.get(x), depth + 1, max_depth)
+		elif object.get(x) is Dictionary:
+			for y in object.get(x):
+				text += "\n"
+				for i in depth + 1:
+					text += "-\t"
+				text += str(y) + ": " + str(object.get(x)[y])
+		elif typeof(object.get(x)) == TYPE_ARRAY:
+			for y in object.get(x):
+				text += "\n"
+				for i in depth + 1:
+					text += "-\t"
+				text += str(y)
+		else:
+			text += str(object.get(x))
+	return text
 
 
 #endregion

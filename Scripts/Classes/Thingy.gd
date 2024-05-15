@@ -4,7 +4,6 @@ extends Resource
 
 
 signal kill_me
-
 @export var _class_name := "Thingy"
 
 enum Attribute {
@@ -75,7 +74,7 @@ var persist := Persist.new()
 
 @export var inhand := Inhand.new(self)
 @export var juiced := LoudBool.new(false)
-@export var output_currency := LoudInt.new(Currency.Type.WILL)
+@export var output_currency := LoudString.new("WILL")
 @export var crit_success := LoudBool.new(false)
 
 @export var timer := LoudTimer.new(1.0, 1.0)
@@ -97,8 +96,8 @@ func _init(_index: int) -> void:
 	xp.total.book.add_multiplier(xp_multiplier)
 	xp.total.book.add_multiplier(th.xp_multiplier)
 	level.increased.connect(level_increased)
-	crit_multiplier.became_not_1.connect(crit_success.set_true)
-	crit_multiplier.renewed.connect(crit_success.set_false)
+	crit_multiplier.changed_to_not_equal_to_one.connect(crit_success.set_true)
+	crit_multiplier.reset_to_base.connect(crit_success.set_false)
 	juice_input_multiplier.changed.connect(juice_input_multiplier_changed)
 	juice_input_multiplier_changed()
 	juiced.changed.connect(juiced_changed)
@@ -143,8 +142,8 @@ func reset() -> void:
 
 func timer_timeout() -> void:
 	inhand.add_currencies()
-	if inhand.output_has(Currency.Type.XP):
-		xp.add(inhand.output[Currency.Type.XP])
+	if inhand.output.has("XP"):
+		xp.add(inhand.output["XP"])
 	inhand.clear()
 	inhand = null
 	if th.crits_apply_to_next_job_duration.is_true():
@@ -210,26 +209,26 @@ func start_timer() -> void:
 	timer.start()
 
 
-func get_output_currency() -> Currency.Type:
+func get_output_currency() -> String:
 	if (
-		wa.is_unlocked(Currency.Type.JUICE)
+		wa.is_unlocked("JUICE")
 		and (
 			(
 				th.smart_juice.is_true()
-				and wa.get_effective_amount(Currency.Type.JUICE).less(
+				and wa.get_effective_amount("JUICE").less(
 					th.max_juice_use.get_value()
 				)
 			)
 			or (
 				th.smart_juice.is_false()
-				and wa.get_amount(Currency.Type.JUICE).less(
+				and wa.get_amount("JUICE").less(
 					get_maximum_juice_input()
 				)
 			)
 		)
 	):
-		return Currency.Type.JUICE
-	return Currency.Type.WILL
+		return "JUICE"
+	return "WILL"
 
 
 func set_inhands() -> void:
@@ -248,25 +247,29 @@ func set_inhands() -> void:
 	set_inhand_xp()
 	set_coin_inhand()
 	match output_currency.get_value():
-		Currency.Type.WILL:
+		"WILL":
 			set_inhand_will()
-		Currency.Type.JUICE:
+		"JUICE":
 			set_inhand_juice()
 	inhand.edit_pending()
 
 
 func set_inhand_will() -> void:
-	inhand.add_output({Currency.Type.WILL:
-		get_random_output().m(
-			crit_multiplier.get_value() if crit_success.is_true() else 1.0
-		).m(
-			juiced_multiplier.get_value() if juiced.is_true() else 1.0
-		)
-	})
+	inhand.add_output(
+		{
+			"WILL": (
+				get_random_output().m(
+					crit_multiplier.get_value() if crit_success.is_true() else 1.0
+				).m(
+					juiced_multiplier.get_value() if juiced.is_true() else 1.0
+				)
+			)
+		}
+	)
 
 
 func set_inhand_juice() -> void:
-	inhand.add_output({Currency.Type.JUICE:
+	inhand.add_output({"JUICE":
 		get_random_juice_output() * (
 			crit_multiplier.get_value() if crit_success.is_true() else 1.0
 		) * (
@@ -276,7 +279,7 @@ func set_inhand_juice() -> void:
 
 
 func set_inhand_xp() -> void:
-	if not wa.is_unlocked(Currency.Type.XP):
+	if not wa.is_unlocked("XP"):
 		return
 	var new_inhand = th.xp_output_range.get_random_point()
 	if juiced.is_true():
@@ -285,7 +288,7 @@ func set_inhand_xp() -> void:
 		new_inhand *= crit_multiplier.get_value()
 	if th.duration_affects_xp_output.is_true():
 		new_inhand *= max(1, timer.wait_time)
-	inhand.add_output({Currency.Type.XP: new_inhand})
+	inhand.add_output({"XP": new_inhand})
 
 
 func set_coin_inhand() -> void:
@@ -298,7 +301,7 @@ func set_coin_inhand() -> void:
 		new_inhand *= crit_multiplier.get_value()
 	if th.crits_apply_to_coin_twice.is_true():
 		new_inhand *= crit_multiplier.get_value()
-	inhand.add_output({Currency.Type.COIN: Big.new(new_inhand)})
+	inhand.add_output({"COIN": Big.new(new_inhand)})
 
 
 func log_rates() -> void:
@@ -306,16 +309,14 @@ func log_rates() -> void:
 
 
 func remove_rates() -> void:
-	for currency_type in Currency.Type.values():
-		if Currency.is_invalid(currency_type):
-			continue
-		wa.get_currency(currency_type).gain_rate.remove_added(self)
+	for key in Currency.data.keys():
+		wa.get_currency(key).gain_rate.remove_added(self)
 
 
 func should_juice() -> bool:
 	var amount_juice_drank = get_random_juice_input()
-	if wa.can_afford(Currency.Type.JUICE, amount_juice_drank):
-		wa.subtract(Currency.Type.JUICE, amount_juice_drank)
+	if wa.can_afford("JUICE", amount_juice_drank):
+		wa.subtract("JUICE", amount_juice_drank)
 		return true
 	return false
 

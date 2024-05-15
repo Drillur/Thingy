@@ -3,6 +3,18 @@ extends Node
 
 
 
+const VALID_EXTENSIONS: Array[String] = [
+	"png",
+	"jpg",
+	"import",
+	"svg",
+	"tscn",
+	"remap",
+	"tres",
+	"dialogue",
+	"json",
+]
+
 var resources := {}
 var chats := {}
 
@@ -24,41 +36,36 @@ func store_all_resources() -> void:
 
 func dir_contents(path):
 	var dir = DirAccess.open(path)
-	if dir:
-		dir.list_dir_begin()
-		var file_name = dir.get_next()
-		if file_name in ["Animations",]:
-			file_name = dir.get_next()
-		
-		while file_name != "":
-			if dir.current_is_dir():
-				dir_contents(path + "/" + file_name)
-			else:
-				if (
-					file_name.ends_with(".png")
-					or file_name.ends_with(".import")
-					or file_name.ends_with(".svg")
-					or file_name.ends_with(".tscn")
-					or file_name.ends_with(".remap")
-					or file_name.ends_with(".tres")
-					or file_name.ends_with(".dialogue")
-					or file_name.ends_with(".json")
-				):
-					var _name := file_name.split(".")[0]
-					var _path: String = path + "/" + file_name
-					_path = _path.trim_suffix(".remap")
-					_path = _path.trim_suffix(".import")
-					if file_name.ends_with(".json"):
-						var file = FileAccess.open(_path, FileAccess.READ)
-						var text = file.get_as_text()
-						var json = JSON.new()
-						json.parse(text)
-						resources[_name] = json.data
-					elif not resources.has(_name):
-						resources[_name] = load(_path)
-					if file_name.ends_with(".dialogue"):
-						chats[_name] = resources[_name]
-			file_name = dir.get_next()
+	if not dir:
+		return
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	if file_name in ["Animations",]:
+		file_name = dir.get_next()
+	
+	while file_name != "":
+		if dir.current_is_dir():
+			dir_contents(path + "/" + file_name)
+		else:
+			var extension: String = file_name.get_extension()
+			if not extension in VALID_EXTENSIONS:
+				file_name = dir.get_next()
+				continue
+			var _name := file_name.split(".")[0]
+			var _path: String = path + "/" + file_name
+			_path = _path.trim_suffix(".remap")
+			_path = _path.trim_suffix(".import")
+			if extension == "json":
+				var file = FileAccess.open(_path, FileAccess.READ)
+				var text = file.get_as_text()
+				var json = JSON.new()
+				json.parse(text)
+				resources[_name] = json.data
+			elif extension == "dialogue":
+				chats[_name] = resources[_name]
+			elif not resources.has(_name):
+				resources[_name] = load(_path)
+		file_name = dir.get_next()
 
 
 func get_resource(_name: String) -> Resource:

@@ -91,13 +91,37 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="times purchased" parent="VBoxContainer/Details/VBoxContainer/TitleComponents" instance=ExtResource("5_4iwff")]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Details/VBoxContainer/TitleComponents"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Times Purchased Current" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/HBoxContainer" instance=ExtResource("5_4iwff")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 4
-text = "4/5"
+text = "[b]4"
 autowrap_mode = 0
+bold = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Slash" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/HBoxContainer/HBoxContainer" instance=ExtResource("5_4iwff")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+text = "[i]/"
+autowrap_mode = 0
+italics = true
+
+[node name="Times Purchased Total" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/HBoxContainer/HBoxContainer" instance=ExtResource("5_4iwff")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+text = "[i]5"
+autowrap_mode = 0
+italics = true
 
 [node name="Description" type="RichTextLabel" parent="VBoxContainer/Details/VBoxContainer"]
 unique_name_in_owner = true

@@ -6,13 +6,13 @@ extends RichTextLabel
 @export var autowrap := true
 @export var hide_icon := false
 @export var italics := false
+@export var bold := false
 
 var currency: Currency
 var big: Big
 var price_big: Big
 var loud_string: LoudString
-var int_pair: LoudIntPair
-var float_pair: LoudFloatPair
+var value: Resource
 
 var queue := await Queueable.new(self)
 
@@ -24,9 +24,9 @@ func _ready() -> void:
 
 
 
-func watch_price(_cur: Currency.Type, _price: Price) -> void:
-	currency = wa.get_currency(_cur) as Currency
-	price_big = _price.get_price(_cur)
+func attach_price(key: String, _price: Price) -> void:
+	currency = wa.get_currency(key) as Currency
+	price_big = _price.get_price(key)
 	queue.method = update_text_price
 	currency.amount.changed.connect(queue.call_method)
 	price_big.changed.connect(queue.call_method)
@@ -54,8 +54,8 @@ func enable_autowrap() -> void:
 
 
 
-func watch_currency(_cur: Currency.Type) -> void:
-	currency = wa.get_currency(_cur)
+func attach_currency(key: String) -> void:
+	currency = wa.get_currency(key)
 	queue.method = currency_changed
 	currency.amount.changed.connect(queue.call_method)
 	queue.call_method()
@@ -73,8 +73,8 @@ func currency_changed() -> void:
 	set_deferred("text", new_text)
 
 
-func watch_currency_rate(_cur: Currency.Type) -> void:
-	currency = wa.get_currency(_cur)
+func attach_currency_rate(key: String) -> void:
+	currency = wa.get_currency(key)
 	currency.net_rate.changed.connect(currency_rate_changed)
 	currency_rate_changed()
 	queue.method = currency_rate_changed
@@ -90,7 +90,7 @@ func currency_rate_changed() -> void:
 	set_deferred("text", new_text)
 
 
-func watch_string(_str: LoudString) -> void:
+func attach_string(_str: LoudString) -> void:
 	loud_string = _str
 	loud_string.changed.connect(string_changed)
 	string_changed()
@@ -105,8 +105,8 @@ func string_changed() -> void:
 		set_deferred("text", ("[i]" if italics else "") + loud_string.get_value())
 
 
-func watch_pending_currency(_cur: Currency.Type) -> void:
-	currency = wa.get_currency(_cur) as Currency
+func attach_pending_currency(key: String) -> void:
+	currency = wa.get_currency(key) as Currency
 	currency.amount.pending_changed.connect(currency_pending_changed)
 	currency_pending_changed()
 	queue.method = currency_pending_changed
@@ -124,7 +124,7 @@ func currency_pending_changed() -> void:
 	set_deferred("text", new_text)
 
 
-func watch_big(_big: Big, color: Color) -> void:
+func attach_big(_big: Big, color: Color) -> void:
 	modulate = color
 	big = _big
 	queue.method = big_changed
@@ -140,50 +140,54 @@ func big_changed() -> void:
 	set_deferred("text", new_text)
 
 
-func watch_int_pair(_int_pair: LoudIntPair, color := Color.WHITE) -> void:
-	if int_pair:
-		if int_pair == _int_pair:
-			return
-		queue.queued = false
-		int_pair.changed.disconnect(queue.call_method)
-	modulate = color
-	int_pair = _int_pair
-	queue.method = int_pair_changed
-	int_pair.changed.connect(queue.call_method)
+func attach_float_pair(_value: LoudFloatPair) -> void:
+	if is_value_equal_to_x(_value):
+		return
+	value = _value
+	setup_value()
+
+
+func attach_float(_value: LoudFloat) -> void:
+	if is_value_equal_to_x(_value):
+		return
+	value = _value
+	setup_value()
+
+
+func attach_int_pair(_value: LoudIntPair) -> void:
+	if is_value_equal_to_x(_value):
+		return
+	value = _value
+	setup_value()
+
+
+func attach_int(_value: LoudInt) -> void:
+	if is_value_equal_to_x(_value):
+		return
+	value = _value
+	setup_value()
+
+
+func setup_value() -> void:
+	queue.method = value_changed
+	value.changed.connect(queue.call_method)
 	queue.call_method()
 
 
-func int_pair_changed() -> void:
-	var new_text: String
-	new_text = "[i]%s[/i]" % (
-		int_pair.get_text()
-	)
-	set_deferred("text", new_text)
+func value_changed() -> void:
+	if value == null:
+		return
+	var _text: String = ""
+	_text = "[i]" if italics else ""
+	_text += "[b]" if bold else ""
+	_text += value.get_text()
+	set_deferred("text", _text)
 
 
-func watch_float_pair(_float_pair: LoudFloatPair, _data := {}) -> void:
-	if float_pair:
-		if float_pair == _float_pair:
-			return
-		queue.queued = false
-		float_pair.changed.disconnect(queue.call_method)
-	var middle: String = "/" if not _data.has("middle") else _data.get("middle")
-	var prepended_text: String = "" if not _data.has("prepended_text") else _data.get("prepended_text")
-	var appended_text: String = "" if not _data.has("appended_text") else _data.get("appended_text")
-	var display_both: bool = true if not _data.has("display_both") else _data.get("display_both")
-	float_pair = _float_pair
-	var update_text = func():
-		set_deferred("text", "%s%s%s" % [
-			prepended_text,
-			float_pair.get_total_text() if float_pair.is_full() and not display_both else (
-				float_pair.get_text() if middle == "/" else "%s%s%s" % [
-					float_pair.get_current_text(),
-					middle,
-					float_pair.get_total_text()
-				]
-			),
-			appended_text,
-		])
-	queue.method = update_text
-	float_pair.changed.connect(queue.call_method)
-	queue.call_method()
+func clear_value() -> void:
+	value.changed.disconnect(queue.call_method)
+	value = null
+
+
+func is_value_equal_to_x(x: Resource) -> bool:
+	return value and value == x

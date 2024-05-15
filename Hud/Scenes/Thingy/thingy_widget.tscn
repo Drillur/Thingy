@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://f0bw1mm367n6"]
 
 [ext_resource type="Script" path="res://Hud/Scenes/Thingy/thingy_widget.gd" id="1_2biu5"]
-[ext_resource type="Theme" uid="uid://crf5gyv8gm6r1" path="res://Hud/Themes/Subtle Background.tres" id="1_n6n2h"]
 [ext_resource type="PackedScene" uid="uid://dowun7x403k8u" path="res://Hud/Scenes/Header.tscn" id="2_5ms20"]
+[ext_resource type="Theme" uid="uid://dlojc3h2w34po" path="res://Hud/Themes/Subtle Background Rounded.tres" id="2_73atl"]
 [ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="4_wqyrf"]
 [ext_resource type="Texture2D" uid="uid://bkebt7vnjp4bt" path="res://Art/Icons/Hud/activeBuffs.png" id="4_xlnmm"]
 [ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/Scenes/bar.tscn" id="5_wxj6c"]
@@ -14,7 +14,7 @@ script = ExtResource("1_2biu5")
 
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 2
-theme = ExtResource("1_n6n2h")
+theme = ExtResource("2_73atl")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -130,10 +130,20 @@ autowrap_mode = 0
 layout_mode = 2
 theme_override_constants/margin_left = 10
 
-[node name="Coin Output Increase" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer/MarginContainer3" instance=ExtResource("4_wqyrf")]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer/MarginContainer3"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Flair" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer/MarginContainer3/HBoxContainer" instance=ExtResource("4_wqyrf")]
+layout_mode = 2
+text = "[img=<15>]res://Art/Icons/Hud/Arrow Up Fill.png[/img] [b]x"
+autowrap_mode = 0
+
+[node name="Coin Output Increase" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/Output/MarginContainer/VBoxContainer/MarginContainer3/HBoxContainer" instance=ExtResource("4_wqyrf")]
 unique_name_in_owner = true
 layout_mode = 2
-text = "[img=<15>]res://Art/Icons/Hud/Arrow Up Fill.png[/img] [b]x1.15"
+text = "[b]1.15"
+autowrap_mode = 0
 
 [node name="Input Components" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true

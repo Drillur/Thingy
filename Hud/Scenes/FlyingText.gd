@@ -50,7 +50,7 @@ func _init(
 
 
 func add(data: Dictionary) -> void:
-	var vico = bag.get_resource("flying_text").instantiate() as FlyingTextVico
+	var vico = ResourceBag.get_resource("flying_text").instantiate() as FlyingTextVico
 	vicos.append(vico)
 	vico.setup(layer[0], layer[1])
 	parent_node.add_child(vico)

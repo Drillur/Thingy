@@ -3,21 +3,17 @@ extends Resource
 
 
 
-enum Type {
-	NONE,
-	WILL,
-	COIN,
-	XP,
-	JUICE,
-	SOUL,
-}
-
-const NONE := Type.NONE
-
 signal sync_requested
 signal increased__amount(_amount)
 
-var type: Type
+static var data := {
+	"WILL": 0,
+	"COIN": 0,
+	"XP": 0,
+	"JUICE": 0,
+	"SOUL": 0,
+}
+
 var key: String
 
 @export var amount := Value.new(0)
@@ -47,9 +43,8 @@ var positive_offline_rate: bool
 #region Init
 
 
-func _init(_type: Type) -> void:
-	type = _type
-	key = Type.keys()[type]
+func _init(_key: String) -> void:
+	key = _key
 	gain_rate.changed.connect(sync_cd.emit)
 	loss_rate.changed.connect(sync_cd.emit)
 	sync_requested.connect(sync_rate)
@@ -58,25 +53,25 @@ func _init(_type: Type) -> void:
 	amount = Value.new(0)
 	amount.add_pending_to_current_on_game_load = false
 	details.set_name(key.capitalize())
-	match type:
-		Type.WILL:
+	match key:
+		"WILL":
 			amount.change_base(1)
-			details.set_icon(bag.get_resource("Heart"), false)
+			details.set_icon(ResourceBag.get_resource("Heart"), false)
 			details.set_color(Color(1, 0.114, 0.278))
 			unlocked = LoudBool.new(true)
-		Type.COIN:
+		"COIN":
 			details.set_color(Color(1, 0.867, 0))
-			details.set_icon(bag.get_resource("Coin"), false)
-		Type.XP:
+			details.set_icon(ResourceBag.get_resource("Coin"), false)
+		"XP":
 			details.set_name("Experience")
 			details.set_color(Color(0.894, 0.51, 1))
-			details.set_icon(bag.get_resource("Star"), false)
-		Type.JUICE:
+			details.set_icon(ResourceBag.get_resource("Star"), false)
+		"JUICE":
 			details.set_color(Color(0.424, 0.957, 0.125))
-			details.set_icon(bag.get_resource("Juice"), false)
-		Type.SOUL:
+			details.set_icon(ResourceBag.get_resource("Juice"), false)
+		"SOUL":
 			details.set_color(Color(0.918, 0.2, 0.553))
-			details.set_icon(bag.get_resource("Ghost"), false)
+			details.set_icon(ResourceBag.get_resource("Ghost"), false)
 			persist.through_tier(1)
 
 
@@ -147,8 +142,8 @@ func sync_rate() -> void:
 		net_rate.set_to(Big.new(gain).s(loss))
 		net_rate.positive.set_to(true)
 	else:
-		gain.text
-		loss.text
+		#gain.text
+		#loss.text
 		net_rate.set_to(Big.new(loss).s(gain))
 		net_rate.positive.set_to(false)
 	if gain_rate.greater(highest_gain_rate):
@@ -190,12 +185,12 @@ func get_effective_amount() -> Big:
 	return amount.get_effective_amount()
 
 
-static func is_valid(_currency_type: Type) -> bool:
-	return _currency_type != Currency.Type.NONE
+static func is_valid(_key: String) -> bool:
+	return Currency.data.has(_key)
 
 
-static func is_invalid(_currency_type: Type) -> bool:
-	return not is_valid(_currency_type)
+static func is_invalid(_key: String) -> bool:
+	return not is_valid(_key)
 
 
 #endregion

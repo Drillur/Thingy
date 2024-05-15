@@ -1,3 +1,4 @@
+HBoxContainer
 Control
 HSlider
 VBoxContainer
@@ -7,7 +8,6 @@ Button
 Label
 MarginContainer
 TextureRect
-HBoxContainer
 Panel
 TextEdit
 CheckBox

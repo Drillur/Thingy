@@ -19,14 +19,14 @@ func _init(_thingy: Thingy) -> void:
 
 
 func add_output(_output: Dictionary) -> void:
-	for currency_type in _output:
-		output[currency_type] = _output[currency_type]
+	for key in _output:
+		output[key] = _output[key]
 
 
 func edit_pending() -> void:
-	for currency_type in output.keys():
-		var currency := wa.get_currency(currency_type)
-		currency.edit_pending(self, output[currency_type])
+	for key in output.keys():
+		var currency := wa.get_currency(key)
+		currency.edit_pending(self, output[key])
 
 
 func clear_pending() -> void:
@@ -42,39 +42,37 @@ func add_currencies() -> void:
 
 func log_rates() -> void:
 	var minimum_duration := thingy.get_minimum_duration()
-	for currency_type in Currency.Type.values():
-		if Currency.is_invalid(currency_type):
-			continue
-		var gain_rate: Value = wa.get_currency(currency_type).gain_rate
-		if not currency_type in output.keys():
+	for key in Currency.data.keys():
+		var gain_rate: Value = wa.get_currency(key).gain_rate
+		if not key in output.keys():
 			gain_rate.remove_added(thingy)
 			continue
 		match Settings.rate_mode.get_value():
 			wa.RateMode.LIVE:
 				gain_rate.edit_added(
 					thingy,
-					Big.new(output[currency_type]).d(thingy.timer.wait_time.get_value())
+					Big.new(output[key]).d(thingy.timer.wait_time.get_value())
 				)
 			wa.RateMode.MINIMUM:
-				match currency_type:
-					Currency.Type.WILL:
+				match key:
+					"WILL":
 						gain_rate.edit_added(
 							thingy,
 							thingy.get_minimum_output().d(minimum_duration)
 						)
-					Currency.Type.XP:
+					"XP":
 						gain_rate.edit_added(
-							self,
+							thingy,
 							thingy.get_minimum_xp_output() / minimum_duration
 						)
-					Currency.Type.JUICE:
+					"JUICE":
 						gain_rate.edit_added(
-							self,
+							thingy,
 							thingy.get_minimum_juice_output() / minimum_duration
 						)
-					Currency.Type.COIN:
+					"COIN":
 						gain_rate.edit_added(
-							self,
+							thingy,
 							thingy.get_minimum_coin_output() * 
 							thingy.get_crit_chance_divider() / minimum_duration
 						)
@@ -87,8 +85,8 @@ func refund() -> void:
 
 
 func refund_input() -> void:
-	for currency_type in input.keys():
-		wa.add(currency_type, input[currency_type])
+	for key in input.keys():
+		wa.add(key, input[key])
 
 
 func clear() -> void:
@@ -107,10 +105,6 @@ func has_input() -> bool:
 	return input.size() > 0
 
 
-func output_has(_currency_type: Currency.Type) -> bool:
-	return output.has(_currency_type)
-
-
 #endregion
 
 
@@ -120,7 +114,7 @@ func output_has(_currency_type: Currency.Type) -> bool:
 func report() -> void:
 	print_debug("Report for Inhand ", self, ":")
 	#print_debug(" - Output: ", output.get_text())
-	#print_debug(" - Output Currency: ", Currency.Type.keys()[output_currency_type])
+	#print_debug(" - Output Currency: ", keys()[output_key])
 
 
 #endregion

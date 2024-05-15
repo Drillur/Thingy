@@ -19,9 +19,9 @@ var upgrade: Upgrade
 
 
 func _ready() -> void:
-	upgrade = up.get_upgrade(Upgrade.Type[name]) as Upgrade
-	if not Upgrade.data.has(upgrade.key):
+	if not Upgrade.data.has(name):
 		return
+	upgrade = up.get_upgrade(name) as Upgrade
 	upgrade.vico = self
 	update_wrap_mode()
 	
@@ -98,8 +98,10 @@ func setup() -> void:
 	pb.title.text = upgrade.details.get_name()
 	description_queue.call_method()
 	if upgrade.times_purchased.get_total() > 1:
-		pb.times_purchased.show()
-		pb.times_purchased.watch_int_pair(upgrade.times_purchased, upgrade.details.get_color())
+		pb.times_purchased_current.get_parent().modulate = upgrade.details.get_color()
+		pb.times_purchased_current.get_parent().show()
+		pb.times_purchased_current.attach_int(upgrade.times_purchased.current)
+		pb.times_purchased_total.attach_int(upgrade.times_purchased.total)
 	#pb.texture_rect.modulate = Color.WHITE
 	set_cost_visibility()
 	pb.texture_rect.texture = upgrade.details.get_icon()

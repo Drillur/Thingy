@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cmo5x3dcvsaet"]
+[gd_scene load_steps=21 format=3 uid="uid://cmo5x3dcvsaet"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_q04pk"]
 [ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="3_0lxd2"]
@@ -19,6 +19,16 @@
 [ext_resource type="Texture2D" uid="uid://bvb4ehu30w7iu" path="res://Art/Icons/Hud/Settings.png" id="12_dnau6"]
 [ext_resource type="Texture2D" uid="uid://bihfgl6qch4gh" path="res://Art/Icons/Hud/Skull.png" id="15_im36d"]
 [ext_resource type="Texture2D" uid="uid://dqb65ponp02yw" path="res://Art/Icons/Hud/Sort.png" id="16_mjpp8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eni0f"]
+bg_color = Color(0.0705882, 0.0705882, 0.0705882, 1)
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_bottom_left = 5
+shadow_color = Color(0, 0, 0, 0.34902)
 
 [node name="Main" type="CanvasLayer"]
 follow_viewport_scale = 0.905
@@ -456,10 +466,15 @@ layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
 
+[node name="Save notification Background2" type="Panel" parent="Content/Save Notification"]
+layout_mode = 2
+theme = ExtResource("5_dm0ov")
+
 [node name="Save notification Background" type="Panel" parent="Content/Save Notification"]
 unique_name_in_owner = true
 layout_mode = 2
 theme = ExtResource("5_dm0ov")
+theme_override_styles/panel = SubResource("StyleBoxFlat_eni0f")
 
 [node name="MarginContainer" type="MarginContainer" parent="Content/Save Notification"]
 layout_mode = 2
@@ -519,6 +534,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+metadata/_edit_lock_ = true
 
 [node name="Label" type="Label" parent="."]
 offset_right = 64.0

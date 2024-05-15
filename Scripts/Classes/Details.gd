@@ -203,8 +203,8 @@ func is_description_set() -> bool:
 	return data.description != ""
 
 
-static func get_value(value: String, singleton, type: int):
-	var d = singleton.get_details(type)
+static func get_value(value: String, singleton, key: String):
+	var d = singleton.get_details(key)
 	return d.call("get_" + value)
 
 

@@ -203,11 +203,11 @@ func pack_array(array: Array) -> Dictionary:
 	var i := 0
 	for value in array:
 		var variable_class: String
-		if value is Array:
+		if value is Object:
+			variable_class = value.get("_class_name")
+			data[variable_class + str(i)] = pack_exported_properties(value)
+		elif value is Array:
 			data[i] = pack_array(value)
-		#elif value is Wish:
-			#variable_class = "Wish"
-			#data[variable_class + str(i)] = pack_exported_properties(value)
 		elif value is int:
 			variable_class = "int"
 			data[variable_class + str(i)] = value
@@ -292,38 +292,62 @@ func unpack_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) ->
 			dictionary[key] = packed_value
 	return dictionary
 
-
 func unpack_dictionary_to_empty_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) -> Dictionary:
-	# Only save empty dictionaries which use INT keys. If you use a STRING key like "example", you are fucked.
 	for key in packed_dictionary.keys():
-		var new_key: int = int(key)
 		if typeof(packed_dictionary[key]) in [TYPE_INT, TYPE_FLOAT, TYPE_STRING]:
-			dictionary[new_key] = packed_dictionary[key]
+			dictionary[key] = packed_dictionary[key]
 		else:
 			match packed_dictionary[key]["_class_name"]:
 				"LoudFloat":
 					var x := LoudFloat.new(0.0)
-					dictionary[new_key] = x
-					unpack_vars(dictionary[new_key], packed_dictionary[key])
+					dictionary[key] = x
+					unpack_vars(dictionary[key], packed_dictionary[key])
 					x.set_default_value(x.current)
 				"Value":
 					var x := Value.new(0.0)
-					dictionary[new_key] = x
-					unpack_vars(dictionary[new_key], packed_dictionary[key])
+					dictionary[key] = x
+					unpack_vars(dictionary[key], packed_dictionary[key])
 					x.change_base(x.current.toFloat())
-				"Thingy":
-					th.new_thingy()
-					dictionary[new_key] = th.get_latest_thingy()
-					unpack_vars(dictionary[new_key], packed_dictionary[key])
 				"Big":
 					var x := Big.new(0.0)
-					dictionary[new_key] = x
-					unpack_vars(dictionary[new_key], packed_dictionary[key])
+					dictionary[key] = x
+					unpack_vars(dictionary[key], packed_dictionary[key])
 					x.change_base(x.toFloat())
 				_:
-					dictionary[new_key] = packed_dictionary[key]
-					print_debug("include that object's _class_name var as a case here")
+					dictionary[key] = packed_dictionary[key]
+					print_debug("include %s's _class_name var as a case here" % key)
 	return dictionary
+
+#func unpack_dictionary_to_empty_dictionary(dictionary: Dictionary, packed_dictionary: Dictionary) -> Dictionary:
+	#for key in packed_dictionary.keys():
+		#var new_key: int = int(key)
+		#if typeof(packed_dictionary[key]) in [TYPE_INT, TYPE_FLOAT, TYPE_STRING]:
+			#dictionary[new_key] = packed_dictionary[key]
+		#else:
+			#match packed_dictionary[key]["_class_name"]:
+				#"LoudFloat":
+					#var x := LoudFloat.new(0.0)
+					#dictionary[new_key] = x
+					#unpack_vars(dictionary[new_key], packed_dictionary[key])
+					#x.set_default_value(x.current)
+				#"Value":
+					#var x := Value.new(0.0)
+					#dictionary[new_key] = x
+					#unpack_vars(dictionary[new_key], packed_dictionary[key])
+					#x.change_base(x.current.toFloat())
+				#"Thingy":
+					#th.new_thingy()
+					#dictionary[new_key] = th.get_latest_thingy()
+					#unpack_vars(dictionary[new_key], packed_dictionary[key])
+				#"Big":
+					#var x := Big.new(0.0)
+					#dictionary[new_key] = x
+					#unpack_vars(dictionary[new_key], packed_dictionary[key])
+					#x.change_base(x.toFloat())
+				#_:
+					#dictionary[new_key] = packed_dictionary[key]
+					#print_debug("include that object's _class_name var as a case here")
+	#return dictionary
 
 
 func unpack_array(packed_array: Dictionary) -> Array:
@@ -335,10 +359,11 @@ func unpack_array(packed_array: Dictionary) -> Array:
 		match variable_class:
 			"int":
 				array.append(int(data))
-			#"Wish":
-				#var wish = Wish.new(Wish.Type.LOAD_RANDOM_WISH, data)
-				#wi.add_wish_and_connect_calls(wish)
-				#array.append(wish)
+			"Thingy":
+				th.new_thingy()
+				var thingy: Thingy = th.get_latest_thingy()
+				array.append(thingy)
+				unpack_vars(thingy, data)
 			_:
 				array.append(data)
 	

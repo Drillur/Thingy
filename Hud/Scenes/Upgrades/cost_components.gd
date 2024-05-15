@@ -24,14 +24,14 @@ var color: Color:
 var price: Price:
 	set(val):
 		price = val
-		for currency_type in price.currency_types:
-			var label = bag.get_resource("RichLabel").instantiate() as RichLabel
-			label.theme = bag.get_resource("ShadowText")
+		for key in price.currency_keys:
+			var label = ResourceBag.get_resource("RichLabel").instantiate() as RichLabel
+			label.theme = ResourceBag.get_resource("ShadowText")
 			label.disable_autowrap()
-			content[currency_type] = label
-			if price.get_price(currency_type).equal(0):
+			content[key] = label
+			if price.get_price(key).equal(0):
 				label.hide()
-			label.watch_price(currency_type, price)
+			label.attach_price(key, price)
 			content_parent.add_child(label)
 		bar.attach_price(price, false)
 		pending_bar.attach_price(price, true)
@@ -44,7 +44,7 @@ func connect_calls() -> void:
 	if SaveManager.loading.became_false.is_connected(set_eta_text):
 		return
 	SaveManager.loading.became_false.connect(set_eta_text)
-	for currency_type in price.currency_types:
+	for currency_type in price.currency_keys:
 		var currency = wa.get_currency(currency_type) as Currency
 		currency.amount.changed.connect(set_eta_text)
 		currency.net_rate.changed.connect(set_eta_text)
@@ -59,7 +59,7 @@ func disconnect_calls() -> void:
 	if not SaveManager.loading.became_false.is_connected(set_eta_text):
 		return
 	SaveManager.loading.became_false.disconnect(set_eta_text)
-	for currency_type in price.currency_types:
+	for currency_type in price.currency_keys:
 		var currency = wa.get_currency(currency_type) as Currency
 		currency.amount.changed.disconnect(set_eta_text)
 		currency.net_rate.changed.disconnect(set_eta_text)
