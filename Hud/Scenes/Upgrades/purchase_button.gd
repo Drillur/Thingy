@@ -108,12 +108,12 @@ func _on_button_button_up():
 
 func _on_focus_entered():
 	if Settings.joypad.is_true():
-		button.grab_focus()
+		button.grab_focus.call_deferred()
 
 
 func _on_button_mouse_entered():
 	if button.focus_mode == Control.FOCUS_ALL:
-		button.grab_focus()
+		button.grab_focus.call_deferred()
 
 
 

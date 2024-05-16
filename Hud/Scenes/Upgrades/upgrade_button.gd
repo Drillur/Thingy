@@ -46,6 +46,7 @@ func _ready() -> void:
 		pb.lock()
 	upgrade.unlocked.changed.connect(update_focus)
 	upgrade.purchased.changed.connect(update_focus)
+	Settings.joypad.changed.connect(update_focus)
 	update_focus()
 	await up.container_loaded
 	set_tab()
@@ -117,7 +118,7 @@ func _on_purchase_button_pressed():
 			up.flash_vico(upgrade.required_upgrade)
 		elif not upgrade.can_afford():
 			pb.cost_components.flash_missing_currencies()
-		elif upgrade.available_now.is_true():
+		elif upgrade.can_purchase():
 			upgrade.purchase()
 
 

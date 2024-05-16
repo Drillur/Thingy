@@ -24,6 +24,8 @@ func _init(_node: Node) -> void:
 
 
 func _on_visibility_changed():
+	if not parent is Control:
+		return
 	parent_visible_in_tree = parent.is_visible_in_tree()
 	if parent_visible_in_tree and queued:
 		queued = false

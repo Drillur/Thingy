@@ -31,6 +31,7 @@ func add_price(key: String, base_value) -> void:
 	price[key].changed.connect(emit_changed)
 	currency_keys.append(key)
 	var x = LoudBool.new(false)
+	affordable[key] = x
 	all_affordable.add_bool(x)
 	
 	# Check currency

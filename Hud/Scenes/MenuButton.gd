@@ -43,7 +43,7 @@ signal pressed
 
 func _ready():
 	color = color
-	Settings.joypad_detected.changed.connect(joypad_allowed_changed)
+	Settings.joypad.changed.connect(joypad_allowed_changed)
 	joypad_allowed_changed()
 	set_icon(icon)
 	if drop_down != null:

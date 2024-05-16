@@ -18,7 +18,8 @@ func _ready() -> void:
 	th.thingy_created.connect(thingy_created)
 	th.container = %ThingyContainer
 	up.container = %UpgradeContainer
-	
+	Settings.joypad.changed.connect(joypad_changed)
+	joypad_changed()
 	SaveManager.color.changed.connect(save_color_changed)
 	SaveManager.saving.became_false.connect(save_notification_now)
 	gv.one_second.connect(save_notification_soon)
@@ -39,6 +40,15 @@ func _ready() -> void:
 
 
 #region Signals
+
+
+func joypad_changed() -> void:
+	if Settings.joypad.is_true():
+		purchase_thingy.focus_mode = Control.FOCUS_ALL
+		purchase_thingy.button.focus_mode = Control.FOCUS_ALL
+	else:
+		purchase_thingy.focus_mode = Control.FOCUS_NONE
+		purchase_thingy.button.focus_mode = Control.FOCUS_NONE
 
 
 func thingy_created() -> void:
@@ -449,7 +459,6 @@ func setup_sidebar() -> void:
 	upgrade_tab_changed()
 
 
-
 func current_tab_changed() -> void:
 	if current_tab.less(0):
 		if purchase_thingy.focus_mode == Control.FOCUS_ALL:
@@ -498,6 +507,7 @@ func upgrade_tab_changed(index: int = upgrade_container.tab_container.current_ta
 
 
 func setup_dev() -> void:
+	$Bar.progress = 0.0
 	fps.get_node("Timer").timeout.connect(fps_timer_timeout)
 	fps_timer_timeout()
 	if gv.dev_mode:
@@ -521,6 +531,18 @@ func _on_dev_button_pressed():
 
 func _on_dev_button_2_pressed():
 	wa.get_amount("WILL").d(2)
+
+
+var tween: Tween
+func _on_button_pressed():
+	tween = get_tree().create_tween()
+	gv.flash($Bar, Color.GOLD)
+	tween.tween_interval(0.1)
+	if $Bar.progress < 0.5:
+		tween.tween_property($Bar, "progress", 1.0, 0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	else:
+		tween.tween_property($Bar, "progress", 0.0, 0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
 
 
 func dev_text() -> void:

@@ -20,18 +20,6 @@ var persist := Persist.new()
 var vico: UpgradeButton
 var required_upgrade: String: set = set_required_upgrade
 
-func set_required_upgrade(val: String) -> void:
-	required_upgrade = val
-	unlocked.set_default_value(false)
-	unlocked.reset()
-	await up.upgrades_initialized
-	up.get_upgrade(required_upgrade).purchased.became_true.connect(
-		unlocked.set_true
-	)
-	up.get_upgrade(required_upgrade).purchased.became_false.connect(
-		unlocked.set_false
-		)
-
 var thingy_attribute := Thingy.Attribute.NONE
 var thingy_attributes_to_edit: Array
 var modifier: LoudFloat
@@ -458,6 +446,7 @@ func _init(_key: String) -> void:
 	times_purchased.current.changed.connect(times_purchased_changed)
 	if not details.is_color_set():
 		details.set_color(gv.get_random_nondark_color())
+	SaveManager.loading.became_false.connect(validate_purchased)
 
 
 func set_price(_cost_text: String) -> void:
@@ -468,6 +457,23 @@ func set_price(_cost_text: String) -> void:
 		var amount = split[1]
 		price_dict[currency_name] = amount
 	price = Price.new(price_dict)
+
+
+func validate_purchased() -> void:
+	purchased.set_to(times_purchased.full.get_value())
+
+
+func set_required_upgrade(val: String) -> void:
+	required_upgrade = val
+	unlocked.set_default_value(false)
+	unlocked.reset()
+	await up.upgrades_initialized
+	up.get_upgrade(required_upgrade).purchased.became_true.connect(
+		unlocked.set_true
+	)
+	up.get_upgrade(required_upgrade).purchased.became_false.connect(
+		unlocked.set_false
+	)
 
 
 # - Signals

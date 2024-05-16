@@ -1,7 +1,7 @@
 extends Node
 
 
-const dev_mode := true
+const dev_mode := false
 
 var root: CanvasLayer
 var root_ready := LoudBool.new(false)
@@ -120,7 +120,7 @@ func find_nearest_focus(node: Control) -> void:
 
 
 func get_nearest_next_focus(node: Control, distance: int) -> Array:
-	if node is UpgradeButton or PurchaseButton:
+	if node is UpgradeButton or node is PurchaseButton:
 		return [node, distance]
 	return get_nearest_next_focus(node.find_next_valid_focus(), distance + 1)
 

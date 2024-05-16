@@ -44,4 +44,16 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pr56i")
 
+[node name="Change" type="Panel" parent="bg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(2, 0)
+layout_mode = 2
+offset_left = 26.0
+offset_right = 62.0
+offset_bottom = 18.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pr56i")
+
 [connection signal="resized" from="." to="." method="_on_resized"]

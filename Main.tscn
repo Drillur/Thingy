@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cmo5x3dcvsaet"]
+[gd_scene load_steps=23 format=3 uid="uid://cmo5x3dcvsaet"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1_q04pk"]
 [ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="3_0lxd2"]
@@ -19,6 +19,8 @@
 [ext_resource type="Texture2D" uid="uid://bvb4ehu30w7iu" path="res://Art/Icons/Hud/Settings.png" id="12_dnau6"]
 [ext_resource type="Texture2D" uid="uid://bihfgl6qch4gh" path="res://Art/Icons/Hud/Skull.png" id="15_im36d"]
 [ext_resource type="Texture2D" uid="uid://dqb65ponp02yw" path="res://Art/Icons/Hud/Sort.png" id="16_mjpp8"]
+[ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/Scenes/bar.tscn" id="20_t4lwv"]
+[ext_resource type="PackedScene" uid="uid://c2qr5m4ppk71t" path="res://Hud/Scenes/Button.tscn" id="21_2pqjj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eni0f"]
 bg_color = Color(0.0705882, 0.0705882, 0.0705882, 1)
@@ -540,6 +542,15 @@ metadata/_edit_lock_ = true
 offset_right = 64.0
 offset_bottom = 122.0
 
+[node name="Bar" parent="." instance=ExtResource("20_t4lwv")]
+offset_left = 208.0
+offset_top = 125.0
+offset_right = 382.0
+offset_bottom = 161.0
+
+[node name="Button" parent="Bar" instance=ExtResource("21_2pqjj")]
+layout_mode = 2
+
 [connection signal="pressed" from="Content/HBoxContainer/ThingyContainer/Purchase Thingy" to="." method="_on_purchase_thingy_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Menu" to="." method="_on_tab_menu_pressed"]
 [connection signal="pressed" from="Content/HBoxContainer2/Navigation Panel/MarginContainer2/MarginContainer/Navigation Buttons/Tab Settings" to="." method="_on_tab_settings_pressed"]
@@ -552,3 +563,4 @@ offset_bottom = 122.0
 [connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/XPComponents" to="." method="_on_xp_components_resized"]
 [connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/JuiceComponents" to="." method="_on_juice_components_resized"]
 [connection signal="resized" from="Content/HBoxContainer2/CurrencyPanel/MarginContainer/HBoxContainer/SoulComponents" to="." method="_on_soul_components_resized"]
+[connection signal="pressed" from="Bar/Button" to="." method="_on_button_pressed"]
