@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://bfk23hhxoyfeq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pr56i"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="BarAnimation" type="MarginContainer"]
+offset_right = 291.0
+size_flags_vertical = 3
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pr56i")

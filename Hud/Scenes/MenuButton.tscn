@@ -1,39 +1,29 @@
-[gd_scene load_steps=7 format=3 uid="uid://bfi0uovwegdxj"]
+[gd_scene load_steps=6 format=3 uid="uid://bfi0uovwegdxj"]
 
 [ext_resource type="Script" path="res://Hud/Scenes/MenuButton.gd" id="1_pwhdq"]
-[ext_resource type="Texture2D" uid="uid://djwo8cenuwp14" path="res://Art/Icons/Hud/Menu.png" id="2_bui6q"]
-[ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Hud/Themes/Invis.tres" id="2_w2of4"]
-[ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="4_eba2e"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icq3d"]
-bg_color = Color(1, 1, 1, 0.0588235)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r7kh0"]
-bg_color = Color(1, 1, 1, 0.03)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+[ext_resource type="Theme" uid="uid://cjvpbaiddna0a" path="res://Hud/Themes/Standard Rounded.tres" id="2_0tdwb"]
+[ext_resource type="Texture2D" uid="uid://df7h83cl7coe8" path="res://Art/Icons/Icon.png" id="2_bui6q"]
+[ext_resource type="PackedScene" uid="uid://c2qr5m4ppk71t" path="res://Hud/Scenes/Button.tscn" id="3_87imt"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="4_g5ow3"]
 
 [node name="Menu Button" type="MarginContainer"]
 custom_minimum_size = Vector2(36, 36)
-offset_right = 36.0
+offset_right = 77.0
 offset_bottom = 36.0
 focus_mode = 2
 script = ExtResource("1_pwhdq")
-icon = ExtResource("2_bui6q")
 text = "Menu"
 
-[node name="Button" type="Button" parent="."]
+[node name="Background" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+show_behind_parent = true
 layout_mode = 2
-mouse_default_cursor_shape = 2
-theme = ExtResource("2_w2of4")
-theme_override_styles/hover = SubResource("StyleBoxFlat_icq3d")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_r7kh0")
+mouse_filter = 2
+theme = ExtResource("2_0tdwb")
+
+[node name="Button" parent="." instance=ExtResource("3_87imt")]
+layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(36, 36)
@@ -48,6 +38,7 @@ theme_override_constants/margin_bottom = 6
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 mouse_filter = 2
+alignment = 1
 
 [node name="HBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -57,6 +48,7 @@ theme_override_constants/separation = 10
 
 [node name="IconContainer" type="Control" parent="MarginContainer/VBoxContainer/HBox"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_vertical = 4
@@ -74,22 +66,17 @@ texture = ExtResource("2_bui6q")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Label" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBox"]
+[node name="Label" parent="MarginContainer/VBoxContainer/HBox" instance=ExtResource("4_g5ow3")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-mouse_filter = 2
-theme = ExtResource("4_eba2e")
-bbcode_enabled = true
 text = "Menu"
-fit_content = true
 autowrap_mode = 0
 
 [connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
 [connection signal="focus_exited" from="." to="." method="_on_focus_exited"]
 [connection signal="button_down" from="Button" to="." method="_on_button_button_down"]
 [connection signal="button_up" from="Button" to="." method="_on_button_button_up"]
-[connection signal="gui_input" from="Button" to="." method="_on_button_gui_input"]
 [connection signal="mouse_entered" from="Button" to="." method="_on_button_mouse_entered"]
 [connection signal="mouse_exited" from="Button" to="." method="_on_button_mouse_exited"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

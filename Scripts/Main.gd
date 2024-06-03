@@ -15,7 +15,6 @@ func _ready() -> void:
 	setup_sidebar()
 	setup_navigation_panel()
 	setup_currency_panel()
-	th.thingy_created.connect(thingy_created)
 	th.container = %ThingyContainer
 	up.container = %UpgradeContainer
 	Settings.joypad.changed.connect(joypad_changed)
@@ -49,10 +48,6 @@ func joypad_changed() -> void:
 	else:
 		purchase_thingy.focus_mode = Control.FOCUS_NONE
 		purchase_thingy.button.focus_mode = Control.FOCUS_NONE
-
-
-func thingy_created() -> void:
-	th.thingy_created.disconnect(thingy_created)
 
 
 func _input(event):
@@ -283,12 +278,17 @@ func juice_unlocked_changed() -> void:
 
 
 func juice_changed() -> void:
-	juice_label.text = wa.get_details("JUICE").get_color_text() % (
-		"[i]%s (Goal: %s)[/i]" % [
-			wa.get_amount_text("JUICE"),
-			th.max_juice_use.get_text(),
-		]
-	)
+	if up.is_purchased("SMART_JUICE"):
+		juice_label.text = wa.get_details("JUICE").get_color_text() % (
+			"[i]%s (Goal: %s)[/i]" % [
+				wa.get_amount_text("JUICE"),
+				th.max_juice_use.get_text(),
+			]
+		)
+	else:
+		juice_label.text = wa.get_details("JUICE").get_color_text() % (
+			"[i]%s[/i]" % wa.get_amount_text("JUICE")
+		)
 
 
 func soul_unlocked_changed() -> void:
@@ -411,7 +411,10 @@ func _on_reset_button_pressed():
 
 
 func _on_purchase_thingy_pressed():
-	th.purchase_thingy()
+	if th.can_afford_thingy() or gv.dev_mode:
+		th.purchase_thingy()
+	else:
+		purchase_thingy.cost_components.flash_missing_currencies()
 
 
 func update_navigation_panel_visibility() -> void:
@@ -507,7 +510,6 @@ func upgrade_tab_changed(index: int = upgrade_container.tab_container.current_ta
 
 
 func setup_dev() -> void:
-	$Bar.progress = 0.0
 	fps.get_node("Timer").timeout.connect(fps_timer_timeout)
 	fps_timer_timeout()
 	if gv.dev_mode:
@@ -531,18 +533,6 @@ func _on_dev_button_pressed():
 
 func _on_dev_button_2_pressed():
 	wa.get_amount("WILL").d(2)
-
-
-var tween: Tween
-func _on_button_pressed():
-	tween = get_tree().create_tween()
-	gv.flash($Bar, Color.GOLD)
-	tween.tween_interval(0.1)
-	if $Bar.progress < 0.5:
-		tween.tween_property($Bar, "progress", 1.0, 0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	else:
-		tween.tween_property($Bar, "progress", 0.0, 0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-
 
 
 func dev_text() -> void:

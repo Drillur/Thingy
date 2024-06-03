@@ -10,12 +10,13 @@ extends MarginContainer
 @onready var output_label = %"Output Label"
 @onready var index_label = %"Index Label"
 @onready var selected = %Selected
-@onready var xp_labels = %"XP Labels"
 @onready var level_label = %"Level Label"
 @onready var border = %Border
 @onready var crit_success = %CritSuccess
 @onready var button = %Button
 @onready var flying_texts = %FlyingTexts
+@onready var juiced = %Juiced
+@onready var crit_success_die = %CritSuccessDie
 
 var thingy: Thingy
 
@@ -25,6 +26,7 @@ var color: Color:
 		progress_bar.modulate = val
 		index_label.modulate = val
 		button.modulate = val
+		crit_success_die.modulate = val
 		if get_index() == 3:
 			border.modulate = val
 
@@ -32,9 +34,11 @@ var color: Color:
 
 func _ready() -> void:
 	set_process(false)
-	xp_labels.hide()
+	juiced.modulate = wa.get_color("JUICE")
+	level_label.hide()
 	xp_bar.hide()
-	crit_success.hide()
+	xp_bar.color = wa.get_color("XP")
+	crit_success.get_parent().hide()
 	await th.container_loaded
 	th.thingy_created.connect(thingy_created)
 	th.container.selected_index.changed.connect(selected_index_changed)
@@ -58,7 +62,9 @@ func _process(_delta):
 
 
 func connect_calls() -> void:
-	thingy.kill_me.connect(thingy_is_sick_of_living)
+	thingy.juiced.changed.connect(jucied_changed)
+	jucied_changed()
+	thingy.died.connect(clear_thingy)
 	thingy.level.increased.connect(level_increased)
 	thingy.timer.started.connect(timer_started)
 	thingy.timer.wait_time.changed.connect(timer_wait_time_changed)
@@ -68,21 +74,28 @@ func connect_calls() -> void:
 	timer_wait_time_changed()
 	level_changed()
 	crit_success_changed()
+	crit_success.attach_float(thingy.crit_multiplier)
 	show()
 
 
 func disconnect_calls() -> void:
-	thingy.kill_me.disconnect(thingy_is_sick_of_living)
+	thingy.juiced.changed.disconnect(jucied_changed)
+	thingy.died.disconnect(clear_thingy)
 	thingy.level.increased.disconnect(level_increased)
 	thingy.timer.started.disconnect(timer_started)
 	thingy.timer.wait_time.changed.disconnect(timer_wait_time_changed)
 	thingy.crit_success.changed.disconnect(crit_success_changed)
 	thingy.level.changed.disconnect(level_changed)
+	crit_success.clear_value()
 	xp_bar.remove_value()
 
 
 
 # - Signal
+
+
+func jucied_changed() -> void:
+	juiced.visible = thingy.juiced.get_value()
 
 
 func selected_index_changed() -> void:
@@ -129,14 +142,9 @@ func _on_button_pressed():
 		th.container.snap_to_index(thingy.index)
 
 
-func thingy_is_sick_of_living(_index: int) -> void:
-	# signal 'kill_me' passes its index ^
-	clear_thingy()
-
-
 func timer_started() -> void:
 	set_output_text()
-	if thingy.last_most_noteworthy_roll != RollLog.RollQuality.AVERAGE:
+	if thingy.crit_success.is_true():
 		throw_crit_text()
 
 
@@ -163,13 +171,7 @@ func set_output_text() -> void:
 
 
 func crit_success_changed() -> void:
-	crit_success.visible = thingy.crit_success.get_value()
-	if thingy.crit_success.is_true():
-		crit_success.text = "[img=<15> color=#%s]%s[/img] [b][i]x%s" % [
-			thingy.details.get_html(),
-			ResourceBag.get_resource("Dice").get_path(),
-			thingy.crit_multiplier.get_text()
-		]
+	crit_success.get_parent().visible = thingy.crit_success.get_value()
 
 
 func timer_wait_time_changed() -> void:
@@ -182,15 +184,15 @@ func level_changed() -> void:
 
 func xp_unlocked_changed() -> void:
 	if wa.is_unlocked("XP"):
-		xp_labels.show()
+		level_label.show()
 		xp_bar.show()
 	else:
-		xp_labels.hide()
+		level_label.hide()
 		xp_bar.hide()
 
 
 func level_increased() -> void:
-	gv.flash(level_label, thingy.details.get_color())
+	gv.flash(level_label, thingy.color.get_value())
 
 
 func thingy_created() -> void:
@@ -209,7 +211,7 @@ func assign_thingy(_thingy: Thingy) -> void:
 		await SaveManager.loading.became_false
 	clear_thingy()
 	thingy = _thingy
-	color = thingy.details.get_color()
+	color = thingy.color.get_value()
 	connect_calls()
 	set_output_text()
 	progress_bar.attach_timer(thingy.timer)
@@ -230,17 +232,7 @@ func clear_thingy() -> void:
 
 
 func throw_crit_text() -> void:
-	var text = FlyingText.new(
-		FlyingText.Type.ROLL_TEXT,
-		flying_texts, # node used to determine text locations
-		FlyingText.global_flying_texts_parent, # node that will hold texts
-		[1, 1], # collision
-	)
-	text.add({
-		"quality": thingy.last_most_noteworthy_roll,
-		"percent": thingy.last_most_noteworthy_roll_percent
-	})
-	text.go()
+	FlyingText.got_crit(flying_texts, thingy.crit_multiplier.get_text(), thingy.color.get_value())
 
 
 

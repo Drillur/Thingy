@@ -75,9 +75,9 @@ func currency_changed() -> void:
 
 func attach_currency_rate(key: String) -> void:
 	currency = wa.get_currency(key)
-	currency.net_rate.changed.connect(currency_rate_changed)
-	currency_rate_changed()
 	queue.method = currency_rate_changed
+	currency.net_rate.changed.connect(queue.call_method)
+	queue.call_method()
 
 
 func currency_rate_changed() -> void:
@@ -92,9 +92,9 @@ func currency_rate_changed() -> void:
 
 func attach_string(_str: LoudString) -> void:
 	loud_string = _str
-	loud_string.changed.connect(string_changed)
-	string_changed()
 	queue.method = string_changed
+	loud_string.changed.connect(queue.call_method)
+	queue.call_method()
 
 
 func string_changed() -> void:
@@ -107,9 +107,9 @@ func string_changed() -> void:
 
 func attach_pending_currency(key: String) -> void:
 	currency = wa.get_currency(key) as Currency
-	currency.amount.pending_changed.connect(currency_pending_changed)
-	currency_pending_changed()
 	queue.method = currency_pending_changed
+	currency.amount.pending_changed.connect(queue.call_method)
+	queue.call_method()
 
 
 func currency_pending_changed() -> void:
@@ -141,28 +141,28 @@ func big_changed() -> void:
 
 
 func attach_float_pair(_value: LoudFloatPair) -> void:
-	if is_value_equal_to_x(_value):
+	if are_values_equal(_value):
 		return
 	value = _value
 	setup_value()
 
 
 func attach_float(_value: LoudFloat) -> void:
-	if is_value_equal_to_x(_value):
+	if are_values_equal(_value):
 		return
 	value = _value
 	setup_value()
 
 
 func attach_int_pair(_value: LoudIntPair) -> void:
-	if is_value_equal_to_x(_value):
+	if are_values_equal(_value):
 		return
 	value = _value
 	setup_value()
 
 
 func attach_int(_value: LoudInt) -> void:
-	if is_value_equal_to_x(_value):
+	if are_values_equal(_value):
 		return
 	value = _value
 	setup_value()
@@ -178,7 +178,7 @@ func value_changed() -> void:
 	if value == null:
 		return
 	var _text: String = ""
-	_text = "[i]" if italics else ""
+	_text += "[i]" if italics else ""
 	_text += "[b]" if bold else ""
 	_text += value.get_text()
 	set_deferred("text", _text)
@@ -189,5 +189,5 @@ func clear_value() -> void:
 	value = null
 
 
-func is_value_equal_to_x(x: Resource) -> bool:
+func are_values_equal(x: Resource) -> bool:
 	return value and value == x

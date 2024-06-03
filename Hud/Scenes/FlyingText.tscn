@@ -1,0 +1,56 @@
+[gd_scene load_steps=5 format=3 uid="uid://cbb6mvlbhyco6"]
+
+[ext_resource type="Script" path="res://Hud/Scenes/FlyingText.gd" id="1_84t0v"]
+[ext_resource type="Texture2D" uid="uid://cygbjwvlojo77" path="res://Art/Icons/Hud/Dice.png" id="2_27t5k"]
+[ext_resource type="Theme" uid="uid://d0f4im7h1ne7c" path="res://Hud/Themes/ShadowText.tres" id="2_ptil2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bdw1f"]
+bg_color = Color(0.109375, 0.109375, 0.109375, 0.902)
+border_color = Color(0.246094, 0.246094, 0.246094, 1)
+border_blend = true
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="FlyingText" type="MarginContainer"]
+offset_right = 37.0
+offset_bottom = 19.0
+mouse_filter = 2
+script = ExtResource("1_84t0v")
+
+[node name="Background" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bdw1f")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_27t5k")
+expand_mode = 2
+
+[node name="Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("2_ptil2")
+bbcode_enabled = true
+text = "1"
+fit_content = true
+autowrap_mode = 0

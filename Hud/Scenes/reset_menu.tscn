@@ -51,6 +51,7 @@ layout_mode = 2
 icon = ExtResource("4_quk5e")
 text = "Free Souls"
 center_content = true
+display_background = true
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer2"]
 layout_mode = 2

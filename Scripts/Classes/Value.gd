@@ -9,7 +9,6 @@ signal pending_changed
 
 @export var _class_name := "Value"
 @export var current: Big
-var pending: Big
 
 var book := Book.new(Book.Type.BIG)
 var copycat_num: Resource
@@ -20,7 +19,6 @@ var minimum := Big.new(0.0)
 
 
 func _init(base_value = 0.0) -> void:
-	pending = book.book[Book.Category.PENDING].sum
 	current = Big.new(base_value)
 	minimum.changed.connect(minimum_check)
 	current.changed.connect(emit_changed)
@@ -39,7 +37,7 @@ func _init(base_value = 0.0) -> void:
 func game_loaded() -> void:
 	if add_pending_to_current_on_game_load:
 		if book.get_pending().greater(0):
-			current.a(pending)
+			current.a(book.get_pending())
 			book.book[Book.Category.PENDING].reset()
 
 

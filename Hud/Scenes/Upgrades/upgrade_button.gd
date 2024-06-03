@@ -20,15 +20,14 @@ var upgrade: Upgrade
 
 func _ready() -> void:
 	if not Upgrade.data.has(name):
+		print_debug("Upgrade ", name, " does not exist!")
 		return
 	upgrade = up.get_upgrade(name) as Upgrade
 	upgrade.vico = self
 	update_wrap_mode()
 	
 	description_queue.method = set_description_text
-	enabled_border.visible = upgrade.purchased.is_true() and upgrade.applied.is_false()
-	upgrade.applied.became_true.connect(enabled_border.hide)
-	upgrade.applied.became_false.connect(enabled_border.show)
+	upgrade.applied.changed.connect(applied_changed)
 	upgrade.unlocked.changed.connect(unlocked_changed)
 	upgrade.purchased.changed.connect(upgrade_purchased_changed)
 	pb.button.mouse_entered.connect(tooltip_time)
@@ -75,6 +74,10 @@ func update_wrap_mode():
 #region Signals
 
 
+func applied_changed() -> void:
+	enabled_border.visible = upgrade.purchased.is_true() and upgrade.applied.is_false()
+
+
 #func update_autobuyer_anim_visibility() -> void:
 	#pb.autobuyer_anim.visible = upgrade.unlocked_and_not_purchased.get_value() and upgrade.autobuyer.is_true()
 	#if pb.autobuyer_anim.visible:
@@ -103,7 +106,6 @@ func setup() -> void:
 		pb.times_purchased_current.get_parent().show()
 		pb.times_purchased_current.attach_int(upgrade.times_purchased.current)
 		pb.times_purchased_total.attach_int(upgrade.times_purchased.total)
-	#pb.texture_rect.modulate = Color.WHITE
 	set_cost_visibility()
 	pb.texture_rect.texture = upgrade.details.get_icon()
 
@@ -143,6 +145,7 @@ func upgrade_purchased_changed() -> void:
 
 
 func set_cost_visibility() -> void:
+	pb.description.visible = upgrade.unlocked.is_true() or upgrade.purchased.is_false()
 	pb.cost_components.visible = upgrade.unlocked.is_true() and upgrade.purchased.is_false()
 	if pb.cost_components.visible:
 		pb.cost_components.connect_calls()
@@ -162,6 +165,7 @@ func set_description_text() -> void:
 
 
 func unlocked_changed() -> void:
+	set_cost_visibility()
 	if upgrade.unlocked.is_true():
 		setup()
 		gv.flash(self, upgrade.details.get_color())

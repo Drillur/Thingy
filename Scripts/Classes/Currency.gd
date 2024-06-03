@@ -49,7 +49,7 @@ func _init(_key: String) -> void:
 	loss_rate.changed.connect(sync_cd.emit)
 	sync_requested.connect(sync_rate)
 	persist.disconnect_calls()
-
+	
 	amount = Value.new(0)
 	amount.add_pending_to_current_on_game_load = false
 	details.set_name(key.capitalize())

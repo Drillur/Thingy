@@ -68,7 +68,7 @@ func log_rates() -> void:
 					"JUICE":
 						gain_rate.edit_added(
 							thingy,
-							thingy.get_minimum_juice_output() / minimum_duration
+							Big.new(thingy.get_minimum_juice_output()).d(minimum_duration)
 						)
 					"COIN":
 						gain_rate.edit_added(

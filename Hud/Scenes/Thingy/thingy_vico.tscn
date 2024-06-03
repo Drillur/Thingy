@@ -1,10 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://btmej8oakg4f1"]
+[gd_scene load_steps=11 format=3 uid="uid://btmej8oakg4f1"]
 
 [ext_resource type="Script" path="res://Hud/Scenes/Thingy/thingy_vico.gd" id="1_ma3ha"]
 [ext_resource type="PackedScene" uid="uid://exe3ppvvv74m" path="res://Hud/Scenes/bar.tscn" id="2_nad20"]
 [ext_resource type="Theme" uid="uid://d0f4im7h1ne7c" path="res://Hud/Themes/ShadowText.tres" id="3_e4ujg"]
 [ext_resource type="Theme" uid="uid://b8t7tkhvril5g" path="res://Hud/Themes/Standard.tres" id="3_q0aqb"]
+[ext_resource type="Texture2D" uid="uid://bklpf2q2wnyoi" path="res://Art/Icons/Hud/Juice.png" id="4_65ha1"]
 [ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Hud/Themes/Invis.tres" id="5_a1a0r"]
+[ext_resource type="Texture2D" uid="uid://cygbjwvlojo77" path="res://Art/Icons/Hud/Dice.png" id="5_eqmag"]
+[ext_resource type="PackedScene" uid="uid://cnygr4pwivdv1" path="res://Hud/Scenes/RichLabel.tscn" id="6_tqssk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5bk8n"]
 draw_center = false
@@ -27,8 +30,8 @@ shadow_size = 2
 
 [node name="ThingyVico" type="MarginContainer"]
 custom_minimum_size = Vector2(160, 50)
-offset_right = 160.0
-offset_bottom = 35.0
+offset_right = 250.0
+offset_bottom = 50.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("1_ma3ha")
@@ -62,11 +65,11 @@ layout_mode = 2
 
 [node name="Xp Bar" parent="." instance=ExtResource("2_nad20")]
 unique_name_in_owner = true
-modulate = Color(0.894118, 0.509804, 1, 1)
 custom_minimum_size = Vector2(40, 4)
 layout_mode = 2
 size_flags_vertical = 8
 kill_background = true
+animate = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -80,11 +83,16 @@ metadata/_edit_lock_ = true
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+[node name="Duration and Level" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/Duration and Level"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Progress Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="Progress Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/Duration and Level/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme = ExtResource("3_e4ujg")
@@ -93,7 +101,7 @@ text = "14"
 fit_content = true
 autowrap_mode = 0
 
-[node name="Max Progress Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="Max Progress Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/Duration and Level/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme = ExtResource("3_e4ujg")
@@ -102,21 +110,23 @@ text = "123e123"
 fit_content = true
 autowrap_mode = 0
 
-[node name="XP Labels" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+[node name="Level Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/Duration and Level"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="Level Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/XP Labels"]
-unique_name_in_owner = true
-layout_mode = 2
+size_flags_vertical = 4
 theme = ExtResource("3_e4ujg")
 bbcode_enabled = true
-text = "123e123"
+text = "[img=<15>]res://Art/Icons/Hud/Star.png[/img] 999"
 fit_content = true
 autowrap_mode = 0
+
+[node name="Juiced" type="TextureRect" parent="MarginContainer/HBoxContainer/Duration and Level"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(15, 15)
+layout_mode = 2
+texture = ExtResource("4_65ha1")
+expand_mode = 5
+stretch_mode = 5
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -135,16 +145,32 @@ text = "[b][i]+123e123"
 fit_content = true
 autowrap_mode = 0
 
-[node name="CritSuccess" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="CritSuccessDie" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 10
-size_flags_vertical = 4
+texture = ExtResource("5_eqmag")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
 theme = ExtResource("3_e4ujg")
 bbcode_enabled = true
-text = "[img=<15>]res://Art/Icons/Hud/Dice.png[/img] x2.5"
+text = "[b][i]x"
 fit_content = true
 autowrap_mode = 0
+
+[node name="CritSuccess" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer" instance=ExtResource("6_tqssk")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "[b][i]2.5"
+autowrap_mode = 0
+italics = true
+bold = true
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 2

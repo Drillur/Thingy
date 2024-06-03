@@ -46,6 +46,7 @@ kill_background = true
 unique_name_in_owner = true
 layout_mode = 2
 kill_background = true
+animate = true
 
 [node name="MarginContainer2" type="MarginContainer" parent="MarginContainer3"]
 layout_mode = 2

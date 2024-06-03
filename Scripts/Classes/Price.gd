@@ -27,7 +27,7 @@ func _init(data: Dictionary) -> void:
 
 func add_price(key: String, base_value) -> void:
 	price[key] = Value.new(base_value)
-	price[key].book.add_powerer(increase_modifier, times_purchased, 0)
+	price[key].book.add_powerer(increase_modifier, times_purchased)
 	price[key].changed.connect(emit_changed)
 	currency_keys.append(key)
 	var x = LoudBool.new(false)

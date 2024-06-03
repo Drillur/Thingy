@@ -7,6 +7,7 @@ extends MarginContainer
 @onready var edge = %Edge
 
 @export var kill_background := false
+@export var animate := false
 
 var color: Color:
 	set(val):
@@ -15,9 +16,13 @@ var color: Color:
 
 var progress: float = -1:
 	set(val):
-		if progress != val:
-			progress = val
-			bar_size.set_to(min(progress * size.x, size.x))
+		var previous: float = clampf(progress, 0.0, 1.0)
+		if is_equal_approx(previous, val):
+			return
+		progress = val
+		bar_size.set_to(minf(progress * size.x, size.x))
+		if animate:
+			new_animation(previous, progress)
 
 var bar_size := LoudInt.new(-1)
 var display_pending := false
@@ -40,6 +45,10 @@ func _ready() -> void:
 	if resize_queued:
 		bar_size_changed()
 
+
+func _on_visibility_changed():
+	if visible:
+		animation_cd.start()
 
 
 func _on_resized():
@@ -96,7 +105,7 @@ func remove_value() -> void:
 	if value != null:
 		value.changed.disconnect(queue.call_method)
 		value.full.became_true.disconnect(queue.call_method)
-		if value is ValuePair and display_pending:# and value.current.pending_changed.is_connected(queue.call_method):
+		if value is ValuePair and display_pending:
 			value.current.pending_changed.disconnect(queue.call_method)
 		value = null
 
@@ -123,8 +132,8 @@ func attach_price(_price: Price, _pending_price := false) -> void:
 
 
 func connect_calls_price() -> void:
-	#price.changed.connect(update_by_price)
 	queue.method = update_by_price
+	price.changed.connect(queue.call_method)
 	for x in price.price.keys():
 		var currency = wa.get_currency(x)
 		if display_pending:
@@ -135,7 +144,7 @@ func connect_calls_price() -> void:
 
 
 func disconnect_calls_price() -> void:
-	#price.changed.disconnect(update_by_price)
+	price.changed.disconnect(queue.call_method)
 	for x in price.price.keys():
 		var currency = wa.get_currency(x)
 		if display_pending:
@@ -180,3 +189,44 @@ func attach_timer(_timer: LoudTimer) -> void:
 func remove_timer() -> void:
 	timer = null
 	set_process(false)
+
+
+#region Animate
+
+
+var animation_cd := LoudTimer.new(0.35)
+
+
+func new_animation(_previous: float, _next: float) -> void:
+	if animation_cd.is_running():
+		return
+	var delta := absf(_next - _previous)
+	var highlight_size := minf(size.x, delta * size.x)
+	if highlight_size < 5:
+		return
+	if delta >= 0.1:
+		gv.flash($"bg/Progress Bar", color)
+	if delta >= 0.25:
+		gv.flash($bg/Control, Color.WHITE)
+	
+	var highlight = ResourceBag.get_resource("BarAnimation").instantiate()
+	highlight.size.x = highlight_size
+	highlight.size.y = size.y
+	highlight.modulate = color
+	highlight.get_node("Panel").custom_minimum_size.x = highlight.size.x
+	if _previous < _next:
+		highlight.get_node("Panel").size_flags_horizontal = Control.SIZE_SHRINK_END
+		highlight.position.x = edge.position.x + 1 - highlight.size.x
+	else:
+		highlight.get_node("Panel").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		highlight.position.x = edge.position.x + 1
+	
+	$bg.add_child(highlight)
+	
+	var tween := get_tree().create_tween()
+	tween.tween_interval(0.15)
+	tween.tween_property(highlight.get_node("Panel"), "custom_minimum_size", Vector2(0, size.x), 0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_callback(highlight.queue_free)
+
+
+#endregion

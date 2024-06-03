@@ -20,6 +20,14 @@ layout_mode = 2
 mouse_filter = 2
 theme = ExtResource("2_yan3f")
 
+[node name="Control" type="Control" parent="bg"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="Progress Bar" type="Panel" parent="bg"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(2, 0)
@@ -44,16 +52,5 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pr56i")
 
-[node name="Change" type="Panel" parent="bg"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(2, 0)
-layout_mode = 2
-offset_left = 26.0
-offset_right = 62.0
-offset_bottom = 18.0
-grow_horizontal = 0
-grow_vertical = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_pr56i")
-
 [connection signal="resized" from="." to="." method="_on_resized"]
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]

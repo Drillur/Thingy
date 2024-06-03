@@ -112,17 +112,15 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-text = "[i]/"
+text = "/"
 autowrap_mode = 0
-italics = true
 
 [node name="Times Purchased Total" parent="VBoxContainer/Details/VBoxContainer/TitleComponents/HBoxContainer/HBoxContainer" instance=ExtResource("5_4iwff")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-text = "[i]5"
+text = "5"
 autowrap_mode = 0
-italics = true
 
 [node name="Description" type="RichTextLabel" parent="VBoxContainer/Details/VBoxContainer"]
 unique_name_in_owner = true

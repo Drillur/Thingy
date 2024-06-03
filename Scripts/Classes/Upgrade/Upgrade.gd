@@ -20,7 +20,7 @@ var persist := Persist.new()
 var vico: UpgradeButton
 var required_upgrade: String: set = set_required_upgrade
 
-var thingy_attribute := Thingy.Attribute.NONE
+var thingy_attribute := ""
 var thingy_attributes_to_edit: Array
 var modifier: LoudFloat
 var modifier_change: float
@@ -29,6 +29,8 @@ var tree: UpgradeTree.Type
 
 var unlocked_tree: UpgradeTree.Type
 
+
+#region Init
 
 
 func _init(_key: String) -> void:
@@ -43,7 +45,7 @@ func _init(_key: String) -> void:
 		price.increase_modifier.set_to(float(my_data.get("Cost Increase")))
 		price.times_purchased.copycat(times_purchased.current)
 	if my_data.get("Thingy Attribute"):
-		thingy_attribute = Thingy.Attribute[my_data.get("Thingy Attribute")]
+		thingy_attribute = my_data.get("Thingy Attribute")
 	if my_data.get("Icon"):
 		details.set_icon(ResourceBag.get_icon(my_data.get("Icon")))
 	if my_data.get("Color"):
@@ -69,253 +71,233 @@ func _init(_key: String) -> void:
 		Book.Category.DIVIDED:
 			operator = "/"
 	
+	var th_attribute_names := gv.get_script_variables(th.get_script())
+	var th_property := thingy_attribute.to_lower()
+	if thingy_attribute.contains("_CURRENT"):
+		th_property = th_property.split("_current")[0]
+	elif thingy_attribute.contains("_TOTAL"):
+		th_property = th_property.split("_total")[0]
+	if th_property in th_attribute_names:
+		if thingy_attribute.contains("_CURRENT"):
+			thingy_attributes_to_edit.append(th.get(th_property).current)
+		elif thingy_attribute.contains("_TOTAL"):
+			thingy_attributes_to_edit.append(th.get(th_property).total)
+		else:
+			if gv.get_script_variables(th.get(th_property).get_script()).has("total"):
+				thingy_attributes_to_edit.append(th.get(th_property).current)
+				thingy_attributes_to_edit.append(th.get(th_property).total)
+			else:
+				thingy_attributes_to_edit.append(th.get(th_property))
+	
 	match thingy_attribute:
-		Thingy.Attribute.COIN_INCREASE:
+		"CRIT_ROLLS_FROM_DURATION_COUNT":
+			details.set_description("Duration required for additional crit rolls [b]%s[/b]." % (operator + "%s"))
+		"CRIT_ROLLS":
+			details.set_description("[b]%s[/b] crit rolls." % (operator + "%s"))
+		"COIN_INCREASE":
 			details.set_description("%s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("COIN").get_icon_and_name(),
 				operator + "%s",
 			])
-			thingy_attributes_to_edit.append(th.coin_increase.current)
-			thingy_attributes_to_edit.append(th.coin_increase.total)
-		Thingy.Attribute.COIN_INCREASE_CURRENT:
+		"COIN_INCREASE_CURRENT":
 			details.set_description("Minimum %s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("COIN").get_icon_and_name(),
 				operator + "%s",
 			])
-			thingy_attributes_to_edit.append(th.coin_increase.current)
-		Thingy.Attribute.COIN_INCREASE_TOTAL:
+		"COIN_INCREASE_TOTAL":
 			details.set_description("Maximum %s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("COIN").get_icon_and_name(),
 				operator + "%s",
 			])
-			thingy_attributes_to_edit.append(th.coin_increase.total)
-		Thingy.Attribute.DURATION_RANGE:
+		"DURATION_RANGE":
 			details.set_description("Duration [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.duration_range.current)
-			thingy_attributes_to_edit.append(th.duration_range.total)
-		Thingy.Attribute.DURATION_RANGE_CURRENT:
+		"DURATION_RANGE_CURRENT":
 			details.set_description("Minimum duration [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.duration_range.current)
-		Thingy.Attribute.DURATION_RANGE_TOTAL:
+		"DURATION_RANGE_TOTAL":
 			details.set_description("Maximum duration [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.duration_range.total)
-		Thingy.Attribute.DURATION_INCREASE_RANGE:
+		"DURATION_INCREASE_RANGE":
 			details.set_description("Duration [u]increase[/u] [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.duration_increase_range.current)
-			thingy_attributes_to_edit.append(th.duration_increase_range.total)
-		Thingy.Attribute.DURATION_INCREASE_RANGE_CURRENT:
+		"DURATION_INCREASE_RANGE_CURRENT":
 			details.set_description("Minimum duration [u]increase[/u] [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.duration_increase_range.current)
-		Thingy.Attribute.DURATION_INCREASE_RANGE_TOTAL:
+		"DURATION_INCREASE_RANGE_TOTAL":
 			details.set_description("Maximum duration [u]increase[/u] [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.duration_increase_range.total)
-		Thingy.Attribute.CRIT:
+		"CRIT_CHANCE":
 			details.set_description("Crit chance [b]%s[/b]." % (operator + "%s%%"))
-			thingy_attributes_to_edit.append(th.crit_chance)
-		Thingy.Attribute.CRIT_CRIT:
+		"CRIT_CRIT_CHANCE":
 			details.set_description("Lucky crit chance [b]%s[/b]." % (operator + "%s%%"))
-			thingy_attributes_to_edit.append(th.crit_crit_chance)
-		Thingy.Attribute.CRIT_RANGE:
+		"CRIT_RANGE":
 			details.set_description("Crit multiplier [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.crit_range.current)
-			thingy_attributes_to_edit.append(th.crit_range.total)
-		Thingy.Attribute.CRIT_RANGE_CURRENT:
+		"CRIT_RANGE_CURRENT":
 			details.set_description("Minimum crit multiplier [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.crit_range.current)
-		Thingy.Attribute.CRIT_RANGE_TOTAL:
+		"CRIT_RANGE_TOTAL":
 			details.set_description("Maximum crit multiplier [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.crit_range.total)
-		Thingy.Attribute.CRIT_COIN_OUTPUT:
+		"CRIT_COIN_OUTPUT":
 			details.set_description("%s output [b]%s[/b]." % [
 				wa.get_details("COIN").get_icon_and_name(),
 				(operator + "%s")
 			])
 			details.set_description(wa.get_details("COIN").get_icon_and_name() + " output [b]%s[/b]." % (operator + "%s"))
-			thingy_attributes_to_edit.append(th.crit_coin_output.current)
-			thingy_attributes_to_edit.append(th.crit_coin_output.total)
-		Thingy.Attribute.CRIT_COIN_OUTPUT_CURRENT:
+		"CRIT_COIN_OUTPUT_CURRENT":
 			details.set_description("Minimum %s output [b]%s[/b]." % [
 				wa.get_details("COIN").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.crit_coin_output.current)
-		Thingy.Attribute.CRIT_COIN_OUTPUT_TOTAL:
+		"CRIT_COIN_OUTPUT_TOTAL":
 			details.set_description("Maximum %s output [b]%s[/b]." % [
 				wa.get_details("COIN").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.crit_coin_output.total)
-		Thingy.Attribute.OUTPUT_RANGE:
+		"OUTPUT_RANGE":
 			details.set_description("%s output [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.output_range.current)
-			thingy_attributes_to_edit.append(th.output_range.total)
-		Thingy.Attribute.OUTPUT_RANGE_CURRENT:
+		"OUTPUT_RANGE_CURRENT":
 			details.set_description("Minimum %s output [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.output_range.current)
-		Thingy.Attribute.OUTPUT_RANGE_TOTAL:
+		"OUTPUT_RANGE_TOTAL":
 			details.set_description("Maximum %s output [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.output_range.total)
-		Thingy.Attribute.OUTPUT_INCREASE_RANGE:
+		"OUTPUT_INCREASE_RANGE":
 			details.set_description("%s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.output_increase_range.current)
-			thingy_attributes_to_edit.append(th.output_increase_range.total)
-		Thingy.Attribute.OUTPUT_INCREASE_RANGE_CURRENT:
+		"OUTPUT_INCREASE_RANGE_CURRENT":
 			details.set_description("Minimum %s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.output_increase_range.current)
-		Thingy.Attribute.OUTPUT_INCREASE_RANGE_TOTAL:
+		"OUTPUT_INCREASE_RANGE_TOTAL":
 			details.set_description("Maximum %s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.output_increase_range.total)
-		Thingy.Attribute.XP:
-			details.set_description("Total %s required [b]%s[/b]." % [
+		"XP_MULTIPLIER":
+			details.set_description("%s required [b]%s[/b]." % [
 				wa.get_details("XP").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.xp_multiplier)
-		Thingy.Attribute.XP_OUTPUT:
+		"XP_OUTPUT_RANGE":
 			details.set_description("%s output [b]%s[/b]." % [
 				wa.get_details("XP").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.xp_output_range.current)
-			thingy_attributes_to_edit.append(th.xp_output_range.total)
-		Thingy.Attribute.XP_OUTPUT_CURRENT:
+		"XP_OUTPUT_RANGE_CURRENT":
 			details.set_description("Minimum %s output [b]%s[/b]." % [
 				wa.get_details("XP").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.xp_output_range.current)
-		Thingy.Attribute.XP_OUTPUT_TOTAL:
+		"XP_OUTPUT_RANGE_TOTAL":
 			details.set_description("Maximum %s output [b]%s[/b]." % [
 				wa.get_details("XP").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.xp_output_range.total)
-		Thingy.Attribute.CURRENT_XP_INCREASE_RANGE:
+		"XP_INCREASE_RANGE_CURRENT":
 			details.set_description("Minimum %s [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("XP").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.xp_increase_range.current)
-		Thingy.Attribute.COST:
+		"XP_INCREASE_RANGE":
+			details.set_description("%s [u]increase[/u] [b]%s[/b]." % [
+				wa.get_details("XP").get_icon_and_name(),
+				(operator + "%s")
+			])
+		"COST":
 			details.set_description("Thingy cost [b]%s[/b]." % (operator + "%s"))
 			await th.initialized
 			for cur in th.price.price:
 				thingy_attributes_to_edit.append(th.price.price[cur])
-		Thingy.Attribute.JUICE_MULTIPLIER_RANGE:
+		"JUICE_MULTIPLIER_RANGE":
 			details.set_description("%s multiplier [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_multiplier_range.current)
-			thingy_attributes_to_edit.append(th.juice_multiplier_range.total)
-		Thingy.Attribute.JUICE_MULTIPLIER_RANGE_CURRENT:
+		"JUICE_MULTIPLIER_RANGE_CURRENT":
 			details.set_description("Minimum %s multiplier [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_multiplier_range.current)
-		Thingy.Attribute.JUICE_MULTIPLIER_RANGE_TOTAL:
+		"JUICE_MULTIPLIER_RANGE_TOTAL":
 			details.set_description("Maximum %s multiplier [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_multiplier_range.total)
-		Thingy.Attribute.JUICE_INPUT_RANGE:
+		"JUICE_INPUT_RANGE":
 			details.set_description("%s input [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_input_range.current)
-			thingy_attributes_to_edit.append(th.juice_input_range.total)
-		Thingy.Attribute.JUICE_INPUT_RANGE_CURRENT:
+		"JUICE_INPUT_RANGE_CURRENT":
 			details.set_description("Minimum %s input [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_input_range.current)
-		Thingy.Attribute.JUICE_INPUT_RANGE_TOTAL:
+		"JUICE_INPUT_RANGE_TOTAL":
 			details.set_description("Maximum %s input [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_input_range.total)
-		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE:
+		"JUICE_INPUT_INCREASE_RANGE":
 			details.set_description("%s input [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_input_increase_range.current)
-			thingy_attributes_to_edit.append(th.juice_input_increase_range.total)
-		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE_CURRENT:
+		"JUICE_INPUT_INCREASE_RANGE_CURRENT":
 			details.set_description("Minimum %s input [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_input_increase_range.current)
-		Thingy.Attribute.JUICE_INPUT_INCREASE_RANGE_TOTAL:
+		"JUICE_INPUT_INCREASE_RANGE_TOTAL":
 			details.set_description("Maximum %s input [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_input_increase_range.total)
-		Thingy.Attribute.JUICE_OUTPUT_RANGE:
+		"JUICE_OUTPUT_RANGE":
 			details.set_description("%s output [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_output_range.current)
-			thingy_attributes_to_edit.append(th.juice_output_range.total)
-		Thingy.Attribute.JUICE_OUTPUT_RANGE_CURRENT:
+		"JUICE_OUTPUT_RANGE_CURRENT":
 			details.set_description("Minimum %s output [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_output_range.current)
-		Thingy.Attribute.JUICE_OUTPUT_RANGE_TOTAL:
+		"JUICE_OUTPUT_RANGE_TOTAL":
 			details.set_description("Maximum %s output [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_output_range.total)
-		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE:
+		"JUICE_OUTPUT_INCREASE_RANGE":
 			details.set_description("%s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_output_increase_range.current)
-			thingy_attributes_to_edit.append(th.juice_output_increase_range.total)
-		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE_CURRENT:
+		"JUICE_OUTPUT_INCREASE_RANGE_CURRENT":
 			details.set_description("Minimum %s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_output_increase_range.current)
-		Thingy.Attribute.JUICE_OUTPUT_INCREASE_RANGE_TOTAL:
+		"JUICE_OUTPUT_INCREASE_RANGE_TOTAL":
 			details.set_description("Maximum %s output [u]increase[/u] [b]%s[/b]." % [
 				wa.get_details("JUICE").get_icon_and_name(),
 				(operator + "%s")
 			])
-			thingy_attributes_to_edit.append(th.juice_output_increase_range.total)
 	
 	match key:
+		"CRIT_ROLLS_FROM_DURATION":
+			details.set_description("[b]+1[/b] crit roll per 10 seconds of maximum duration.")
+			th.crit_rolls_from_duration.copycat(applied)
+		"CRIT_ROLLS":
+			details.set_description(details.get_description() + (
+				"\n%s Thingies will roll again even if they rolled a crit. Multipliers may stack." % (
+					ResourceBag.get_icon_text("Info")
+				)
+			))
 		"TOTAL_OUTPUT_RANGE01":
 			details.set_description("Maximum %s output [b]%s[/b]." % [
 				wa.get_details("WILL").get_icon_and_name(),
@@ -325,10 +307,6 @@ func _init(_key: String) -> void:
 					ResourceBag.get_icon_text("Info")
 				)
 			))
-		"WILL_POW_LEVELS":
-			details.set_description("%s output [b]x1.01 ^ total Thingy levels[/b]." % [
-				wa.get_details("WILL").get_icon_and_name()
-			])
 		"UNLOCK_CRIT":
 			details.set_description("Crit chance [b]+%s%%[/b]." + "\n%s Crits multiply %s output by the Thingy's [i]crit multiplier[/i]." % [
 				ResourceBag.get_icon_text("Info"),
@@ -358,9 +336,6 @@ func _init(_key: String) -> void:
 				wa.get_details("COIN").get_icon_and_name()
 			))
 			th.crits_apply_to_coin_twice.copycat(applied)
-		"CRITS_AFFECT_ALL_OUTPUT":
-			details.set_description("Global output multiplier +0.01 per crit.")
-			th.crits_add_to_all_output.copycat(applied)
 		"UNLOCK_UPGRADES":
 			details.set_color(up.upgrade_color)
 			unlocked_tree = UpgradeTree.Type.FIRESTARTER
@@ -383,6 +358,7 @@ func _init(_key: String) -> void:
 			wa.get_unlocked("COIN").copycat(applied)
 		"CRITS_AFFECT_NEXT_DURATION":
 			details.set_description("Crits divide the next job's duration.")
+			th.crits_apply_to_next_job_duration.copycat(applied)
 		"UNLOCK_JUICE":
 			details.set_description("Thingies may produce and consume %s to become [i][wave amp=20 freq=2]juiced![/wave][/i], halving duration and doubling primary output. If none is available to drink, they will produce it." % (
 				wa.get_details("JUICE").get_icon_and_name()
@@ -403,7 +379,6 @@ func _init(_key: String) -> void:
 			th.crits_apply_to_duration.copycat(applied)
 		"UNLOCK_LUCKY_CRIT":
 			details.set_description("Successful crits and lucky crits have a chance to roll for another crit, called a [i][wave amp=20 freq=2]lucky crit![/wave][/i] Crit multiplier will stack. Lucky crit chance [b]+%s%%[/b].")
-	
 	
 	times_purchased.total.reset()
 	price.owner_purchased.copycat(purchased)
@@ -476,7 +451,18 @@ func set_required_upgrade(val: String) -> void:
 	)
 
 
-# - Signals
+#endregion
+
+
+#region Upgrade-Specific Shit
+
+
+
+#endregion
+
+
+#region Private
+
 
 
 func times_purchased_changed() -> void:
@@ -522,7 +508,7 @@ func sync_modifier() -> void:
 
 
 func reset() -> void:
-	times_purchased.reset()
+	times_purchased.current.reset()
 	price.reset()
 
 
@@ -553,14 +539,19 @@ func get_purchase_limit() -> int:
 
 
 func get_description() -> String:
-	if modifier:
+	if modifier and details.get_description().contains("%s"):
 		return get_modifier_description()
 	return details.get_description()
 
 
 func get_modifier_description() -> String:
 	if (
-		Thingy.is_attribute_duration_related(thingy_attribute)
+		thingy_attribute in [
+			"DURATION_RANGE",
+			"DURATION_RANGE_CURRENT",
+			"DURATION_RANGE_TOTAL",
+			"CRIT_ROLLS_FROM_DURATION_COUNT",
+		]
 		and Book.is_category_additive(category)
 	):
 		return get_duration_description()
@@ -571,8 +562,8 @@ func get_modifier_description() -> String:
 	if times_purchased.full.is_false():
 		var text = details.get_description() % "%s -> %s"
 		if thingy_attribute in [
-			Thingy.Attribute.CRIT,
-			Thingy.Attribute.CRIT_CRIT,
+			"CRIT_CHANCE",
+			"CRIT_CRIT_CHANCE",
 		]:
 			text = details.get_description() % "%s -> %s%"
 		return text % [

@@ -1,36 +1,41 @@
-[gd_scene load_steps=6 format=3 uid="uid://cb3ej8nlybhvm"]
+[gd_scene load_steps=5 format=3 uid="uid://cb3ej8nlybhvm"]
 
 [ext_resource type="Script" path="res://Hud/Scenes/icon_button.gd" id="1_0b77l"]
-[ext_resource type="Theme" uid="uid://rfljn78ajnbs" path="res://Hud/Themes/Invis.tres" id="2_3bb0d"]
-[ext_resource type="SpriteFrames" uid="uid://g71x1b7vd3pt" path="res://Art/Animations/autobuyer.tres" id="2_7272n"]
-[ext_resource type="Texture2D" uid="uid://dlxx28hr2xdck" path="res://Art/Icons/Hud/Check.png" id="3_c3ale"]
-[ext_resource type="Texture2D" uid="uid://408er70eh4ns" path="res://Art/Icons/Hud/upgrades.png" id="4_w61eh"]
+[ext_resource type="PackedScene" uid="uid://c2qr5m4ppk71t" path="res://Hud/Scenes/Button.tscn" id="2_68njl"]
+[ext_resource type="Theme" uid="uid://cjvpbaiddna0a" path="res://Hud/Themes/Standard Rounded.tres" id="2_wqhtm"]
+[ext_resource type="Texture2D" uid="uid://df7h83cl7coe8" path="res://Art/Icons/Icon.png" id="3_c3ale"]
 
 [node name="Icon Button" type="MarginContainer"]
 custom_minimum_size = Vector2(36, 36)
-offset_right = 36.0
-offset_bottom = 36.0
+offset_right = 99.0
+offset_bottom = 40.0
 script = ExtResource("1_0b77l")
 
-[node name="Button" type="Button" parent="."]
+[node name="Background" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+show_behind_parent = true
 layout_mode = 2
-focus_mode = 0
-mouse_default_cursor_shape = 2
-theme = ExtResource("2_3bb0d")
+mouse_filter = 2
+theme = ExtResource("2_wqhtm")
+
+[node name="Button" parent="." instance=ExtResource("2_68njl")]
+layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(36, 36)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="Control" type="Control" parent="MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="MarginContainer/Control"]
@@ -43,31 +48,13 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
 mouse_filter = 2
-texture = ExtResource("4_w61eh")
+texture = ExtResource("3_c3ale")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Control" type="Control" parent="MarginContainer/Control/Icon"]
-show_behind_parent = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-
-[node name="Autobuyer" type="AnimatedSprite2D" parent="MarginContainer/Control/Icon/Control"]
-unique_name_in_owner = true
-sprite_frames = ExtResource("2_7272n")
-frame_progress = 0.691775
-
 [node name="Icon Shadow" type="TextureRect" parent="MarginContainer/Control/Icon"]
 unique_name_in_owner = true
+visible = false
 modulate = Color(0, 0, 0, 1)
 show_behind_parent = true
 layout_mode = 2
@@ -77,32 +64,9 @@ offset_right = 25.0
 offset_bottom = 25.0
 size_flags_horizontal = 0
 mouse_filter = 2
-texture = ExtResource("4_w61eh")
+texture = ExtResource("3_c3ale")
 expand_mode = 2
 stretch_mode = 5
-
-[node name="Check" type="TextureRect" parent="MarginContainer/Control/Icon"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-offset_right = 24.0
-offset_bottom = 24.0
-mouse_filter = 2
-texture = ExtResource("3_c3ale")
-expand_mode = 1
-
-[node name="CheckShadow" type="TextureRect" parent="MarginContainer/Control/Icon/Check"]
-unique_name_in_owner = true
-modulate = Color(0, 0, 0, 1)
-show_behind_parent = true
-layout_mode = 2
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 25.0
-offset_bottom = 25.0
-mouse_filter = 2
-texture = ExtResource("3_c3ale")
-expand_mode = 1
 
 [connection signal="button_down" from="Button" to="." method="_on_button_button_down"]
 [connection signal="button_up" from="Button" to="." method="_on_button_button_up"]

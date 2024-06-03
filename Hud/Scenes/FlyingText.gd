@@ -1,89 +1,111 @@
 class_name FlyingText
-extends Resource
+extends MarginContainer
 
 
-
-enum Type { CURRENCY, JUST_TEXT, ROLL_TEXT, }
-enum CurrencyKeys { collide, cur, text, }
 
 static var global_flying_texts_parent: Control
 
+@onready var background = %Background
+@onready var icon = %Icon
+@onready var label = %Label
 
-
-var type: Type
-var vicos := []
-var rect: Rect2
-var parent_node: Node
-var duration: float
-var layer: Array
-var timer := Timer.new()
-var velocity_range: Array
+var tween: Tween
 
 
 
-func _init(
-	_type: Type,
-	_base_node: Node,
-	_parent_node: Node,
-	_layer: Array,
-	_velocity_range: Array = [
-		randf_range(-1, 1),
-		randf_range(-1, -1.8)
-	]
-):
-	type = _type
-	rect = _base_node.get_global_rect()
-	parent_node = _parent_node
-	layer = _layer
-	velocity_range = _velocity_range
-	match type:
-		Type.CURRENCY:
-			duration = 0.6
-		Type.JUST_TEXT, Type.ROLL_TEXT:
-			duration = 1.5
-	timer.wait_time = 0.08
-	timer.one_shot = false
-	timer.timeout.connect(throw_text)
-	gv.add_child(timer)
+func _ready() -> void:
+	hide()
+
+
+
+func set_text(_text: String) -> void:
+	label.text = _text
+
+
+func set_icon(_icon) -> void:
+	if _icon is Texture2D:
+		icon.texture = _icon
+	elif _icon is String:
+		icon.texture = ResourceBag.get_icon(_icon)
+
+
+func set_position_by_spawn_node(_spawn_node: Node) -> void:
+	var node_rect: Rect2 = _spawn_node.get_global_rect()
+	var node_half_width = node_rect.size.x / 2
+	var node_fourth_height = node_rect.size.y / 4
+	var x_offset = randi_range(-node_rect.size.x / 4, node_rect.size.x / 4)
 	
-	gv.flying_texts.append(self)
-
-
-func add(data: Dictionary) -> void:
-	var vico = ResourceBag.get_resource("flying_text").instantiate() as FlyingTextVico
-	vicos.append(vico)
-	vico.setup(layer[0], layer[1])
-	parent_node.add_child(vico)
-	vico.global_position = Vector2(
-		rect.position.x + randf_range(0, rect.size.x),
-		rect.position.y + randf_range(0, rect.size.y)
+	var my_half_width = size.x / 2
+	var my_half_height = size.y / 2
+	position = Vector2(
+		node_rect.position.x + node_half_width - my_half_width + x_offset,
+		node_rect.position.y + node_fourth_height - my_half_height
 	)
-	vico.hide()
-	
-	match type:
-		Type.CURRENCY:
-			vico.setup_currency(data)
-		Type.ROLL_TEXT:
-			vico.setup_roll_text(data)
-			if data.get("quality") in [
-				RollLog.RollQuality.UNBELIEVABLY_BAD,
-				RollLog.RollQuality.GODLIKE,
-			]:
-				duration = 10.0
-		Type.JUST_TEXT:
-			vico.setup_text(data)
+
+
+func go(_spawn_node: Node) -> void:
+	await get_tree().physics_frame
+	set_position_by_spawn_node(_spawn_node)
+	show()
+	animate_normally()
+
+
+func animate_normally() -> void:
+	tween = get_tree().create_tween()
+	var new_pos := Vector2(position.x, position.y - randf_range(20, 25))
+	tween.tween_property(self, "position", new_pos, 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.finished.connect(tween.kill)
+	tween.finished.connect(queue_free)
 
 
 
-func go(_custom_duration := duration):
-	duration = _custom_duration
-	timer.start()
-	throw_text()
+#region Static
 
 
-func throw_text() -> void:
-	var vico = vicos.pop_front() as FlyingTextVico
-	vico.go(duration, velocity_range)
-	if vicos.size() == 0:
-		timer.stop()
-		gv.flying_texts.erase(self)
+
+static func new_text_with_icon(_spawn_node: Node, _text: String, _icon: Texture2D, color := Color.WHITE) -> void:
+	if not FlyingText.can_throw(_spawn_node):
+		return
+	var prefab: FlyingText = ResourceBag.get_resource("FlyingText").instantiate()
+	FlyingText.global_flying_texts_parent.add_child(prefab)
+	prefab.set_icon(_icon)
+	prefab.set_text(_text)
+	prefab.label.modulate = color
+	prefab.icon.modulate = color
+	prefab.go(_spawn_node)
+
+
+static func new_text(_spawn_node: Node, _text: String) -> void:
+	if not FlyingText.can_throw(_spawn_node):
+		return
+	var prefab: FlyingText = ResourceBag.get_resource("FlyingText").instantiate()
+	FlyingText.global_flying_texts_parent.add_child(prefab)
+	prefab.icon.queue_free()
+	prefab.set_text(_text)
+	prefab.go(_spawn_node)
+
+
+static func got_currency(_spawn_node: Node, currency_key: String, _amount: Big) -> void:
+	if not FlyingText.can_throw(_spawn_node):
+		return
+	var text: String = "+%s %s" % [
+		_amount.get_text(),
+		wa.get_details(currency_key).get_colored_name()
+	]
+	var _icon: Texture2D = wa.get_icon(currency_key)
+	FlyingText.new_text_with_icon(_spawn_node, text, _icon)
+
+
+static func got_crit(_spawn_node: Node, crit_text: String, color: Color) -> void:
+	if not FlyingText.can_throw(_spawn_node):
+		return
+	var text: String = "[b]Crit![/b] [i]%s[/i]" % crit_text
+	var _icon: Texture2D = ResourceBag.get_icon("Dice")
+	FlyingText.new_text_with_icon(_spawn_node, text, _icon, color)
+
+
+static func can_throw(spawn_node: Node) -> bool:
+	return spawn_node.is_visible_in_tree()
+
+
+#endregion

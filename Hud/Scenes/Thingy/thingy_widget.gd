@@ -25,10 +25,13 @@ extends MarginContainer
 @onready var juice_input = %"Juice Input"
 @onready var juice_input_increase = %"Juice Input Increase"
 @onready var coin_output_increase = %"Coin Output Increase"
+@onready var crit_rolls = %CritRollChances
 
 var thingy: Thingy:
 	set(val):
 		thingy = val
+		xp_bar.animation_cd.stop()
+		xp_bar.animation_cd.start()
 		if not wa.get_unlocked("XP").changed.is_connected(xp_unlocked):
 			wa.get_unlocked("XP").changed.connect(xp_unlocked)
 			wa.get_unlocked("JUICE").changed.connect(juice_unlocked)
@@ -52,6 +55,7 @@ var thingy: Thingy:
 			th.juice_output_increase_range.changed.connect(juice_output_increase_changed)
 			th.juice_input_increase_range.changed.connect(juice_input_increase_changed)
 			th.coin_increase.changed.connect(diplay_coin_output_increase)
+			th.crit_rolls.changed.connect(crit_rolls_changed)
 			diplay_coin_output_increase()
 			xp_unlocked()
 			juice_unlocked()
@@ -59,6 +63,7 @@ var thingy: Thingy:
 
 
 func _ready() -> void:
+	xp_bar.color = wa.get_color("XP")
 	hide()
 	await th.container_loaded
 	th.container.selected_index.changed.connect(selected_index_changed)
@@ -92,6 +97,9 @@ func connect_calls() -> void:
 	thingy.juice_input_multiplier.changed.connect(juice_input_changed)
 	thingy.coin_output_multiplier.changed.connect(crit_coin_output_changed)
 	coin_output_increase.attach_float_pair(th.coin_increase)
+	thingy.crit_rolls.changed.connect(crit_rolls_changed)
+	crit_rolls.attach_int(thingy.crit_rolls)
+	crit_rolls_changed(false)
 	level_changed(false)
 	xp_changed()
 	xp_output_range_changed(false)
@@ -119,6 +127,8 @@ func disconnect_calls() -> void:
 	thingy.juice_output_multiplier.changed.disconnect(juice_output_changed)
 	thingy.juice_input_multiplier.changed.disconnect(juice_input_changed)
 	thingy.coin_output_multiplier.changed.disconnect(crit_coin_output_changed)
+	thingy.crit_rolls.changed.disconnect(crit_rolls_changed)
+	crit_rolls.clear_value()
 
 
 
@@ -255,12 +265,12 @@ func juice_output_changed(flash := true) -> void:
 	var text = wa.get_details("JUICE").get_icon_and_name() + ": [b]"
 	text += wa.get_details("JUICE").get_color_text()
 	if th.juice_output_range.is_full():
-		text = text % Big.get_float_text(thingy.get_minimum_juice_output())
+		text = text % thingy.get_minimum_juice_output().get_text()
 	else:
 		text = text % (
 			"%s-%s" % [
-				Big.get_float_text(thingy.get_minimum_juice_output()),
-				Big.get_float_text(thingy.get_maximum_juice_output()),
+				thingy.get_minimum_juice_output().get_text(),
+				thingy.get_maximum_juice_output().get_text(),
 			]
 		)
 	juice_output.text = text
@@ -415,6 +425,12 @@ func duration_increase_changed(flash := true) -> void:
 	duration_increase.text = text
 	if flash:
 		gv.flash(duration_increase, thingy.details.get_color())
+
+
+func crit_rolls_changed(flash := true) -> void:
+	crit_rolls.get_parent().visible = th.crit_rolls.greater(1)
+	if flash:
+		gv.flash(crit_rolls, thingy.details.get_color())
 
 
 #endregion

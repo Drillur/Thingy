@@ -1,3 +1,4 @@
+@tool
 class_name IconButton
 extends MarginContainer
 
@@ -6,33 +7,45 @@ extends MarginContainer
 signal pressed
 signal right_mouse_pressed
 
-@onready var check = %Check
+@export var icon: Texture2D
+@export var center_content := false:
+	set(val):
+		center_content = val
+		if not is_node_ready():
+			await ready
+		if val:
+			$MarginContainer.size_flags_horizontal = SIZE_FILL
+		else:
+			$MarginContainer.size_flags_horizontal = SIZE_SHRINK_BEGIN
+@export var flip_h := false:
+	set(val):
+		flip_h = val
+		if not is_node_ready():
+			await ready
+		texture_rect.flip_h = val
+@export var display_background := false:
+	set(val):
+		display_background = val
+		if not is_node_ready():
+			await ready
+		if display_background:
+			background.show()
+		else:
+			background.hide()
+
 @onready var texture_rect = %Icon
 @onready var button = $Button
 @onready var icon_shadow = %"Icon Shadow"
-@onready var autobuyer = %Autobuyer
-
-@export var icon: Texture2D
-@export var kill_autobuyer := false
-@export var kill_check := false
+@onready var background = %Background
 
 var color: Color:
 	set(val):
 		color = val
 		texture_rect.self_modulate = val
 		button.modulate = val
-		if is_instance_valid(autobuyer):
-			autobuyer.modulate = val
 
 
 func _ready():
-	hide_check()
-	set_theme_invis()
-	autobuyer.hide()
-	if kill_autobuyer:
-		autobuyer.queue_free()
-	if kill_check:
-		check.queue_free()
 	if icon != null:
 		texture_rect.texture = icon
 		icon_shadow.texture = texture_rect.texture
@@ -78,46 +91,12 @@ func set_button_color(_color: Color) -> void:
 
 
 
-func remove_optionals() -> IconButton:
-	check.queue_free()
-	icon_shadow.queue_free()
-	autobuyer.queue_free()
-	return self
-
-
-func remove_check():
-	check.queue_free()
-	return self
-
-
-func remove_icon_shadow():
+func clear_optionals() -> IconButton:
 	icon_shadow.queue_free()
 	return self
 
 
-func remove_autobuyer():
-	autobuyer.queue_free()
+func clear_icon_shadow():
+	icon_shadow.queue_free()
 	return self
-
-
-func show_check() -> void:
-	check.show()
-
-
-func hide_check() -> void:
-	check.hide()
-
-
-func set_theme_standard() -> void:
-	button.theme = ResourceBag.get_resource("Standard")
-
-
-func set_theme_invis() -> void:
-	button.theme = ResourceBag.get_resource("Invis")
-
-
-
-
-func get_check() -> Node:
-	return check
 

@@ -6,13 +6,12 @@ extends MarginContainer
 
 signal pressed
 
-@onready var icon_container = %IconContainer
-@onready var texture_rect = %Icon
-@onready var button = $Button
-@onready var label = %Label
-@onready var h_box = %HBox
-
-@export var icon: Texture2D
+@export var icon: Texture2D:
+	set(val):
+		icon = val
+		if not is_node_ready():
+			await ready
+		set_icon(val)
 @export var text: String:
 	set(val):
 		text = val
@@ -23,7 +22,6 @@ signal pressed
 			label.hide()
 		else:
 			label.show()
-
 @export var color := Color.WHITE:
 	set(val):
 		color = val
@@ -31,58 +29,70 @@ signal pressed
 			await ready
 		button.modulate = val
 		texture_rect.modulate = val
+		if background:
+			background.modulate = val
 		if val == Color.BLACK:
 			label.modulate = val
-
+@export var icon_size := 24:
+	set(val):
+		icon_size = val
+		if not is_node_ready():
+			await ready
+		icon_container.custom_minimum_size = Vector2(val, val)
+		texture_rect.custom_minimum_size = Vector2(val, val)
 @export var center_content := false
-
-@export var display_node: Node
 @export var drop_down: Node
+@export var display_background := false:
+	set(val):
+		display_background = val
+		if not is_node_ready():
+			await ready
+		if display_background:
+			background.show()
+		else:
+			background.hide()
+
+@onready var icon_container = %IconContainer
+@onready var texture_rect = %Icon
+@onready var button = $Button
+@onready var label = %Label
+@onready var h_box = %HBox
+@onready var background = %Background
+
+var disabled := LoudBool.new(false)
 
 
 
 func _ready():
 	color = color
-	Settings.joypad.changed.connect(joypad_allowed_changed)
-	joypad_allowed_changed()
 	set_icon(icon)
 	if drop_down != null:
 		button.disconnect("button_down", _on_button_button_down)
 		button.disconnect("button_up", _on_button_button_up)
-		drop_down.visibility_changed.connect(drop_down_visibility_changed)
 		drop_down.hide()
-		drop_down_visibility_changed()
 	if text == "":
 		label.hide()
 	else:
 		label.show()
+	if display_background:
+		background.show()
+	else:
+		background.hide()
 	
 	if center_content:
 		h_box.alignment = HBoxContainer.ALIGNMENT_CENTER
+	else:
+		h_box.alignment = HBoxContainer.ALIGNMENT_BEGIN
+	disabled.became_true.connect(disable)
+	disabled.became_false.connect(enable)
 
 
 
 func _on_button_pressed():
 	if drop_down != null:
 		drop_down.visible = not drop_down.visible
-	elif display_node != null:
-		display_node.visible = not display_node.visible
 	
 	pressed.emit()
-
-
-func _on_button_gui_input(event):
-	gui_input.emit(event)
-
-
-
-func drop_down_visibility_changed() -> void:
-	if drop_down.visible:
-		texture_rect.rotation_degrees = 0
-		texture_rect.position.y = 0
-	else:
-		texture_rect.rotation_degrees = -90
-		texture_rect.position = Vector2(0, 24)
 
 
 func _on_button_mouse_exited():
@@ -129,18 +139,13 @@ func set_color(val: Color) -> void:
 	color = val
 
 
-func _on_focus_entered():
-	button.grab_focus()
+func enable() -> void:
+	color = Color.WHITE
+	button.disabled = false
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 
-func _on_focus_exited():
-	texture_rect.position.y = 0
-
-
-func joypad_allowed_changed() -> void:
-	if Settings.joypad.is_true():
-		focus_mode = Control.FOCUS_ALL
-		button.focus_mode = Control.FOCUS_ALL
-	else:
-		focus_mode = Control.FOCUS_NONE
-		button.focus_mode = Control.FOCUS_NONE
+func disable() -> void:
+	color = Color.BLACK
+	button.disabled = true
+	button.mouse_default_cursor_shape = Control.CURSOR_ARROW
